@@ -28,7 +28,7 @@ src/
 │
 ├── WebAPI/ # Controller API
 │
-└── WebClientApp/ # Vue+Vite+Quasar
+└── WebClientApp/ # Vue3 + Nuxt + NuxtUI
 
 ````
 
