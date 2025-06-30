@@ -1,8 +1,10 @@
 # Drink
-This is a practice project for learning full-stack web development, built with DotNet Core 9 as the backend framework and Nuxt 3 as the frontend.
+* This is a practice project for learning full-stack web development, built with DotNet Core 9 as the backend framework and Nuxt 3 as the frontend.
+* The main feature of this project is to organize group drink orders, and it includes both a frontend (client site) and a backend (admin panel).
 
 ## Requirement
-* .NET Core 9.0.2
+* .NET Core 9
+* Nuxt 3
 
 ## Project Structure
 ````
@@ -34,4 +36,4 @@ src/
 ````
 
 ## Misc
-* Inspired by [eShopOnWeb](https://github.com/dotnet-architecture/eShopOnWeb) and [book-exchange-app](https://github.com/dimatrubca/book-exchange-app) using Onion Architecture.
+* Inspired by [eShopOnWeb](https://github.com/dotnet-architecture/eShopOnWeb) and [book-exchange-app](https://github.com/dimatrubca/book-exchange-app), with the project structure based on Onion Architecture principles.
