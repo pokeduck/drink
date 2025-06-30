@@ -1,4 +1,5 @@
 # Drink
+This is a practice project for learning full-stack web development, built with DotNet Core 9 as the backend framework and Nuxt 3 as the frontend.
 
 ## Requirement
 * .NET Core 9.0.2
