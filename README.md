@@ -3,7 +3,7 @@
 * The main feature of this project is to organize group drink orders, and it includes both a frontend (client site) and a backend (admin panel).
 
 ## Requirement
-* .NET Core 9
+* .NET Core 10
 * Nuxt 3
 
 ## Project Structure
