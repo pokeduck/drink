@@ -1,0 +1,55 @@
+@page
+@model IndexModel
+@{
+  ViewData["Title"] = "使用者管理";
+  // 模擬資料
+  var users = new List<dynamic>
+  {
+    new { Id = 1, Name = "Alice", Role = "Admin" },
+    new { Id = 2, Name = "Bob", Role = "User" },
+    new { Id = 3, Name = "Charlie", Role = "User" }
+  };
+}
+
+<title hx-swap-oob="true">使用者管理 - Admin</title>
+
+<div class="container-fluid" x-data="{ search: '' }">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>使用者列表</h2>
+    <button class="btn btn-primary">新增使用者</button>
+  </div>
+
+  <div class="mb-3">
+    <input type="text" class="form-control"
+           placeholder="🔍 輸入名稱篩選..."
+           x-model="search">
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>姓名</th>
+          <th>角色</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in users)
+        {
+          <tr x-show="'@user.Name'.toLowerCase().includes(search.toLowerCase())">
+            <td>@user.Id</td>
+            <td>@user.Name</td>
+            <td><span class="badge bg-secondary">@user.Role</span></td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary">編輯</button>
+            </td>
+          </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

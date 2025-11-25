@@ -1,3 +1,11 @@
 ﻿@{
-    Layout = "_Layout";
+  // 檢查 Header 是否包含 HX-Request
+  if (Context.Request.Headers.ContainsKey("HX-Request"))
+  {
+    Layout = null; // 局部刷新，不回傳外框
+  }
+  else
+  {
+    Layout = "_Layout"; // 第一次進入或F5刷新，回傳完整頁面
+  }
 }

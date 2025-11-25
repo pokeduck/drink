@@ -1,0 +1,26 @@
+<h4 class="mb-4">Admin Panel</h4>
+<div class="list-group">
+
+  <a href="javascript:void(0);"
+     class="list-group-item list-group-item-action"
+     hx-get="/Users"
+     hx-target="#main-content"
+     hx-push-url="true">
+    👤 使用者管理
+  </a>
+
+  <a href="javascript:void(0);"
+     class="list-group-item list-group-item-action"
+     hx-get="/Products"
+     hx-target="#main-content"
+     hx-push-url="true">
+    📦 商品管理
+  </a>
+
+  <hr>
+
+  <a href="/Logout" class="list-group-item list-group-item-action text-danger">
+    登出
+  </a>
+
+</div>

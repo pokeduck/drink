@@ -1,0 +1,51 @@
+@page
+@model IndexModel
+@{ ViewData["Title"] = "商品管理"; }
+
+<title hx-swap-oob="true">商品管理 - Admin</title>
+
+<div class="container-fluid">
+  <h2>商品管理</h2>
+
+  <div class="card mb-4 p-3 bg-light">
+    <form hx-post="?handler=Create"
+          hx-target="#product-table-body"
+          hx-swap="beforeend"
+          hx-on::after-request="this.reset()">
+      <div class="input-group">
+        <input type="text" name="ProductName" class="form-control" placeholder="輸入新商品名稱..." required>
+        <button class="btn btn-success" type="submit">
+          + 快速新增
+          <span class="htmx-indicator spinner-border spinner-border-sm"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <table class="table">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>名稱</th>
+      <th>狀態</th>
+      <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="product-table-body">
+    <tr>
+      <td>101</td>
+      <td>超級顯卡</td>
+      <td>庫存足</td>
+      <td>
+        <button class="btn btn-sm btn-danger"
+                hx-post="?handler=Delete"
+                hx-swap="delete"
+                hx-target="closest tr"
+                hx-confirm="確定要刪除嗎？">
+          刪除
+        </button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
