@@ -19,14 +19,15 @@
 </aside>
 
 <main class="flex-grow-1 position-relative" style="height: 100vh; overflow: hidden;">
-
-
   <div id="main-content" class="h-100 p-4" style="overflow-y: auto;"
        x-transition:enter="transition ease-out duration-500"
        x-transition:enter-start="opacity-0 transform scale-95"
        x-transition:enter-end="opacity-100 transform scale-100">
 
     @RenderBody()
+  </div>
+  <div id="global-loading" class="loading-overlay" style="display:none;">
+    <img src="/images/bars.svg" alt="Loading..." class="loading-spinner">
   </div>
 
 </main>
