@@ -1,13 +1,44 @@
 ﻿document.body.addEventListener('htmx:beforeRequest', function (evt) {
-
   console.log('beforeRequest');
-  showLoading();
+  // showLoading();
 });
 
 document.body.addEventListener('htmx:afterRequest', function (evt) {
+  const link = evt.target.closest('.app-sidebar a.nav-link');
+    
 
+  // 1. collapse 所有已展開的 treeview
+  document.querySelectorAll('.nav-item.menu-open').forEach(item => {
+    item.classList.remove('menu-open');
+    const submenu = item.querySelector('.nav-treeview');
+    if (submenu) submenu.style.display = 'none';
+  });
+
+  // 2. 清除所有 active
+  document.querySelectorAll('.app-sidebar a.nav-link.active')
+    .forEach(el => el.classList.remove('active'));
+
+  if (!link) return;
+
+  // 3. 設定目前的 link 為 active
+  link.classList.add('active');
+
+  // 4. 讓它的所有父層 treeview 展開
+  let parent = link.closest('.nav-item');
+  while (parent) {
+    const tree = parent.closest('.nav-item');
+    if (!tree) break;
+
+    const submenu = tree.querySelector('.nav-treeview');
+    if (submenu) {
+      tree.classList.add('menu-open');
+      submenu.style.display = 'block';
+    }
+
+    parent = tree.parentElement.closest('.nav-item');
+  }
   console.log('afterRequest');
-  hideLoading();
+  // hideLoading();
 });
 
 let loadingTimer = null;
@@ -62,3 +93,41 @@ function hideLoading() {
   // hide 並不會立即隱藏，而是交給 tryHideLoading 判斷是否已達 1 秒
   tryHideLoading();
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+
+  // 取得目前的 path（例如 /products/index）
+  const currentPath = window.location.pathname.toLowerCase();
+
+  // 找到 sidebar 裡面 hx-get 等於該 path 的 <a>
+  const link = document.querySelector(
+    `.app-sidebar a.nav-link[hx-get="${currentPath}"]`
+  );
+
+  if (!link) return;
+
+  // 如果是 treeview toggle，那不 active
+  if (link.querySelector('.nav-arrow')) return;
+
+  // 1. 清除所有 active
+  document.querySelectorAll('.app-sidebar a.nav-link.active')
+    .forEach(el => el.classList.remove('active'));
+
+  // 2. 設定 active
+  link.classList.add('active');
+
+  // 3. 展開所有父層 treeview
+  let parent = link.closest('.nav-item');
+  while (parent) {
+    const tree = parent.closest('.nav-item');
+    if (!tree) break;
+
+    const submenu = tree.querySelector('.nav-treeview');
+    if (submenu) {
+      tree.classList.add('menu-open');
+      submenu.style.display = 'block';
+    }
+
+    parent = tree.parentElement.closest('.nav-item');
+  }
+});

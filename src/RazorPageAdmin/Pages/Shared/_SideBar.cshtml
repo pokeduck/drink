@@ -1,26 +1,180 @@
-<h4 class="mb-4">Admin Panel</h4>
-<div class="list-group">
+@{
+  var path = Context.Request.Path.ToString().ToLower();
+  Console.WriteLine(path);
+}
+<aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+  <div class="sidebar-brand">
+    <a href="javascript:void(0);" class="brand-link" hx-get="/" hx-target="#app-main" hx-push-url="true">
+      <img
+        src="~/images/logo.png"
+        alt="AdminLTE Logo"
+        class="brand-image opacity-75 shadow"
+      />
+      <span class="brand-text fw-light">DRINK</span>
+    </a>
+  </div>
+  <div class="sidebar-wrapper">
+    <nav class="mt-2">
+      <ul
+        class="nav sidebar-menu flex-column"
+        data-lte-toggle="treeview"
+        role="navigation"
+        aria-label="Main navigation"
+        data-accordion="false"
+        id="navigation">
+        <li class="nav-item">
+          <a href="javascript:void(0);" class="nav-link" hx-get="/" hx-target="#app-main" hx-push-url="true">
+            <i class="nav-icon bi bi-palette"></i>
+            <p>Dashboard</p>
+          </a>
+        </li>
 
-  <a href="javascript:void(0);"
-     class="list-group-item list-group-item-action"
-     hx-get="/Users"
-     hx-target="#main-content"
-     hx-push-url="true">
-    👤 使用者管理
-  </a>
+        <li class="nav-item">
+          <a href="javascript:void(0);" class="nav-link">
+            <i class="nav-icon bi bi-speedometer"></i>
+            <p>
+              會員
+              <i class="nav-arrow bi bi-chevron-right"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="javascript:void(0);" class="nav-link" hx-get="/account/manage" hx-target="#app-main" hx-push-url="true">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>會員管理</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="javascript:void(0);" class="nav-link" hx-get="/account/email" hx-target="#app-main" hx-push-url="true">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>會員信箱管理</p>
+              </a>
+            </li>
+          </ul>
+        </li>
 
-  <a href="javascript:void(0);"
-     class="list-group-item list-group-item-action"
-     hx-get="/Products"
-     hx-target="#main-content"
-     hx-push-url="true">
-    📦 商品管理
-  </a>
 
-  <hr>
+        <li class="nav-item">
+          <a href="javascript:void(0);" class="nav-link">
+            <i class="nav-icon bi bi-speedometer"></i>
+            <p>
+              商品
+              <i class="nav-arrow bi bi-chevron-right"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="javascript:void(0);" class="nav-link" hx-get="/products/category" hx-target="#app-main" hx-push-url="true">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>商品分類管理</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="javascript:void(0);" class="nav-link" hx-get="/products/index" hx-target="#app-main" hx-push-url="true">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>商品品項管理</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="javascript:void(0);" class="nav-link" hx-get="/products/tag" hx-target="#app-main" hx-push-url="true">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>商品標籤管理</p>
+              </a>
+            </li>
+          </ul>
+        </li>
 
-  <a href="/Logout" class="list-group-item list-group-item-action text-danger">
-    登出
-  </a>
+        <li class="nav-header">MULTI LEVEL EXAMPLE</li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="nav-icon bi bi-circle-fill"></i>
+            <p>Level 1</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="nav-icon bi bi-circle-fill"></i>
+            <p>
+              Level 1
+              <i class="nav-arrow bi bi-chevron-right"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>Level 2</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>
+                  Level 2
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="#" class="nav-link">
+                    <i class="nav-icon bi bi-circle"></i>
+                    <p>
+                      Level 3
+                      <i class="nav-arrow bi  bi-chevron-right"></i>
+                    </p>
+                  </a>
+                  <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                      <a href="#" class="nav-link">
+                        <i class="nav-icon bi bi-record-circle-fill"></i>
+                        <p>Level 4</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="#" class="nav-link">
+                        <i class="nav-icon bi bi-record-circle-fill"></i>
+                        <p>Level 4</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="#" class="nav-link">
+                        <i class="nav-icon bi bi-record-circle-fill"></i>
+                        <p>Level 4</p>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link">
+                    <i class="nav-icon bi bi-record-circle-fill"></i>
+                    <p>Level 3</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link">
+                    <i class="nav-icon bi bi-record-circle-fill"></i>
+                    <p>Level 3</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>Level 2</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="nav-icon bi bi-circle-fill"></i>
+            <p>Level 1</p>
+          </a>
+        </li>
 
-</div>
+
+      </ul>
+    </nav>
+  </div>
+</aside>
