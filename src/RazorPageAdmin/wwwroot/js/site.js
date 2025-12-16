@@ -1,22 +1,20 @@
-﻿document.body.addEventListener('htmx:beforeRequest', function (evt) {
+﻿document.addEventListener('htmx:beforeRequest', function (evt) {
   console.log('beforeRequest');
   // showLoading();
 });
 
-document.body.addEventListener('htmx:afterRequest', function (evt) {
+document.addEventListener('htmx:afterRequest', function (evt) {
   const link = evt.target.closest('.app-sidebar a.nav-link');
-    
 
   // 1. collapse 所有已展開的 treeview
-  document.querySelectorAll('.nav-item.menu-open').forEach(item => {
+  document.querySelectorAll('.nav-item.menu-open').forEach((item) => {
     item.classList.remove('menu-open');
     const submenu = item.querySelector('.nav-treeview');
     if (submenu) submenu.style.display = 'none';
   });
 
   // 2. 清除所有 active
-  document.querySelectorAll('.app-sidebar a.nav-link.active')
-    .forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.app-sidebar a.nav-link.active').forEach((el) => el.classList.remove('active'));
 
   if (!link) return;
 
@@ -46,13 +44,13 @@ let lastStartTime = 0;
 let isLoadingVisible = false;
 
 function showLoading() {
-  const overlay = document.getElementById("global-loading");
+  const overlay = document.getElementById('global-loading');
 
   const now = Date.now();
   lastStartTime = now;
 
   if (!isLoadingVisible) {
-    overlay.style.display = "flex";
+    overlay.style.display = 'flex';
     isLoadingVisible = true;
   }
 
@@ -68,7 +66,7 @@ function showLoading() {
 }
 
 function tryHideLoading() {
-  const overlay = document.getElementById("global-loading");
+  const overlay = document.getElementById('global-loading');
 
   const elapsed = Date.now() - lastStartTime; // 計算距離最後一次 show 的時間
 
@@ -84,7 +82,7 @@ function tryHideLoading() {
   }
 
   // 超過 1 秒 → 真正隱藏 overlay
-  overlay.style.display = "none";
+  overlay.style.display = 'none';
   isLoadingVisible = false;
   loadingTimer = null;
 }
@@ -95,14 +93,15 @@ function hideLoading() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  // 串接 ui:init event
+  document.dispatchEvent(new CustomEvent('ui:init', { detail: { root: document } }));
+  console.log('set event DOMContentLoaded');
 
   // 取得目前的 path（例如 /products/index）
   const currentPath = window.location.pathname.toLowerCase();
 
   // 找到 sidebar 裡面 hx-get 等於該 path 的 <a>
-  const link = document.querySelector(
-    `.app-sidebar a.nav-link[hx-get="${currentPath}"]`
-  );
+  const link = document.querySelector(`.app-sidebar a.nav-link[hx-get="${currentPath}"]`);
 
   if (!link) return;
 
@@ -110,8 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (link.querySelector('.nav-arrow')) return;
 
   // 1. 清除所有 active
-  document.querySelectorAll('.app-sidebar a.nav-link.active')
-    .forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.app-sidebar a.nav-link.active').forEach((el) => el.classList.remove('active'));
 
   // 2. 設定 active
   link.classList.add('active');
@@ -130,4 +128,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     parent = tree.parentElement.closest('.nav-item');
   }
+});
+
+// 1. 監聽 htmx
+document.addEventListener('htmx:afterSwap', (evt) => {
+  // 建立一個自訂事件
+  console.log('set event htmx:afterSwap');
+  const event = new CustomEvent('ui:init', {
+    detail: { root: evt.target },
+  });
+  document.dispatchEvent(event);
 });
