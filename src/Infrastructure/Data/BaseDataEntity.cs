@@ -9,3 +9,11 @@ public class BaseDataEntity
   [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
   public virtual int Id { get; set; }
 }
+public interface ICreatedEntity
+{
+  public DateTime CreatedAt { get; set; }
+}
+public interface IUpdatedEntity
+{
+  public DateTime UpdatedAt { get; set; }
+}

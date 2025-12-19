@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Drink.Infrastructure.Data;
 
-public class SideBar : BaseDataEntity
+public sealed class SideBar : BaseDataEntity, ICreatedEntity, IUpdatedEntity
 {
   /// <summary>
   /// 顯示名稱
@@ -35,6 +35,16 @@ public class SideBar : BaseDataEntity
   /// 是否啟用（不啟用則不顯示）
   /// </summary>
   public bool IsActive { get; set; } = true;
+
+  /// <summary>
+  /// 建立時間
+  /// </summary>
+  public DateTime CreatedAt { get; set; }
+
+  /// <summary>
+  /// 最後更新時間
+  /// </summary>
+  public DateTime UpdatedAt { get; set; }
 
   // ===== 導覽屬性 =====
 
