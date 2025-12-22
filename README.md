@@ -12,7 +12,8 @@
 src/
 ├── Application/
 │   ├── Extensions/
-│   └── Mapping/
+│   ├── DTOs/
+│   └── Services/
 │
 ├── Domain/
 │   ├── Entities/
@@ -29,9 +30,16 @@ src/
 │   └── Repositories/
 │
 ├── RazorPageAdmin/ # Razor Page
-│
+│   ├── Pages/
+│   ├── ViewModels/
+|   └── Mapping/
+|
 ├── WebAPI/ # Controller API
-│
+│   ├── Controllers/
+│   ├── Requests/
+│   ├── Responses/
+|   └── Mapping/
+|
 └── WebClientApp/ # Vue3 + Nuxt + NuxtUI
 
 ````
