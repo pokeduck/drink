@@ -1,0 +1,10 @@
+﻿{
+  "extends": "../../internal/tsconfig/base.json", // 直接指路，簡單粗暴
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  }
+}

@@ -1,8 +1,18 @@
-{
+﻿{
+  "name": "drink3-solution",
+  "private": true,
+  "version": "1.0.0",
   "devDependencies": {
-    "eslint": "^9.39.2",
-    "eslint-plugin-prettier": "^5.5.4",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.49.0"
-  }
+    "concurrently": "^8.2.0"
+  },
+  "scripts": {
+    "prepare": "pnpm -C web install",
+    "dev:api": "dotnet watch --project api/yyy/yyy.csproj",
+    "dev:web": "pnpm -C web dev",
+    "dev": "concurrently -n \"API,WEB\" -c \"magenta,cyan\" \"npm run dev:api\" \"npm run dev:web\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.30.1"
 }

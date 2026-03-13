@@ -1,4 +1,4 @@
-root = true
+﻿root = true
 
 [*]
 end_of_line = lf
@@ -9,7 +9,7 @@ indent_size = 2
 max_line_length = off
 
 [*.{cs,csx,cshtml,vb,vbx,txt,html,htm,css,js,json,yml,yaml,xml,config,ini,sh,ps1,psm1,psd1,ps1xml,psrc1xml,csproj,sln,gitignore,gitattributes,editorconfig,md,markdown,asciidoc,adoc,asc,ipynb,py}]
-charset = utf-8-bom
+charset = utf-8
 
 
 # Microsoft .NET properties
