@@ -3,31 +3,35 @@ import { createResolver } from "@nuxt/kit";
 const { resolve } = createResolver(import.meta.url);
 
 export default defineNuxtConfig({
-  // 1. 讓 TypeScript 知道如何處理你的共享包
+  modules: ["@element-plus/nuxt", "@pinia/nuxt"],
+
   typescript: {
-    // 這裡相當於在 tsconfig.json 裡寫內容
     tsConfig: {
-      extends: "../../internal/tsconfig/base.json", // 繼承你的基礎設定 (方法 4)
+      extends: resolve("../../internal/tsconfig/base.json"),
       compilerOptions: {
         paths: {
-          "@app/models": ["../../internal/models/src"],
-          "@app/core": ["../../internal/core/src"],
+          "@app/models": [resolve("../../internal/models/src")],
+          "@app/core": [resolve("../../internal/core/src")],
         },
       },
     },
   },
 
-  // 2. 讓 Vite/Nitro 執行時能找到檔案 (這是給運行時用的)
   alias: {
-    "@app/models": "../../internal/models/src",
-    "@app/core": "../../internal/core/src",
+    "@app/models": resolve("../../internal/models/src"),
+    "@app/core": resolve("../../internal/core/src"),
   },
 
-  // 3. 務必讓 Nuxt 轉譯這些外部包，否則遇到 .ts 檔案可能會報錯
   build: {
     transpile: ["@app/models", "@app/core"],
   },
   devServer: {
     port: 3002,
+  },
+
+  runtimeConfig: {
+    public: {
+      apiBase: "http://localhost:3000/api",
+    },
   },
 });

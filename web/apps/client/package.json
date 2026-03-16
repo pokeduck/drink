@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "@drink/client",
   "private": true,
   "type": "module",
   "scripts": {

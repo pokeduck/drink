@@ -9,4 +9,5 @@ export interface DrinkOrder {
   name: string;
   status: DrinkStatus;
   price: number;
+  createdAt: string;
 }
