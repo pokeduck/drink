@@ -12,3 +12,7 @@ export const getStatusLabel = (status: DrinkStatus): string => {
 export const formatPrice = (price: number) => `NT$ ${price}`;
 
 export const convertDate = (date: string) => new Date(date).toLocaleDateString();
+
+export const testFunction = () => {
+  console.log("This is a test function.");
+};
