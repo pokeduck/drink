@@ -1,6 +1,6 @@
 # Drink
 
-![.NET Build](https://github.com/pokeduck/drink/actions/workflows/dotnet.yml/badge.svg)
+![.NET Build](https://github.com/pokeduck/drink/actions/workflows/api.yml/badge.svg)
 ![Web Build](https://github.com/pokeduck/drink/actions/workflows/web.yml/badge.svg)
 
 * This is a practice project for learning full-stack web development, built with .NET 10 as the backend framework and Nuxt 4 as the frontend.
