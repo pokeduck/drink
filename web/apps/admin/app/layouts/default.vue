@@ -66,7 +66,7 @@ nuxtApp.hook("app:error", () => {
       <!-- 頂部導覽列 (固定高度) -->
       <el-header class="admin-header" height="60px">
         <div class="header-left">
-          <el-link :underline="false" href="/" class="logo-link">
+          <el-link underline="never" href="/" class="logo-link">
             <div class="logo-wrapper">
               <el-icon :size="24" class="logo-icon">
                 <ColdDrink />
@@ -74,7 +74,7 @@ nuxtApp.hook("app:error", () => {
               <span class="logo-text">DRINK ADMIN</span>
             </div>
           </el-link>
-          <el-button type="text" :icon="isCollapsed ? 'Expand' : 'Fold'" @click="menuStore.toggleCollapse" class="collapse-btn" />
+          <el-link underline="never" :icon="isCollapsed ? 'Expand' : 'Fold'" @click="menuStore.toggleCollapse" class="collapse-btn" />
         </div>
         <div class="header-right">
           <el-avatar :size="32" :src="defaultAvatar" />
