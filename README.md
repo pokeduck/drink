@@ -1,48 +1,49 @@
 # Drink
-* This is a practice project for learning full-stack web development, built with DotNet Core 10 as the backend framework and Nuxt 3 as the frontend.
-* The main feature of this project is to organize group drink orders, and it includes both a frontend (client site) and a backend (admin panel).
-* The admin panel UI template uses [AdminLTE v4](https://github.com/ColorlibHQ/AdminLTE).
 
-## Requirement
-* .NET Core 10
-* Nuxt 3
+* This is a practice project for learning full-stack web development, built with .NET 10 as the backend framework and Nuxt 4 as the frontend.
+* The main feature of this project is to organize group drink orders, and it includes both a frontend (client site) and a backend (admin panel).
+
+## Tech Stack
+
+**Frontend (Monorepo — pnpm + Turborepo)**
+- Client: Nuxt 4 + Nuxt UI
+- Admin: Nuxt 4 + Element Plus
+- Shared: `web/internal` (utilities, shared interfaces)
+
+**Backend**
+- .NET 10, ASP.NET Core Web API
+- Entity Framework Core 10
+- PostgreSQL
+- JWT Authentication
+
+## Requirements
+
+* .NET 10
+* Node.js 22+
+* pnpm 10+
+* PostgreSQL
 
 ## Project Structure
-````
-src/
-├── Application/
-│   ├── Extensions/
-│   ├── DTOs/
-│   └── Services/
-│
-├── Domain/
-│   ├── Entities/
-│   ├── ValueObjects/
-│   ├── Enums/
-│   └── Interfaces/
-│
-├── Infrastructure/
-│   ├── Data/
-│   ├── Helpers/
-│   ├── Services/
-│   ├── Settings/
-│   ├── Migrations/
-│   └── Repositories/
-│
-├── RazorPageAdmin/ # Razor Page
-│   ├── Pages/
-│   ├── ViewModels/
-|   └── Mapping/
-|
-├── WebAPI/ # Controller API
-│   ├── Controllers/
-│   ├── Requests/
-│   ├── Responses/
-|   └── Mapping/
-|
-└── WebClientApp/ # Vue3 + Nuxt + NuxtUI
 
-````
+```
+drink/
+├── api/
+│   ├── Domain/               # Entities, Enums, Interfaces
+│   ├── Application/          # Services, Requests, Responses, Mappings
+│   ├── Infrastructure/       # DbContext, Migrations, EF Extensions
+│   ├── User.API/             # User-facing API
+│   ├── Admin.API/            # Admin-facing API
+│   └── Migrator/             # Migration runner
+│
+├── web/
+│   ├── apps/
+│   │   ├── client/           # Nuxt 4 + Nuxt UI (frontend)
+│   │   └── admin/            # Nuxt 4 + Element Plus (admin panel)
+│   └── internal/             # Shared utilities and interfaces
+│
+└── specs/                    # Project specifications
+```
 
 ## Misc
-* Inspired by [eShopOnWeb](https://github.com/dotnet-architecture/eShopOnWeb) and [book-exchange-app](https://github.com/dimatrubca/book-exchange-app), with the project structure based on Onion Architecture principles.
+
+* Inspired by [eShopOnWeb](https://github.com/dotnet-architecture/eShopOnWeb), with the project structure based on Onion Architecture principles.
