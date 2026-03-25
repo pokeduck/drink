@@ -13,6 +13,7 @@
     "@app/core": "workspace:*",
     "@app/models": "workspace:*",
     "@app/tsconfig": "workspace:*",
+
     "@element-plus/nuxt": "^1.1.5",
     "@pinia/nuxt": "^0.11.3",
     "element-plus": "^2.13.5",

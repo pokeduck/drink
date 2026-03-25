@@ -21,9 +21,9 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.15.2",
+    "@app/tsconfig": "workspace:*",
     "eslint": "^10.0.3",
     "typescript": "^5.9.3",
     "vue-tsc": "^3.2.5"
-  },
-  "packageManager": "pnpm@10.30.3"
+  }
 }

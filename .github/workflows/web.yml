@@ -21,6 +21,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: "10.30.1"
+          package_json_file: "web/package.json"
 
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -33,6 +34,10 @@ jobs:
         working-directory: web
         run: pnpm install --frozen-lockfile
 
-      - name: Build
+      - name: Build admin
         working-directory: web
-        run: pnpm build
+        run: pnpm --filter @drink/admin build
+
+      - name: Build client
+        working-directory: web
+        run: pnpm --filter @drink/client build

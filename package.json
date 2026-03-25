@@ -7,6 +7,9 @@
   },
   "scripts": {
     "prepare": "pnpm -C web install",
+    "build:web": "pnpm -C web build",
+    "build:admin": "pnpm -C web --filter @drink/admin build",
+    "build:client": "pnpm -C web --filter @drink/client build",
     "dev:api": "dotnet watch --project api/yyy/yyy.csproj",
     "dev:web": "pnpm -C web dev",
     "dev": "concurrently -n \"API,WEB\" -c \"magenta,cyan\" \"npm run dev:api\" \"npm run dev:web\""
