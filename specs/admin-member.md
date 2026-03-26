@@ -2,8 +2,8 @@
 
 ## Objective
 - 後台會員分為 Admin 和 Staff 兩種角色
-- Admin 為系統預設帳號，擁有全部權限，不可透過後台建立或刪除
-- Staff 由 Admin 建立，透過 Role 控制可存取的 Menu 和 CRUD 權限
+- Admin 為系統預設帳號，擁有全部 Menu 存取權，不可透過後台建立或刪除
+- Staff 由 Admin 建立，透過 Role 控制可存取的 Menu 和 CRUD
 - Admin 可將任意 Staff 的 Role 升級為 Admin
 
 ---
@@ -18,7 +18,10 @@
 | PasswordHash | string | bcrypt 雜湊密碼 |
 | RoleId | int | FK → AdminRole |
 | IsActive | bool | 帳號是否啟用 |
-| CreatedAt | DateTime | 建立時間 |
+| CreatedAt | DateTime | 建立時間（ICreateEntity） |
+| Creator | int | 建立者 ID（ICreateEntity） |
+| UpdatedAt | DateTime | 更新時間（IUpdateEntity） |
+| Updater | int | 更新者 ID（IUpdateEntity） |
 
 ### AdminRole
 | 欄位 | 型別 | 說明 |
@@ -26,37 +29,34 @@
 | Id | int | PK，自動遞增 |
 | Name | string(50) | 角色名稱（Admin / 自訂） |
 | IsSystem | bool | true = Admin 系統角色，不可刪除修改 |
-| CreatedAt | DateTime | 建立時間 |
+| CreatedAt | DateTime | 建立時間（ICreateEntity） |
+| Creator | int | 建立者 ID（ICreateEntity） |
+| UpdatedAt | DateTime | 更新時間（IUpdateEntity） |
+| Updater | int | 更新者 ID（IUpdateEntity） |
 
-### AdminRolePermission
+### AdminMenuRole
 | 欄位 | 型別 | 說明 |
 |------|------|------|
 | Id | int | PK，自動遞增 |
 | RoleId | int | FK → AdminRole |
-| Menu | AdminMenu (enum) | 對應的後台 Menu |
-| CanRead | bool | 讀取權限 |
-| CanCreate | bool | 新增權限 |
-| CanUpdate | bool | 修改權限 |
-| CanDelete | bool | 刪除權限 |
+| MenuId | int | FK → AdminMenu.Id |
+| CanRead | bool | 可讀取 |
+| CanCreate | bool | 可新增 |
+| CanUpdate | bool | 可修改 |
+| CanDelete | bool | 可刪除 |
+| CreatedAt | DateTime | 建立時間（ICreateEntity） |
+| Creator | int | 建立者 ID（ICreateEntity） |
+| UpdatedAt | DateTime | 更新時間（IUpdateEntity） |
+| Updater | int | 更新者 ID（IUpdateEntity） |
 
-### AdminMenu (Enum)
-```csharp
-public enum AdminMenu
-{
-    AdminMember = 1,    // 後台會員管理
-    UserMember = 2,     // 前台會員管理
-    Store = 3,          // 店家管理
-    Order = 4,          // 訂單管理
-    GlobalOption = 5,   // Global 選項管理
-    SystemSetting = 6   // 系統設定
-}
-```
+> AdminMenu 為獨立資料表（樹狀結構），詳見 [admin-role.md](./admin-role.md)
 
 ---
 
 ## Relationships
 - `AdminUser` → `AdminRole`：多對一（一個 Staff 只能有一個 Role）
-- `AdminRole` → `AdminRolePermission`：一對多（一個 Role 有多個 Menu 權限）
+- `AdminRole` → `AdminMenuRole`：一對多（一個 Role 對應多個 Menu CRUD 設定）
+- `AdminMenuRole` → `AdminMenu`：多對一（MenuId → AdminMenu.Id）
 
 ---
 
@@ -74,14 +74,14 @@ public enum AdminMenu
 - 一個 Staff 只能有一個 Role
 
 ### Role 管理
-- Admin Role（IsSystem = true）預設存在，不可刪除或修改權限
+- Admin Role（IsSystem = true）預設存在，不可刪除或修改
 - Admin 可自訂建立新 Role（IsSystem = false）
 - 新建立的 Role 預設所有 Menu 的 CRUD 全部關閉
-- Admin 可修改自訂 Role 的權限
+- Admin 可修改自訂 Role 的 Menu CRUD 設定
 
-### 升級權限
+### 升級角色
 - Admin 可將任意 Staff 的 RoleId 改為 Admin Role Id
-- 升級後該 Staff 擁有全部權限
+- 升級後該 Staff 擁有全部 Menu 存取權
 
 ---
 
@@ -89,7 +89,7 @@ public enum AdminMenu
 
 ```csharp
 // Entity
-public class AdminUser : BaseDataEntity
+public class AdminUser : BaseDataEntity, ICreateEntity, IUpdateEntity
 {
     [StringLength(50)]
     public string Username { get; set; }
@@ -101,30 +101,41 @@ public class AdminUser : BaseDataEntity
 
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
+    public int Creator { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public int Updater { get; set; }
 }
 
-public class AdminRole : BaseDataEntity
+public class AdminRole : BaseDataEntity, ICreateEntity, IUpdateEntity
 {
     [StringLength(50)]
     public string Name { get; set; }
 
     public bool IsSystem { get; set; }
     public DateTime CreatedAt { get; set; }
+    public int Creator { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public int Updater { get; set; }
 
-    public ICollection<AdminRolePermission> Permissions { get; set; }
+    public ICollection<AdminMenuRole> MenuRoles { get; set; }
 }
 
-public class AdminRolePermission : BaseDataEntity
+public class AdminMenuRole : BaseDataEntity, ICreateEntity, IUpdateEntity
 {
     public int RoleId { get; set; }
     public AdminRole Role { get; set; }
 
+    public int MenuId { get; set; }
     public AdminMenu Menu { get; set; }
 
     public bool CanRead { get; set; }
     public bool CanCreate { get; set; }
     public bool CanUpdate { get; set; }
     public bool CanDelete { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public int Creator { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public int Updater { get; set; }
 }
 ```
 
@@ -158,7 +169,7 @@ new AdminUser
 - 密碼必須 bcrypt 雜湊存儲
 
 ⚠️ Ask First:
-- 修改 AdminMenu enum（影響現有權限資料）
+- 修改 AdminMenu 資料表結構（影響現有角色資料）
 - 修改 Seed Data（影響初始化邏輯）
 
 🚫 Never:
