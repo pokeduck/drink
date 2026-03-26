@@ -50,19 +50,104 @@
 - JWT Authentication
 
 ## Commands
-- Build: `dotnet build`
-- Run: `dotnet run --project api/User.API`
-- Test: `dotnet test`
-- Migration Add: `dotnet ef migrations add <Name> --project api/Infrastructure --startup-project api/Migrator`
-- Migration Run: `dotnet ef database update --project api/Infrastructure --startup-project api/Migrator`
+
+### Root（Monorepo）
+- 全部開發：`pnpm dev`（concurrently 啟動 API + Web）
+- API 開發：`pnpm dev:api`
+- Web 開發：`pnpm dev:web`
+- 全部建置：`pnpm build:web`
+- Admin 建置：`pnpm build:admin`
+- Client 建置：`pnpm build:client`
+- 安裝前端依賴：`pnpm prepare`
+
+### 後端 API
+- Build：`dotnet build`
+- Run：`dotnet run --project api/User.API`
+- Test：`dotnet test`
+- Migration Add：`dotnet ef migrations add <Name> --project api/Infrastructure --startup-project api/Migrator`
+- Migration Run：`dotnet ef database update --project api/Infrastructure --startup-project api/Migrator`
+
+### 前端 Client
+- Lint：`pnpm -C web --filter @drink/client lint`
+- Typecheck：`pnpm -C web --filter @drink/client typecheck`
+
+### 前端 Admin
+- Preview：`pnpm -C web --filter @drink/admin preview`
+
+## Testing
+
+### 測試範圍
+
+| 層級 | 測試類型 | 框架 | 說明 |
+|------|---------|------|------|
+| 前台前端 (Client) | E2E Test | Playwright | 核心業務流程端到端驗證 |
+| 前台後端 (User.API) | Unit Test | xUnit | Service 層單元測試 |
+| 後台前端 (Admin) | — | — | 不測試 |
+| 後台後端 (Admin.API) | — | — | 不測試 |
+
+### 前台前端 E2E Test
+
+- 測試檔位置：`web/apps/client/e2e/`
+- 執行指令：`pnpm --filter client test:e2e`
+- 核心測試情境：
+  1. 建立團購群（選擇商家、設定截止時間）
+  2. 加入一筆品項（選擇飲料、甜度、冰塊、加料）
+  3. 時間到結算
+  4. 匯出 Excel
+
+### 前台後端 Unit Test
+
+- 測試檔位置：`api/User.API.Tests/`
+- 執行指令：`dotnet test --project api/User.API.Tests`
+- 測試目標：Service 層業務邏輯（判斷邏輯，非純 CRUD）
+- Mock 外部依賴（DB、第三方 API）
+- 重點測試項目：
+  - 團購截止時間判斷（是否過期、能否加入）
+  - 結算金額計算
+  - 訂單狀態流轉（進行中 → 截止 → 已送達 → 已結束，不允許跳躍）
+  - Refresh Token Rotation（舊 token 作廢、重複使用偵測）
+  - Google OAuth domain 驗證邏輯
+- 不需測試：純 CRUD、Controller 層、EF Core mapping
+
+### 測試策略
+
+| | Unit Test | E2E Test |
+|---|---|---|
+| 數量 | 多，每個邏輯分支一個 | 少，只測核心 happy path |
+| 速度 | 快（毫秒級） | 慢（秒級，需開瀏覽器） |
+| 何時跑 | 開發中隨時跑 | PR 合併前、部署前 |
+| 開發順序 | 邊開發邊寫 | 功能完成後再補 |
+
+> **注意：** 測試在前台核心功能（團購、訂單）開發完成後再補，目前先定義策略。
+
+---
 
 ## Project Structure
+
+### 後端 API
 - `api/Domain/` – Entities, Enums, Interfaces
 - `api/Application/` – Services, Requests, Responses, Mappings
 - `api/Infrastructure/` – DbContext, Migrations, EF Extensions
 - `api/User.API/` – User-facing API controllers
 - `api/Admin.API/` – Admin-facing API controllers
 - `api/Migrator/` – Migration runner
+
+### 前端 Web（pnpm Monorepo）
+- `web/apps/admin/` – 後台（Nuxt 4 + Element Plus）
+  - `app/pages/` – 頁面
+  - `app/components/` – 元件
+  - `app/composable/` – 組合式函數
+  - `app/stores/` – Pinia Store
+  - `app/layouts/` – 佈局
+  - `app/plugins/` – 插件
+  - `app/assets/` – 靜態資源
+- `web/apps/client/` – 前台（Nuxt 4 + Nuxt UI）
+  - `app/pages/` – 頁面
+  - `app/components/` – 元件
+  - `app/assets/` – 靜態資源
+- `web/internal/core/` – 共用工具函數（`@app/core`）
+- `web/internal/models/` – 共用 Response Interface（`@app/models`）
+- `web/internal/tsconfig/` – 共用 TypeScript 設定（`@app/tsconfig`）
 
 ## Code Style
 
@@ -236,7 +321,10 @@ GET /api/admin/users?page=1&page_size=20&sort_by=created_at&sort_order=desc&keyw
 - Entity 必須繼承 `BaseDataEntity`
 - Service 必須繼承 `BaseService`
 - Controller 必須繼承 `BaseController`
-- 密碼必須雜湊存儲，絕不明文
+- 密碼必須以 Argon2id 雜湊存儲（Salt + Pepper），絕不明文
+- Salt 由 Argon2id 自動生成（per-user，存於 hash 內）
+- Pepper 為全域秘密，存於 appsettings / 環境變數，不進版控
+- 雜湊流程：`Argon2id(password + pepper, salt)`
 - 新增 Entity 後必須建立 Migration
 - 資料表嚴格遵守第三正規化（3NF）
 - API 回傳格式統一使用 `{ data, message, code }`

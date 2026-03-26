@@ -501,6 +501,25 @@ new AdminMenu { Id = 15, ParentId = 11,   Name = "加料",     Icon = "Plus",   
 
 ---
 
+## Success Criteria
+
+- [ ] `GET /api/admin/menus/me` 依 Token RoleId 回傳該 Role 可存取的 Menu 樹狀結構，不含 CRUD 欄位
+- [ ] 父節點底下所有子節點都無存取權時，不回傳該父節點
+- [ ] `GET /api/admin/roles` 回傳所有 Role，含 IsSystem 標記與 Staff 數量
+- [ ] `GET /api/admin/roles/{roleId}` 回傳該 Role 的所有 Menu CRUD 設定
+- [ ] `POST /api/admin/roles` 建立 Role 並同時設定 Menu CRUD，未提供的 Menu 預設全 false
+- [ ] `PUT /api/admin/roles/{roleId}` 整批覆蓋 Menu CRUD，不支援 partial update
+- [ ] IsSystem = true 的 Role 不可 PUT / DELETE，回傳 403
+- [ ] `DELETE /api/admin/roles/{roleId}` 有 Staff 時必須提供 reassign_role_id，否則回傳 400
+- [ ] Role 名稱唯一，重複回傳 409
+- [ ] RoleMiddleware 每次 API 請求即時查 DB，無快取
+- [ ] Controller 透過 `[RequireRole(MenuId, CrudAction)]` 標記，Middleware 比對後無權回傳 403
+- [ ] AdminMenu 為自關聯樹狀結構，僅葉節點設定 CRUD，群組節點不設定
+- [ ] 前端 Sidebar 收到 menus/me 回傳即全部渲染，不做額外判斷
+- [ ] 前端 Role 編輯頁以 Menu CRUD 矩陣表格呈現，IsSystem Role 全部 disabled
+
+---
+
 ## Boundaries
 
 ✅ Always:
