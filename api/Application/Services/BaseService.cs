@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using AutoMapper;
 using Drink.Application.Responses;
 using Drink.Domain.Entities;
 using Drink.Infrastructure.Repositories;
@@ -10,11 +11,13 @@ namespace Drink.Application.Services;
 public abstract class BaseService
 {
   protected readonly IServiceProvider ServiceProvider;
+  protected readonly IMapper Mapper;
   private readonly IHttpContextAccessor _httpContextAccessor;
 
   protected BaseService(IServiceProvider serviceProvider)
   {
     ServiceProvider = serviceProvider;
+    Mapper = serviceProvider.GetRequiredService<IMapper>();
     _httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
   }
 
