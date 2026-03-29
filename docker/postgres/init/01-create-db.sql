@@ -1,0 +1,2 @@
+SELECT 'CREATE DATABASE drink ICU_LOCALE = ''zh-TW'' LOCALE_PROVIDER = icu TEMPLATE template0 ENCODING = ''UTF8'''
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'drink')\gexec
