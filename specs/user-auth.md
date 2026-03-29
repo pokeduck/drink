@@ -40,6 +40,7 @@ public enum UserStatus
 ```csharp
 public enum NotificationType
 {
+    None = 0,       // 不接收通知（預設值）
     WebPush = 1,
     Email = 2,
     Both = 3

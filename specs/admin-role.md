@@ -355,6 +355,10 @@ public static class MenuConstants
     public const int Sugar = 13;
     public const int Ice = 14;
     public const int Topping = 15;
+    public const int Size = 16;
+
+    // 店家覆寫設定
+    public const int ShopOverride = 17;
 }
 ```
 
@@ -437,6 +441,10 @@ new AdminMenu { Id = 12, ParentId = 11,   Name = "通用品名", Icon = "Grape",
 new AdminMenu { Id = 13, ParentId = 11,   Name = "甜度定義", Icon = "Sugar",        Endpoint = "/drink-option/sugar",   Sort = 2 },
 new AdminMenu { Id = 14, ParentId = 11,   Name = "冰塊定義", Icon = "IceCream",     Endpoint = "/drink-option/ice",     Sort = 3 },
 new AdminMenu { Id = 15, ParentId = 11,   Name = "加料",     Icon = "Plus",         Endpoint = "/drink-option/topping", Sort = 4 },
+new AdminMenu { Id = 16, ParentId = 11,   Name = "容量定義", Icon = "CoffeeCup",    Endpoint = "/drink-option/size",    Sort = 5 },
+
+// 店家覆寫設定（從 ShopList 拆分）
+new AdminMenu { Id = 17, ParentId = 9,    Name = "覆寫設定", Icon = "Setting",      Endpoint = "/shop/override",        Sort = 2 },
 ```
 
 ---

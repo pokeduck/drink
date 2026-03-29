@@ -1,6 +1,9 @@
 # Specs
 
 - [SPEC.md](./SPEC.md) – 主要專案規範
-- [admin-member.md](./admin-member.md) – 後台會員系統
-- [admin-role.md](./admin-role.md) – 後台角色管理
-- [user-member.md](./user-member.md) – 前台會員系統
+- [admin-admin-user.md](./admin-admin-user.md) – 後台 — 後台帳號管理
+- [admin-role.md](./admin-role.md) – 後台 — 角色管理
+- [admin-user-management.md](./admin-user-management.md) – 後台 — 前台會員管理
+- [drink-option.md](./drink-option.md) – 飲料選項（通用品名、甜度、冰塊、加料、容量）
+- [shop.md](./shop.md) – 店家與菜單管理
+- [user-auth.md](./user-auth.md) – 前台 — 會員認證與個人資料
