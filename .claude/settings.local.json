@@ -11,7 +11,9 @@
       "Bash(git commit:*)",
       "Bash(git checkout:*)",
       "Bash(git status:*)",
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build:*)",
+      "Bash(dotnet add:*)",
+      "Bash(dotnet format:*)"
     ]
   }
 }
