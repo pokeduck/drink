@@ -40,6 +40,16 @@ export default defineNuxtConfig({
     transpile: ['@app/models', '@app/core']
   },
 
+  devServer: {
+    port: 8082,
+  },
+
+  runtimeConfig: {
+    public: {
+      apiBase: "http://localhost:5102/api",
+    },
+  },
+
   eslint: {
     config: {
       stylistic: {

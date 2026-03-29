@@ -26,12 +26,12 @@ export default defineNuxtConfig({
     transpile: ["@app/models", "@app/core"],
   },
   devServer: {
-    port: 3002,
+    port: 8081,
   },
 
   runtimeConfig: {
     public: {
-      apiBase: "http://localhost:3000/api",
+      apiBase: "http://localhost:5101/api",
     },
   },
 });
