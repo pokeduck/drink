@@ -342,7 +342,8 @@ public static class MenuConstants
 
     // 會員管理
     public const int MemberList = 5;
-    public const int MemberVerification = 6;
+    public const int VerificationRegister = 6;
+    public const int VerificationForgotPassword = 22;
 
     // 訂單管理
     public const int OrderList = 8;
@@ -363,6 +364,9 @@ public static class MenuConstants
     // 通知管理
     public const int NotificationList = 19;
     public const int NotificationByGroup = 20;
+
+    // 系統設定
+    public const int SystemSetting = 21;
 }
 ```
 
@@ -427,9 +431,10 @@ new AdminMenu { Id = 2,  ParentId = 1,    Name = "帳號列表",     Icon = "Ava
 new AdminMenu { Id = 3,  ParentId = 1,    Name = "角色管理", Icon = "Lock",        Endpoint = "/admin-account/role",   Sort = 2 },
 
 // 會員管理
-new AdminMenu { Id = 4,  ParentId = null, Name = "會員管理",   Icon = "User",        Endpoint = null,                    Sort = 2 },
-new AdminMenu { Id = 5,  ParentId = 4,    Name = "會員列表",   Icon = "List",        Endpoint = "/member/list",          Sort = 1 },
-new AdminMenu { Id = 6,  ParentId = 4,    Name = "驗證信列表", Icon = "Message",     Endpoint = "/member/verification",  Sort = 2 },
+new AdminMenu { Id = 4,  ParentId = null, Name = "會員管理",       Icon = "User",    Endpoint = null,                                Sort = 2 },
+new AdminMenu { Id = 5,  ParentId = 4,    Name = "會員列表",       Icon = "List",    Endpoint = "/member/list",                      Sort = 1 },
+new AdminMenu { Id = 6,  ParentId = 4,    Name = "註冊驗證信",     Icon = "Message", Endpoint = "/member/verification/register",      Sort = 2 },
+new AdminMenu { Id = 22, ParentId = 4,    Name = "忘記密碼驗證信", Icon = "EditPen", Endpoint = "/member/verification/forgot-password",Sort = 3 },
 
 // 訂單管理
 new AdminMenu { Id = 7,  ParentId = null, Name = "訂單管理", Icon = "Document",     Endpoint = null,                    Sort = 3 },
@@ -454,6 +459,9 @@ new AdminMenu { Id = 17, ParentId = 9,    Name = "覆寫設定", Icon = "Setting
 new AdminMenu { Id = 18, ParentId = null, Name = "通知管理", Icon = "Bell",         Endpoint = null,                        Sort = 6 },
 new AdminMenu { Id = 19, ParentId = 18,   Name = "通知列表", Icon = "ChatDotRound", Endpoint = "/notification/list",        Sort = 1 },
 new AdminMenu { Id = 20, ParentId = 18,   Name = "揪團通知", Icon = "ChatLineRound",Endpoint = "/notification/by-group",    Sort = 2 },
+
+// 系統設定
+new AdminMenu { Id = 21, ParentId = null, Name = "系統設定", Icon = "Setting",      Endpoint = "/system/setting",           Sort = 7 },
 ```
 
 ---

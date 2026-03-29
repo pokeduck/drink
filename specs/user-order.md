@@ -6,7 +6,7 @@
 - 揪團 Active 且未過截止時間時，參與者可編輯/刪除自己的飲料，發起人可編輯所有參與者的飲料
 - 揪團截止後不可修改飲料內容
 - 發起人可手動推進揪團狀態、取消揪團、匯出 Excel
-- 訂單狀態變更為「已送達」時，系統自動通知所有參與者
+- 發起人可手動發送通知給所有參與者（不綁定特定狀態）
 
 > Entity 定義詳見 [admin-order.md](./admin-order.md)，本 spec 不重複定義
 
@@ -158,7 +158,8 @@ GET /api/user/group-orders/{id}
     }
   },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```
@@ -253,7 +254,8 @@ GET /api/user/group-orders/initiated?page=1&page_size=20&sort_by=created_at&sort
     "page_size": 20
   },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```

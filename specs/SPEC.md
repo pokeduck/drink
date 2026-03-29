@@ -309,6 +309,15 @@ GET /api/admin/users?page=1&page_size=20&sort_by=created_at&sort_order=desc&keyw
 
 ---
 
+### Creator 欄位慣例
+- `Creator` / `Updater` 欄位型別為 `int`
+- `Creator = 0` 代表 **系統操作或用戶自行操作**（如：前台自行註冊、Google 登入自動建立、前台觸發驗證信）
+- `Creator > 0` 代表由特定 AdminUser 或 User 操作
+- 後台操作時 Creator / Updater = 當前登入的 AdminUserId
+- 前台用戶操作自身資料時 Updater = 自己的 UserId
+
+---
+
 ## Git Workflow
 - Branch: `feat/<feature>`, `fix/<issue>`, `chore/<task>`
 - Commit: `feat(scope): description`
