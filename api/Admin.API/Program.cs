@@ -66,6 +66,8 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseMiddleware<Drink.Application.Middleware.RoleMiddleware>();
+
 app.MapControllers();
 
 app.Run();

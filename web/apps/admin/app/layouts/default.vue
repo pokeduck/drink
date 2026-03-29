@@ -4,15 +4,19 @@
  * 整合：全站初始化 Loading + 局部路由切換 Loading
  */
 import { useMenuStore } from "~/stores/menu";
+import { useAuthStore } from "~/stores/auth";
 import { storeToRefs } from "pinia";
+import { EditPen, SwitchButton } from "@element-plus/icons-vue";
 import defaultAvatar from "~/assets/avatar.png";
+
+const authStore = useAuthStore();
+const menuStore = useMenuStore();
+const { isCollapsed } = storeToRefs(menuStore);
 
 // 1. 狀態宣告：一開始就設為 true，確保全站 Loading 立即啟動
 const isInitialLoading = ref(true); // 全站初次載入 (Fullscreen)
 const isPageLoading = ref(false); // 局部路由換頁載入 (Main Region)
 
-const menuStore = useMenuStore();
-const { isCollapsed } = storeToRefs(menuStore);
 const nuxtApp = useNuxtApp();
 
 // 2. 全站初始化邏輯 (onMounted)
@@ -53,6 +57,17 @@ nuxtApp.hook("app:error", () => {
   isInitialLoading.value = false;
   isPageLoading.value = false;
 });
+
+// Header Dropdown 操作
+const handleCommand = async (command: string) => {
+  if (command === "logout") {
+    await authStore.logout();
+    menuStore.clearMenu();
+    await navigateTo("/login");
+  } else if (command === "change-password") {
+    await navigateTo("/change-password");
+  }
+};
 </script>
 
 <template>
@@ -77,7 +92,15 @@ nuxtApp.hook("app:error", () => {
           <el-link underline="never" :icon="isCollapsed ? 'Expand' : 'Fold'" @click="menuStore.toggleCollapse" class="collapse-btn" />
         </div>
         <div class="header-right">
-          <el-avatar :size="32" :src="defaultAvatar" />
+          <el-dropdown @command="handleCommand">
+            <el-avatar :size="32" :src="defaultAvatar" class="avatar-trigger" />
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="change-password" :icon="EditPen">修改密碼</el-dropdown-item>
+                <el-dropdown-item command="logout" :icon="SwitchButton" divided>登出</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </div>
       </el-header>
 
@@ -184,5 +207,9 @@ nuxtApp.hook("app:error", () => {
 }
 .admin-main::-webkit-scrollbar-track {
   background: transparent;
+}
+
+.avatar-trigger {
+  cursor: pointer;
 }
 </style>

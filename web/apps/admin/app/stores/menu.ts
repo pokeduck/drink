@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { useApi } from '~/composable/useApi'
 
 export interface MenuModel {
   index: string
@@ -7,68 +8,56 @@ export interface MenuModel {
   children?: MenuModel[]
 }
 
+interface MenuTreeResponse {
+  id: number
+  name: string
+  icon: string | null
+  endpoint: string | null
+  sort: number
+  children: MenuTreeResponse[]
+}
+
+interface ApiResponse<T> {
+  data: T
+  code: number
+  error?: string
+  message?: string
+}
+
+/**
+ * 將 API 回傳的 MenuTreeResponse 轉換為前端 MenuModel
+ */
+function toMenuModel(items: MenuTreeResponse[]): MenuModel[] {
+  return items.map((item) => {
+    const model: MenuModel = {
+      index: item.endpoint ?? `/menu-${item.id}`,
+      title: item.name,
+      icon: item.icon ?? undefined,
+    }
+
+    if (item.children && item.children.length > 0) {
+      model.children = toMenuModel(item.children)
+    }
+
+    return model
+  })
+}
+
 export const useMenuStore = defineStore('menu', () => {
   const menuData = ref<MenuModel[]>([])
   const loading = ref(false)
   const isCollapsed = ref(false)
 
-  // 切換收合狀態
   const toggleCollapse = () => {
     isCollapsed.value = !isCollapsed.value
   }
 
-  // 初始化 Mock Data
-  const initMockData = () => {
-    menuData.value = [
-      {
-        index: '/',
-        title: '控制台',
-        icon: 'House',
-      },
-      {
-        index: '/products',
-        title: '產品管理',
-        icon: 'Goods',
-        children: [
-          { index: '/products/list', title: '商品列表' },
-          {
-            index: '/products/config',
-            title: '分類配置',
-            children: [
-              { index: '/products/config/drinks', title: '飲品分類' },
-              { index: '/products/config/foods', title: '熟食分類' },
-            ],
-          },
-        ],
-      },
-      {
-        index: '/orders',
-        title: '訂單系統',
-        icon: 'List',
-        children: [
-          { index: '/orders/active', title: '處理中訂單' },
-          { index: '/orders/history', title: '歷史成交紀錄' },
-        ],
-      },
-      {
-        index: '/settings',
-        title: '系統設定',
-        icon: 'Setting',
-      }
-    ]
-  }
-
-  /**
-   * 未來對接 API 的位置
-   */
   const fetchMenuData = async () => {
     loading.value = true
     try {
-      // TODO: const { data } = await useFetch('/api/menu')
-      // menuData.value = data.value
-      
-      // 目前先直接使用 Mock Data
-      initMockData()
+      const api = useApi()
+      const res = await api.get<ApiResponse<MenuTreeResponse[]>>('/admin/menus/me')
+      menuData.value = toMenuModel(res.data)
     } catch (error) {
       console.error('Failed to fetch menu:', error)
     } finally {
@@ -76,11 +65,16 @@ export const useMenuStore = defineStore('menu', () => {
     }
   }
 
+  const clearMenu = () => {
+    menuData.value = []
+  }
+
   return {
     menuData,
     loading,
     isCollapsed,
     fetchMenuData,
-    toggleCollapse
+    toggleCollapse,
+    clearMenu,
   }
 })

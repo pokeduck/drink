@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MenuModel } from './SideMenu.vue'
+import type { MenuModel } from '~/stores/menu'
 
 defineProps<{
   item: MenuModel

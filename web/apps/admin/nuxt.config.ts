@@ -31,7 +31,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBase: "http://localhost:5101/api",
+      apiBase: "https://localhost:5101/api",
     },
   },
 });

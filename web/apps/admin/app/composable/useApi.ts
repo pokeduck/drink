@@ -1,42 +1,67 @@
-import { hash } from "ohash";
+import { useAuthStore } from '~/stores/auth'
 
 export const useApi = () => {
-  const config = useRuntimeConfig();
-  const token = useCookie("auth_token"); // 假設你把 JWT 存在 Cookie
+  const config = useRuntimeConfig()
+  const authStore = useAuthStore()
+
+  let isRefreshing = false
+  let refreshPromise: Promise<boolean> | null = null
 
   const apiFetch = $fetch.create({
-    // 1. 設定 Base URL
     baseURL: config.public.apiBase,
 
-    // 2. 請求攔截器 (Request Interceptor)
     async onRequest({ options }) {
-      // 確保 headers 存在且是 Headers 實例
-      const headers = new Headers(options.headers);
+      const headers = new Headers(options.headers)
 
-      if (token.value) {
-        headers.set("Authorization", `Bearer ${token.value}`);
+      if (authStore.accessToken) {
+        headers.set('Authorization', `Bearer ${authStore.accessToken}`)
       }
 
-      options.headers = headers;
+      options.headers = headers
     },
 
-    // 3. 錯誤處理攔截器 (Response Error Interceptor)
-    async onResponseError({ response }) {
+    async onResponseError({ response, request, options }) {
+      // 401 → 嘗試 refresh token 後重試一次
+      if (response.status === 401 && authStore.refreshToken) {
+        if (!isRefreshing) {
+          isRefreshing = true
+          refreshPromise = authStore.refresh()
+        }
+
+        const success = await refreshPromise
+        isRefreshing = false
+        refreshPromise = null
+
+        if (success) {
+          // 重試原始請求
+          const headers = new Headers(options.headers)
+          headers.set('Authorization', `Bearer ${authStore.accessToken}`)
+          return $fetch(request, { ...options, headers })
+        }
+
+        // refresh 失敗，導向登入
+        authStore.clearTokens()
+        await navigateTo('/login')
+        return
+      }
+
+      // 其他 401 (無 refresh token)
       if (response.status === 401) {
-        // Token 過期或無效，跳轉回登入頁
-        await navigateTo("/login");
-      } else {
-        // TODO: 串接 Element Plus 的 Message 提示錯誤訊息
-        console.error("API Error:", response._data?.message || "未知錯誤");
+        authStore.clearTokens()
+        await navigateTo('/login')
+        return
       }
-    },
-  });
 
-  // 回傳封裝好的請求方法
+      // 非 401 錯誤
+      const msg = response._data?.message || response._data?.error || '未知錯誤'
+      console.error('API Error:', msg)
+    },
+  })
+
   return {
-    get: <T>(url: string, opts?: any) => apiFetch<T>(url, { method: "GET", ...opts }),
-    post: <T>(url: string, body?: any, opts?: any) => apiFetch<T>(url, { method: "POST", body, ...opts }),
-    put: <T>(url: string, body?: any, opts?: any) => apiFetch<T>(url, { method: "PUT", body, ...opts }),
-    delete: <T>(url: string, opts?: any) => apiFetch<T>(url, { method: "DELETE", ...opts }),
-  };
-};
+    get: <T>(url: string, opts?: any) => apiFetch<T>(url, { method: 'GET', ...opts }),
+    post: <T>(url: string, body?: any, opts?: any) => apiFetch<T>(url, { method: 'POST', body, ...opts }),
+    put: <T>(url: string, body?: any, opts?: any) => apiFetch<T>(url, { method: 'PUT', body, ...opts }),
+    delete: <T>(url: string, opts?: any) => apiFetch<T>(url, { method: 'DELETE', ...opts }),
+  }
+}
