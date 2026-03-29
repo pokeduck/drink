@@ -6,6 +6,12 @@
 # Claude Code
 .claude/
 
+# Serilog logs
+logs/
+
+# File uploads
+Uploads/
+
 # dotenv files
 .env
 

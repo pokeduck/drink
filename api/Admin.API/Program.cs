@@ -5,6 +5,9 @@ using Drink.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Serilog
+builder.AddSerilog();
+
 // JSON snake_case
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -48,6 +51,10 @@ if (app.Environment.IsDevelopment())
   app.UseSwagger();
   app.UseSwaggerUI();
 }
+
+app.UseAssetFileServer(builder.Configuration);
+
+app.UseSerilogLogging();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 

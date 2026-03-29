@@ -30,6 +30,9 @@ public static class ServiceCollectionExtensions
     // HttpContext
     services.AddHttpContextAccessor();
 
+    // File Upload
+    services.AddFileUpload(configuration);
+
     return services;
   }
 
