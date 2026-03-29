@@ -18,7 +18,8 @@ public static class ServiceCollectionExtensions
     // DbContext
     var connectionString = configuration.GetConnectionString("DefaultConnection");
     services.AddDbContext<DrinkDbContext>(options =>
-        options.UseNpgsql(connectionString));
+        options.UseNpgsql(connectionString, o =>
+            o.MigrationsHistoryTable("__ef_migration_history")));
 
     // Repository
     services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

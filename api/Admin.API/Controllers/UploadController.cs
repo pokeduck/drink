@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace Drink.Admin.API.Controllers;
 
+[Authorize]
 public class UploadController : BaseController
 {
   private readonly IHttpClientFactory _httpClientFactory;
