@@ -76,4 +76,10 @@ public static class ErrorCodes
 
   // Notification (4-09-XX)
   public static readonly (int Code, string Error) NotificationNotFound = (40901, "NOTIFICATION_NOT_FOUND");
+
+  // File Upload (4-10-XX)
+  public static readonly (int Code, string Error) FileExtensionNotAllowed = (41001, "FILE_EXTENSION_NOT_ALLOWED");
+  public static readonly (int Code, string Error) FileSizeExceeded = (41002, "FILE_SIZE_EXCEEDED");
+  public static readonly (int Code, string Error) FileNotFound = (41003, "FILE_NOT_FOUND");
+  public static readonly (int Code, string Error) FileUploadFailed = (41004, "FILE_UPLOAD_FAILED");
 }
