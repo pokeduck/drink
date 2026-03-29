@@ -18,6 +18,9 @@ builder.Services.AddInfrastructure(builder.Configuration);
 // Application Services (auto-scan all BaseService subclasses)
 builder.Services.AddApplicationServices();
 
+// AutoMapper (auto-scan all Profiles)
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
+
 // JWT Authentication
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
@@ -36,13 +39,14 @@ builder.Services.AddCors(options =>
 });
 
 // Swagger (dev only)
-builder.Services.AddOpenApi();
+builder.Services.AddSwagger("Drink Admin API");
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-  app.MapOpenApi();
+  app.UseSwagger();
+  app.UseSwaggerUI();
 }
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
