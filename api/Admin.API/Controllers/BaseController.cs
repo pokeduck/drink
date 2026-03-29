@@ -1,10 +1,10 @@
 using Drink.Application.Responses;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Drink.User.API.Controllers;
+namespace Drink.Admin.API.Controllers;
 
 [ApiController]
-[Route("api/user/[controller]")]
+[Route("api/admin/[controller]")]
 public abstract class BaseController : ControllerBase
 {
     protected IActionResult ApiOk(object? data = null)

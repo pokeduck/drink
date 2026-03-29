@@ -1,0 +1,17 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "allow": [
+      "Bash(pnpm --filter @drink/client -C web build)",
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git status:*)",
+      "Bash(dotnet build:*)"
+    ]
+  }
+}

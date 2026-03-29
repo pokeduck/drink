@@ -10,7 +10,11 @@
 
     <ItemGroup>
       <PackageReference Include="EFCore.NamingConventions" Version="10.0.1" />
+      <PackageReference Include="Isopoh.Cryptography.Argon2" Version="2.0.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+      <FrameworkReference Include="Microsoft.AspNetCore.App" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.17.0" />
     </ItemGroup>
 
     <ItemGroup>

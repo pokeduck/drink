@@ -1,19 +1,51 @@
-using Drink.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using Drink.Application.Middleware;
+using Drink.Infrastructure.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// JSON snake_case
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+    });
 
-builder.Services.AddControllers();
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// Infrastructure (DbContext, Repository, JWT settings, HttpContextAccessor)
+builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddDbContext<DrinkDbContext>(options =>
-  options.UseNpgsql(connectionString));
+// JWT Authentication
+builder.Services.AddJwtAuthentication(builder.Configuration);
+
+// Authorization
+builder.Services.AddAuthorization();
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// Swagger (dev only)
+builder.Services.AddOpenApi();
+
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
 
-app.UseHttpsRedirection();
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
+app.UseCors();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

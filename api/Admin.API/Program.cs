@@ -1,24 +1,53 @@
+using System.Text.Json;
+using Drink.Application.Middleware;
+using Drink.Infrastructure.Extensions;
 
-using Drink.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// JSON snake_case
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+    });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-// 2. 註冊 DbContext 並啟用 Snake Case
-builder.Services.AddDbContext<DrinkDbContext>(options =>
-  options.UseNpgsql(connectionString));
+// Infrastructure (DbContext, Repository, JWT settings, HttpContextAccessor)
+builder.Services.AddInfrastructure(builder.Configuration);
+
+// JWT Authentication
+builder.Services.AddJwtAuthentication(builder.Configuration);
+
+// Authorization
+builder.Services.AddAuthorization();
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// Swagger (dev only)
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
+app.UseCors();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();
