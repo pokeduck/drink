@@ -7,5 +7,6 @@
 - [drink-option.md](./drink-option.md) – 飲料選項（通用品名、甜度、冰塊、加料、容量）
 - [shop.md](./shop.md) – 店家與菜單管理
 - [admin-order.md](./admin-order.md) – 後台 — 訂單管理
+- [admin-notification.md](./admin-notification.md) – 後台 — 通知管理
 - [user-auth.md](./user-auth.md) – 前台 — 會員認證與個人資料
 - [user-order.md](./user-order.md) – 前台 — 揪團與訂單

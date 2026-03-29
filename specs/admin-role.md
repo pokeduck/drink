@@ -359,6 +359,10 @@ public static class MenuConstants
 
     // 店家覆寫設定
     public const int ShopOverride = 17;
+
+    // 通知管理
+    public const int NotificationList = 19;
+    public const int NotificationByGroup = 20;
 }
 ```
 
@@ -445,6 +449,11 @@ new AdminMenu { Id = 16, ParentId = 11,   Name = "容量定義", Icon = "CoffeeC
 
 // 店家覆寫設定（從 ShopList 拆分）
 new AdminMenu { Id = 17, ParentId = 9,    Name = "覆寫設定", Icon = "Setting",      Endpoint = "/shop/override",        Sort = 2 },
+
+// 通知管理
+new AdminMenu { Id = 18, ParentId = null, Name = "通知管理", Icon = "Bell",         Endpoint = null,                        Sort = 6 },
+new AdminMenu { Id = 19, ParentId = 18,   Name = "通知列表", Icon = "ChatDotRound", Endpoint = "/notification/list",        Sort = 1 },
+new AdminMenu { Id = 20, ParentId = 18,   Name = "揪團通知", Icon = "ChatLineRound",Endpoint = "/notification/by-group",    Sort = 2 },
 ```
 
 ---
