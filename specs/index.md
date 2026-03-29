@@ -10,3 +10,5 @@
 - [admin-notification.md](./admin-notification.md) – 後台 — 通知管理
 - [user-auth.md](./user-auth.md) – 前台 — 會員認證與個人資料
 - [user-order.md](./user-order.md) – 前台 — 揪團與訂單
+- [admin-verification.md](./admin-verification.md) – 後台 — 驗證信管理（註冊驗證信 + 忘記密碼驗證信）
+- [admin-system-setting.md](./admin-system-setting.md) – 後台 — 系統設定
