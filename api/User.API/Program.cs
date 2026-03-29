@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Drink.Application.Middleware;
+using Drink.Application.Extensions;
 using Drink.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,11 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+      options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
     });
 
 // Infrastructure (DbContext, Repository, JWT settings, HttpContextAccessor)
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Application Services (auto-scan all BaseService subclasses)
+builder.Services.AddApplicationServices();
 
 // JWT Authentication
 builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -23,12 +27,12 @@ builder.Services.AddAuthorization();
 // CORS
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+  options.AddDefaultPolicy(policy =>
+  {
+    policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+  });
 });
 
 // Swagger (dev only)
@@ -38,7 +42,7 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+  app.MapOpenApi();
 }
 
 app.UseMiddleware<GlobalExceptionMiddleware>();

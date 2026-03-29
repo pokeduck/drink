@@ -13,51 +13,51 @@ namespace Drink.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+  public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+  {
+    // DbContext
+    var connectionString = configuration.GetConnectionString("DefaultConnection");
+    services.AddDbContext<DrinkDbContext>(options =>
+        options.UseNpgsql(connectionString));
+
+    // Repository
+    services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+    // JWT
+    services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+    services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+    // HttpContext
+    services.AddHttpContextAccessor();
+
+    return services;
+  }
+
+  public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+  {
+    var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>()!;
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
+
+    services.AddAuthentication(options =>
     {
-        // DbContext
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<DrinkDbContext>(options =>
-            options.UseNpgsql(connectionString));
-
-        // Repository
-        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
-        // JWT
-        services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
-        services.AddScoped<IJwtTokenService, JwtTokenService>();
-
-        // HttpContext
-        services.AddHttpContextAccessor();
-
-        return services;
-    }
-
-    public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+      options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+      options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
     {
-        var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>()!;
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
+      options.TokenValidationParameters = new TokenValidationParameters
+      {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = key,
+        ClockSkew = TimeSpan.Zero
+      };
+    });
 
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings.Issuer,
-                ValidAudience = jwtSettings.Audience,
-                IssuerSigningKey = key,
-                ClockSkew = TimeSpan.Zero
-            };
-        });
-
-        return services;
-    }
+    return services;
+  }
 }

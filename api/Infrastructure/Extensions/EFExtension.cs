@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Drink.Domain.Entities;
 using Drink.Infrastructure.Data;
@@ -57,13 +57,13 @@ public static class EFExtension
 
   {
     propertyBuilder.HasConversion(
-// Serialize: IEnumerable<Enum> → "1,2,3"
+      // Serialize: IEnumerable<Enum> → "1,2,3"
       v => string.Join(",", v.Select(e => Convert.ToInt32(e))),
 
-// Deserialize: "1,2,3" → IEnumerable<Enum>
+      // Deserialize: "1,2,3" → IEnumerable<Enum>
       v => ParseCommaSeparatedEnum<TEnum>(v),
 
-// ValueComparer: for EF Core change tracking
+      // ValueComparer: for EF Core change tracking
       new ValueComparer<IEnumerable<TEnum>>(
         (c1, c2) => c1 != null && c2 != null && c1.SequenceEqual(c2),
         c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),

@@ -1,4 +1,4 @@
-﻿using Drink.Infrastructure.Data;
+using Drink.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Drink.Migrator;

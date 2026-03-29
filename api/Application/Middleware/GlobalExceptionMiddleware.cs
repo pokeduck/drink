@@ -9,44 +9,44 @@ namespace Drink.Application.Middleware;
 
 public class GlobalExceptionMiddleware
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<GlobalExceptionMiddleware> _logger;
-    private readonly IHostEnvironment _env;
+  private readonly RequestDelegate _next;
+  private readonly ILogger<GlobalExceptionMiddleware> _logger;
+  private readonly IHostEnvironment _env;
 
-    public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger, IHostEnvironment env)
+  public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger, IHostEnvironment env)
+  {
+    _next = next;
+    _logger = logger;
+    _env = env;
+  }
+
+  public async Task InvokeAsync(HttpContext context)
+  {
+    try
     {
-        _next = next;
-        _logger = logger;
-        _env = env;
+      await _next(context);
     }
-
-    public async Task InvokeAsync(HttpContext context)
+    catch (Exception ex)
     {
-        try
-        {
-            await _next(context);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unhandled exception occurred");
-            await HandleExceptionAsync(context, ex);
-        }
+      _logger.LogError(ex, "Unhandled exception occurred");
+      await HandleExceptionAsync(context, ex);
     }
+  }
 
-    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+  private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+  {
+    context.Response.ContentType = "application/json";
+    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+    var response = ApiResponse.Fail(
+        ErrorCodes.ServiceUnavailable,
+        _env.IsDevelopment() ? exception.Message : "伺服器發生錯誤，請稍後再試");
+
+    var options = new JsonSerializerOptions
     {
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+      PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+    };
 
-        var response = ApiResponse.Fail(
-            ErrorCodes.ServiceUnavailable,
-            _env.IsDevelopment() ? exception.Message : "伺服器發生錯誤，請稍後再試");
-
-        var options = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
-        };
-
-        await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
-    }
+    await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
+  }
 }
