@@ -18,8 +18,8 @@ builder.Services.AddControllers()
 // Infrastructure (DbContext, Repository, JWT settings, HttpContextAccessor)
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Application Services (auto-scan all BaseService subclasses)
-builder.Services.AddApplicationServices();
+// Application Services (auto-scan all BaseService subclasses, exclude Upload-only services)
+builder.Services.AddApplicationServices(typeof(Drink.Application.Services.FileUploadService));
 
 // AutoMapper (auto-scan all Profiles)
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
@@ -29,6 +29,11 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 
 // Authorization
 builder.Services.AddAuthorization();
+
+// Upload API proxy
+builder.Services.Configure<Drink.Infrastructure.Settings.UploadApiSettings>(
+    builder.Configuration.GetSection("UploadApi"));
+builder.Services.AddHttpClient();
 
 // CORS
 builder.Services.AddCors(options =>
@@ -51,8 +56,6 @@ if (app.Environment.IsDevelopment())
   app.UseSwagger();
   app.UseSwaggerUI();
 }
-
-app.UseAssetFileServer(builder.Configuration);
 
 app.UseSerilogLogging();
 
