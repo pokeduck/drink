@@ -99,7 +99,7 @@ onMounted(() => {
     </el-page-header>
 
     <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px; max-width: 800px">
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" label-position="right">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" label-position="right" @submit.prevent>
         <el-form-item label="角色名稱" prop="name">
           <el-input v-model="form.name" placeholder="請輸入角色名稱" maxlength="50" style="max-width: 300px" />
         </el-form-item>
