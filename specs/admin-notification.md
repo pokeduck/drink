@@ -155,7 +155,8 @@ GET /api/admin/notifications?page=1&page_size=20&sort_by=created_at&sort_order=d
     "page_size": 20
   },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```
@@ -191,7 +192,8 @@ GET /api/admin/notifications/{notificationId}
     ]
   },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```
@@ -221,7 +223,8 @@ GET /api/admin/notifications/by-group-order?page=1&page_size=20&sort_by=created_
     "page_size": 20
   },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```

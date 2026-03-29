@@ -240,7 +240,8 @@ GET /api/admin/users?page=1&page_size=20&sort_by=created_at&sort_order=desc&keyw
     "page_size": 20
   },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```
@@ -262,7 +263,8 @@ GET /api/admin/users/{userId}
     "updated_at": "2025-01-02T00:00:00Z"
   },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```

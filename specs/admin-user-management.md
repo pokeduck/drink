@@ -86,7 +86,8 @@ GET /api/admin/members?page=1&page_size=20&sort_by=created_at&sort_order=desc&ke
     "page_size": 20
   },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```
@@ -112,7 +113,8 @@ GET /api/admin/members/{memberId}
     "updated_at": "2025-03-15T08:30:00Z"
   },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```

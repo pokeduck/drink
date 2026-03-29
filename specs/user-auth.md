@@ -205,7 +205,8 @@ GET /api/user/profile
     "email_verified": true
   },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```

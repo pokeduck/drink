@@ -251,7 +251,8 @@ GET /api/admin/orders?page=1&page_size=20&sort_by=created_at&sort_order=desc&key
     "page_size": 20
   },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```
@@ -325,7 +326,8 @@ GET /api/admin/orders/{orderId}
     }
   },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```

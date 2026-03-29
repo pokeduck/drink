@@ -245,7 +245,8 @@ GET /api/admin/users?page=1&page_size=20&sort_by=created_at&sort_order=desc&keyw
     "page_size": 20
   },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```
@@ -258,7 +259,8 @@ GET /api/admin/users?page=1&page_size=20&sort_by=created_at&sort_order=desc&keyw
 {
   "data": {},
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
 }
 ```
@@ -267,17 +269,37 @@ GET /api/admin/users?page=1&page_size=20&sort_by=created_at&sort_order=desc&keyw
 |------|------|------|
 | data | object / array / null | 回傳資料，無資料時為 null |
 | message | string? | 錯誤訊息，成功時為 null |
-| code | string | 自訂業務代碼（如 `SUCCESS`, `ROLE_NOT_FOUND`, `VALIDATION_ERROR`） |
+| code | int | 數字錯誤碼，成功為 `0`，錯誤為 `4XXYY` 格式（見 Error Code Registry） |
+| error | string? | 文字錯誤碼（如 `ROLE_ALREADY_EXISTS`），成功時為 null |
 | errors | Record<string, string[]>? | 欄位驗證錯誤，非驗證錯誤時為 null |
+
+#### 數字碼編碼規則
+格式：`4_XX_YY`（5 位數整數）
+- `4`：固定前綴
+- `XX`：模組編號（00–09）
+- `YY`：該模組內流水號（01–99）
+
+| 模組碼 | 模組 |
+|--------|------|
+| 00 | 通用 |
+| 01 | Admin Auth / Admin User |
+| 02 | Admin Role |
+| 03 | User Auth |
+| 04 | Verification |
+| 05 | Order |
+| 06 | Shop |
+| 07 | Drink Option |
+| 08 | System Setting |
+| 09 | Notification |
 
 #### 成功回傳
 ```json
 {
   "data": { "id": 1, "name": "Admin" },
   "message": null,
-  "code": "SUCCESS",
+  "code": 0,
+  "error": null,
   "errors": null
-
 }
 ```
 
@@ -286,7 +308,8 @@ GET /api/admin/users?page=1&page_size=20&sort_by=created_at&sort_order=desc&keyw
 {
   "data": null,
   "message": "角色名稱已存在",
-  "code": "ROLE_ALREADY_EXISTS",
+  "code": 40202,
+  "error": "ROLE_ALREADY_EXISTS",
   "errors": null
 }
 ```
@@ -296,7 +319,8 @@ GET /api/admin/users?page=1&page_size=20&sort_by=created_at&sort_order=desc&keyw
 {
   "data": null,
   "message": "輸入驗證失敗",
-  "code": "VALIDATION_ERROR",
+  "code": 40001,
+  "error": "VALIDATION_ERROR",
   "errors": {
     "name": ["角色名稱為必填"],
     "permissions[0].menu_id": ["Menu 不存在"]
@@ -318,6 +342,107 @@ GET /api/admin/users?page=1&page_size=20&sort_by=created_at&sort_order=desc&keyw
 
 ---
 
+### Error Code Registry
+所有 API 業務錯誤碼統一定義，後端以 `static class ErrorCodes` 管理常數。每個錯誤碼同時具有數字碼（`code`）與文字碼（`error`）。
+
+#### 通用 (4-00-XX)
+| Code | Error | HTTP | 說明 |
+|------|-------|------|------|
+| 0 | — | 200 | 成功（`error` 為 null） |
+| 40001 | `VALIDATION_ERROR` | 400 | 欄位驗證失敗（搭配 errors） |
+| 40002 | `UNAUTHORIZED` | 401 | 未登入或 Token 無效 |
+| 40003 | `FORBIDDEN` | 403 | 無權限操作 |
+| 40004 | `NOT_FOUND` | 404 | 資源不存在（通用） |
+| 40005 | `SERVICE_UNAVAILABLE` | 503 | 維護模式 |
+
+#### 後台認證 / 後台帳號（Admin Auth）(4-01-XX)
+| Code | Error | HTTP | 說明 |
+|------|-------|------|------|
+| 40101 | `INVALID_CREDENTIALS` | 401 | 帳號或密碼錯誤 |
+| 40102 | `INVALID_PASSWORD` | 400 | 舊密碼錯誤 |
+| 40103 | `USERNAME_ALREADY_EXISTS` | 409 | 帳號已存在 |
+| 40104 | `ADMIN_ACCOUNT_INACTIVE` | 403 | 後台帳號已停用 |
+| 40105 | `CANNOT_DELETE_ADMIN` | 403 | 不可刪除 Admin 帳號 |
+| 40106 | `CANNOT_CHANGE_ADMIN_ROLE` | 403 | 不可變更 Admin 角色 |
+
+#### 後台角色（Admin Role）(4-02-XX)
+| Code | Error | HTTP | 說明 |
+|------|-------|------|------|
+| 40201 | `ROLE_NOT_FOUND` | 400 | 角色不存在 |
+| 40202 | `ROLE_ALREADY_EXISTS` | 409 | 角色名稱已存在 |
+| 40203 | `CANNOT_MODIFY_SYSTEM_ROLE` | 403 | 不可修改系統角色 |
+| 40204 | `CANNOT_DELETE_SYSTEM_ROLE` | 403 | 不可刪除系統角色 |
+| 40205 | `ROLE_HAS_STAFF` | 400 | 角色下有帳號，需指定 reassign_role_id |
+| 40206 | `INVALID_MENU_ID` | 400 | Menu ID 不存在 |
+
+#### 前台認證（User Auth）(4-03-XX)
+| Code | Error | HTTP | 說明 |
+|------|-------|------|------|
+| 40301 | `EMAIL_ALREADY_EXISTS` | 409 | Email 已存在 |
+| 40302 | `INVALID_CREDENTIALS` | 401 | Email 或密碼錯誤 |
+| 40303 | `EMAIL_NOT_VERIFIED` | 403 | Email 未驗證 |
+| 40304 | `ACCOUNT_INACTIVE` | 403 | 帳號已停用 |
+| 40305 | `GOOGLE_DOMAIN_NOT_ALLOWED` | 403 | Google 登入 domain 不符 |
+| 40306 | `INVALID_TOKEN` | 400 | Token 無效或過期 |
+| 40307 | `TOKEN_ALREADY_USED` | 400 | Token 已使用 |
+
+#### 驗證信（Verification）(4-04-XX)
+| Code | Error | HTTP | 說明 |
+|------|-------|------|------|
+| 40401 | `RESEND_TOO_FREQUENT` | 429 | 重發過於頻繁（同用戶同類型 10 分鐘內最多 1 次） |
+
+#### 揪團訂單（Order）(4-05-XX)
+| Code | Error | HTTP | 說明 |
+|------|-------|------|------|
+| 40501 | `SHOP_NOT_AVAILABLE` | 400 | 店家不可用（下架或已刪除） |
+| 40502 | `INVALID_DEADLINE` | 400 | 截止時間無效（必須在未來） |
+| 40503 | `NOT_INITIATOR` | 403 | 非揪團發起人 |
+| 40504 | `ORDER_NOT_ACTIVE` | 400 | 揪團非 Active 狀態或已過截止 |
+| 40505 | `INVALID_STATUS_TRANSITION` | 400 | 無效的狀態流轉 |
+| 40506 | `CANNOT_CANCEL_ORDER` | 400 | 不可取消（僅 Active/Closed 可取消） |
+| 40507 | `ORDER_NOT_FOUND` | 404 | 揪團不存在 |
+
+#### 店家（Shop）(4-06-XX)
+| Code | Error | HTTP | 說明 |
+|------|-------|------|------|
+| 40601 | `SHOP_ALREADY_EXISTS` | 409 | 店家名稱已存在 |
+| 40602 | `SHOP_NOT_FOUND` | 404 | 店家不存在 |
+| 40603 | `CATEGORY_ALREADY_EXISTS` | 409 | 分類名稱已存在（同店家內） |
+| 40604 | `CATEGORY_NOT_FOUND` | 404 | 分類不存在 |
+| 40605 | `MENU_ITEM_NOT_FOUND` | 404 | 菜單品項不存在 |
+| 40606 | `DRINK_ITEM_NOT_FOUND` | 400 | DrinkItem 不存在 |
+
+#### 飲料選項（Drink Option）(4-07-XX)
+| Code | Error | HTTP | 說明 |
+|------|-------|------|------|
+| 40701 | `DRINK_ITEM_ALREADY_EXISTS` | 409 | 通用品名已存在 |
+| 40702 | `DRINK_ITEM_IN_USE` | 400 | 品名被店家菜單引用，不可刪除 |
+| 40703 | `SUGAR_ALREADY_EXISTS` | 409 | 甜度名稱已存在 |
+| 40704 | `SUGAR_IN_USE` | 400 | 甜度被引用，不可刪除 |
+| 40705 | `SUGAR_NOT_FOUND` | 400 | 甜度不存在 |
+| 40706 | `ICE_ALREADY_EXISTS` | 409 | 冰塊名稱已存在 |
+| 40707 | `ICE_IN_USE` | 400 | 冰塊被引用，不可刪除 |
+| 40708 | `ICE_NOT_FOUND` | 400 | 冰塊不存在 |
+| 40709 | `TOPPING_ALREADY_EXISTS` | 409 | 加料名稱已存在 |
+| 40710 | `TOPPING_IN_USE` | 400 | 加料被引用，不可刪除 |
+| 40711 | `TOPPING_NOT_FOUND` | 400 | 加料不存在 |
+| 40712 | `SIZE_ALREADY_EXISTS` | 409 | 容量名稱已存在 |
+| 40713 | `SIZE_IN_USE` | 400 | 容量被引用，不可刪除 |
+| 40714 | `SIZE_NOT_FOUND` | 400 | 容量不存在 |
+
+#### 系統設定（System Setting）(4-08-XX)
+| Code | Error | HTTP | 說明 |
+|------|-------|------|------|
+| 40801 | `SETTING_KEY_NOT_FOUND` | 400 | 設定 Key 不存在 |
+| 40802 | `SETTING_VALUE_INVALID` | 400 | 設定值格式無效 |
+
+#### 通知（Notification）(4-09-XX)
+| Code | Error | HTTP | 說明 |
+|------|-------|------|------|
+| 40901 | `NOTIFICATION_NOT_FOUND` | 404 | 通知不存在 |
+
+---
+
 ## Git Workflow
 - Branch: `feat/<feature>`, `fix/<issue>`, `chore/<task>`
 - Commit: `feat(scope): description`
@@ -336,7 +461,7 @@ GET /api/admin/users?page=1&page_size=20&sort_by=created_at&sort_order=desc&keyw
 - 雜湊流程：`Argon2id(password + pepper, salt)`
 - 新增 Entity 後必須建立 Migration
 - 資料表嚴格遵守第三正規化（3NF）
-- API 回傳格式統一使用 `{ data, message, code }`
+- API 回傳格式統一使用 `{ data, message, code, error, errors }`
 - 所有列表 API 必須支援分頁、排序、搜尋、篩選
 
 ⚠️ Ask First:
