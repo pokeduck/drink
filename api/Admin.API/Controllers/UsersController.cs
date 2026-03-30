@@ -63,7 +63,7 @@ public class UsersController : BaseController
     if (result.Code != 0)
     {
       var httpStatus = result.Error == "USERNAME_ALREADY_EXISTS" ? 409 : 400;
-      return ApiError((result.Code, result.Error!), result.Message!, httpStatus);
+      return ApiError((result.Code, result.Error!), result.Message!, httpStatus, result.Errors);
     }
     return StatusCode(201, ApiResponse<AdminUserDetailResponse>.Success(result.Data));
   }

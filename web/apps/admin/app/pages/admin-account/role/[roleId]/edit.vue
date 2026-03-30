@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useApi } from '~/composable/useApi'
 import { useFormLayout } from '~/composable/useFormLayout'
+import { useApiError } from '~/composable/useApiError'
+import { useLoading } from '~/composable/useLoading'
 
 interface MenuCrudItem {
   menu_id: number
@@ -28,9 +30,10 @@ const router = useRouter()
 const route = useRoute()
 const roleId = Number(route.params.roleId)
 const { labelPosition } = useFormLayout()
+const { handleError } = useApiError()
 
 const formRef = ref()
-const loading = ref(false)
+const { loading, start: startLoading, stop: stopLoading } = useLoading()
 const fetchLoading = ref(true)
 const isSystem = ref(false)
 
@@ -69,7 +72,7 @@ const handleSubmit = async () => {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
 
-  loading.value = true
+  startLoading()
   try {
     await api.put(`/admin/roles/${roleId}`, {
       name: form.name,
@@ -84,10 +87,9 @@ const handleSubmit = async () => {
     ElMessage.success('角色更新成功')
     router.push('/admin-account/role')
   } catch (err: any) {
-    const msg = err?.data?.message || '更新失敗'
-    ElMessage.error(msg)
+    handleError(err, formRef.value, '更新失敗')
   } finally {
-    loading.value = false
+    stopLoading()
   }
 }
 
@@ -104,7 +106,7 @@ onMounted(() => {
       <template #content>{{ isSystem ? '檢視角色' : '編輯角色' }}</template>
     </el-page-header>
 
-    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
+    <el-card v-loading="fetchLoading || loading" shadow="never" style="margin-top: 16px">
       <el-alert
         v-if="isSystem"
         type="info"
@@ -157,7 +159,7 @@ onMounted(() => {
       </el-table>
 
       <div v-if="!isSystem" style="margin-top: 24px">
-        <el-button type="primary" :loading="loading" @click="handleSubmit">儲存</el-button>
+        <el-button type="primary" @click="handleSubmit">儲存</el-button>
         <el-button @click="router.push('/admin-account/role')">取消</el-button>
       </div>
       <div v-else style="margin-top: 24px">

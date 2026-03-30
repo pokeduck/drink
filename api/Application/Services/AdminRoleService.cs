@@ -81,7 +81,9 @@ public class AdminRoleService : BaseService
 
     // 名稱唯一
     if (await roleRepo.Any(r => r.Name == request.Name))
-      return Fail<AdminRoleDetailResponse>(ErrorCodes.RoleAlreadyExists, "角色名稱已存在");
+      return Fail<AdminRoleDetailResponse>(
+        ErrorCodes.RoleAlreadyExists, "角色名稱已存在",
+        new Dictionary<string, string[]> { ["name"] = ["角色名稱已存在"] });
 
     // 驗證所有 MenuId 合法（僅葉節點）
     if (!await ValidateMenuIds(request.Menus.Select(m => m.MenuId).ToList()))
@@ -117,7 +119,9 @@ public class AdminRoleService : BaseService
 
     // 名稱唯一（排除自己）
     if (await roleRepo.Any(r => r.Name == request.Name && r.Id != roleId))
-      return Fail<AdminRoleDetailResponse>(ErrorCodes.RoleAlreadyExists, "角色名稱已存在");
+      return Fail<AdminRoleDetailResponse>(
+        ErrorCodes.RoleAlreadyExists, "角色名稱已存在",
+        new Dictionary<string, string[]> { ["name"] = ["角色名稱已存在"] });
 
     // 驗證所有 MenuId 合法
     if (!await ValidateMenuIds(request.Menus.Select(m => m.MenuId).ToList()))

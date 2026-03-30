@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { useApi } from '~/composable/useApi'
 import { useFormLayout } from '~/composable/useFormLayout'
+import { useApiError } from '~/composable/useApiError'
+import { useLoading } from '~/composable/useLoading'
 import { useAuthStore } from '~/stores/auth'
 
 const api = useApi()
 const authStore = useAuthStore()
 const router = useRouter()
 const { labelPosition } = useFormLayout()
+const { handleError } = useApiError()
 
 const formRef = ref()
-const loading = ref(false)
+const { loading, start: startLoading, stop: stopLoading } = useLoading()
 
 const form = reactive({
   old_password: '',
@@ -38,7 +41,7 @@ const handleSubmit = async () => {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
 
-  loading.value = true
+  startLoading()
   try {
     await api.put('/admin/auth/password', {
       old_password: form.old_password,
@@ -48,10 +51,9 @@ const handleSubmit = async () => {
     await authStore.logout()
     await router.push('/login')
   } catch (err: any) {
-    const msg = err?.data?.message || '密碼修改失敗'
-    ElMessage.error(msg)
+    handleError(err, formRef.value, '密碼修改失敗')
   } finally {
-    loading.value = false
+    stopLoading()
   }
 }
 </script>
@@ -64,7 +66,7 @@ const handleSubmit = async () => {
       <template #content>修改密碼</template>
     </el-page-header>
 
-    <el-card shadow="never" style="margin-top: 16px">
+    <el-card v-loading="loading" shadow="never" style="margin-top: 16px">
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large">
         <el-row :gutter="24">
           <el-col :span="24">
@@ -87,7 +89,7 @@ const handleSubmit = async () => {
         </el-row>
 
         <el-form-item>
-          <el-button type="primary" :loading="loading" @click="handleSubmit">確認修改</el-button>
+          <el-button type="primary" @click="handleSubmit">確認修改</el-button>
           <el-button @click="router.back()">取消</el-button>
         </el-form-item>
       </el-form>

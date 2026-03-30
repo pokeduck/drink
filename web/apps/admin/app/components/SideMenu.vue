@@ -34,21 +34,18 @@ const activeIndex = computed(() => {
   if (indexes.includes(path)) return path
   // 找最長前綴匹配的 menu index
   let best = ''
+  let bestLen = 0
   for (const idx of indexes) {
     const prefix = idx.replace(/\/list$/, '')
-    if (path.startsWith(prefix) && prefix.length > best.length) {
+    if (path.startsWith(prefix) && prefix.length > bestLen) {
+      bestLen = prefix.length
       best = idx
     }
   }
   return best || path
 })
 
-// 在組件初始化時獲取選單資料
-onMounted(() => {
-  if (menuData.value.length === 0) {
-    menuStore.fetchMenuData()
-  }
-})
+// menu fetch 已在 layout 層級發起，此處不再重複呼叫
 </script>
 
 <template>

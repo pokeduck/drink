@@ -73,15 +73,17 @@ const breadcrumbs = computed(() => {
   const leafPaths = collectLeafPaths(menuStore.menuData)
   const currentSegments = route.path.split("/").filter(Boolean)
 
-  // 找同一模組下的 menu 頁面（前綴相同的葉節點中取第一個）
-  const parentMenuPath = leafPaths.find((lp) => {
-    const leafSegments = lp.split("/").filter(Boolean)
-    return (
-      leafSegments.length >= 2 &&
-      currentSegments.length >= 2 &&
-      leafSegments[0] === currentSegments[0]
-    )
-  })
+  // 找最長前綴匹配的 menu 葉節點
+  // e.g. /admin-account/role/create → /admin-account/role（而非 /admin-account/list）
+  let parentMenuPath: string | undefined
+  let bestMatchLen = 0
+  for (const lp of leafPaths) {
+    const prefix = lp.replace(/\/list$/, '')
+    if (route.path.startsWith(prefix) && prefix.length > bestMatchLen) {
+      bestMatchLen = prefix.length
+      parentMenuPath = lp
+    }
+  }
 
   if (parentMenuPath) {
     const parentChain = findAncestorChain(menuStore.menuData, parentMenuPath)

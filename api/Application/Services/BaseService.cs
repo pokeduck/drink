@@ -44,4 +44,7 @@ public abstract class BaseService
 
   protected static ApiResponse<T> Fail<T>((int Code, string Error) errorCode, string message)
       => ApiResponse<T>.Fail(errorCode, message);
+
+  protected static ApiResponse<T> Fail<T>((int Code, string Error) errorCode, string message, Dictionary<string, string[]> errors)
+      => ApiResponse<T>.Fail(errorCode, message, errors);
 }

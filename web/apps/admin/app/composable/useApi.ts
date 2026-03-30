@@ -1,5 +1,9 @@
 import { useAuthStore } from '~/stores/auth'
 
+// 全域 API pending 計數器
+const pendingCount = ref(0)
+export const useApiPending = () => computed(() => pendingCount.value > 0)
+
 export const useApi = () => {
   const config = useRuntimeConfig()
   const authStore = useAuthStore()
@@ -58,10 +62,17 @@ export const useApi = () => {
     },
   })
 
+  const tracked = <T>(promise: Promise<T>): Promise<T> => {
+    pendingCount.value++
+    return promise.finally(() => {
+      pendingCount.value--
+    })
+  }
+
   return {
-    get: <T>(url: string, opts?: any) => apiFetch<T>(url, { method: 'GET', ...opts }),
-    post: <T>(url: string, body?: any, opts?: any) => apiFetch<T>(url, { method: 'POST', body, ...opts }),
-    put: <T>(url: string, body?: any, opts?: any) => apiFetch<T>(url, { method: 'PUT', body, ...opts }),
-    delete: <T>(url: string, opts?: any) => apiFetch<T>(url, { method: 'DELETE', ...opts }),
+    get: <T>(url: string, opts?: any) => tracked(apiFetch<T>(url, { method: 'GET', ...opts })),
+    post: <T>(url: string, body?: any, opts?: any) => tracked(apiFetch<T>(url, { method: 'POST', body, ...opts })),
+    put: <T>(url: string, body?: any, opts?: any) => tracked(apiFetch<T>(url, { method: 'PUT', body, ...opts })),
+    delete: <T>(url: string, opts?: any) => tracked(apiFetch<T>(url, { method: 'DELETE', ...opts })),
   }
 }

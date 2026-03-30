@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useApi } from '~/composable/useApi'
+import { useApiError } from '~/composable/useApiError'
 
 interface AdminUser {
   id: number
@@ -24,6 +25,7 @@ interface ApiResponse<T> {
 
 const api = useApi()
 const router = useRouter()
+const { handleError } = useApiError()
 
 // 搜尋 & 篩選
 const keyword = ref('')
@@ -77,8 +79,7 @@ const handleDelete = async (user: AdminUser) => {
     await fetchList()
   } catch (err: any) {
     if (err !== 'cancel') {
-      const msg = err?.data?.message || '刪除失敗'
-      ElMessage.error(msg)
+      handleError(err, undefined, '刪除失敗')
     }
   }
 }
@@ -110,7 +111,7 @@ const handleResetPassword = async () => {
     ElMessage.success('密碼重設成功')
     resetPasswordDialogVisible.value = false
   } catch (err: any) {
-    ElMessage.error(err?.data?.message || '密碼重設失敗')
+    handleError(err, undefined, '密碼重設失敗')
   } finally {
     resetPasswordLoading.value = false
   }

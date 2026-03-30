@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useApi } from '~/composable/useApi'
+import { useApiError } from '~/composable/useApiError'
 
 interface AdminRole {
   id: number
@@ -15,6 +16,7 @@ interface ApiResponse<T> {
 
 const api = useApi()
 const router = useRouter()
+const { handleError } = useApiError()
 
 const tableData = ref<AdminRole[]>([])
 const loading = ref(false)
@@ -67,8 +69,7 @@ const handleDelete = async () => {
     deleteDialogVisible.value = false
     await fetchList()
   } catch (err: any) {
-    const msg = err?.data?.message || '刪除失敗'
-    ElMessage.error(msg)
+    handleError(err, undefined, '刪除失敗')
   } finally {
     deleteLoading.value = false
   }

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useApi } from '~/composable/useApi'
 import { useFormLayout } from '~/composable/useFormLayout'
+import { useApiError } from '~/composable/useApiError'
+import { useLoading } from '~/composable/useLoading'
 
 interface MenuCrudItem {
   menu_id: number
@@ -19,9 +21,10 @@ interface ApiResponse<T> {
 const api = useApi()
 const router = useRouter()
 const { labelPosition } = useFormLayout()
+const { handleError } = useApiError()
 
 const formRef = ref()
-const loading = ref(false)
+const { loading, start: startLoading, stop: stopLoading } = useLoading()
 const fetchLoading = ref(true)
 
 const form = reactive({
@@ -65,7 +68,7 @@ const handleSubmit = async () => {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
 
-  loading.value = true
+  startLoading()
   try {
     await api.post('/admin/roles', {
       name: form.name,
@@ -80,10 +83,9 @@ const handleSubmit = async () => {
     ElMessage.success('角色建立成功')
     router.push('/admin-account/role')
   } catch (err: any) {
-    const msg = err?.data?.message || '建立失敗'
-    ElMessage.error(msg)
+    handleError(err, formRef.value, '建立失敗')
   } finally {
-    loading.value = false
+    stopLoading()
   }
 }
 
@@ -100,7 +102,7 @@ onMounted(() => {
       <template #content>新增角色</template>
     </el-page-header>
 
-    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
+    <el-card v-loading="fetchLoading || loading" shadow="never" style="margin-top: 16px">
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large" @submit.prevent>
         <el-row :gutter="24">
           <el-col :span="24">
@@ -138,7 +140,7 @@ onMounted(() => {
       </el-table>
 
       <div style="margin-top: 24px">
-        <el-button type="primary" :loading="loading" @click="handleSubmit">建立</el-button>
+        <el-button type="primary" @click="handleSubmit">建立</el-button>
         <el-button @click="router.push('/admin-account/role')">取消</el-button>
       </div>
     </el-card>

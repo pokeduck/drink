@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
+import { useLoading } from '~/composable/useLoading'
 
 definePageMeta({
   layout: 'blank',
@@ -13,7 +14,7 @@ const form = reactive({
   password: '',
 })
 
-const loading = ref(false)
+const { loading, start: startLoading, stop: stopLoading } = useLoading()
 const errorMsg = ref('')
 const formRef = ref()
 
@@ -31,7 +32,7 @@ const handleLogin = async () => {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
 
-  loading.value = true
+  startLoading()
   errorMsg.value = ''
 
   try {
@@ -40,14 +41,14 @@ const handleLogin = async () => {
   } catch (err: any) {
     errorMsg.value = err.message || '登入失敗'
   } finally {
-    loading.value = false
+    stopLoading()
   }
 }
 </script>
 
 <template>
   <div class="login-container">
-    <el-card class="login-card" shadow="hover">
+    <el-card v-loading="loading" class="login-card" shadow="hover">
       <div class="login-header">
         <el-icon :size="36" color="#409eff">
           <ColdDrink />
@@ -67,7 +68,7 @@ const handleLogin = async () => {
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" :loading="loading" size="large" class="login-btn" @click="handleLogin">
+          <el-button type="primary" size="large" class="login-btn" @click="handleLogin">
             登入
           </el-button>
         </el-form-item>

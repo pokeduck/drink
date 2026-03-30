@@ -55,7 +55,7 @@ public class RolesController : BaseController
     if (result.Code != 0)
     {
       var httpStatus = result.Error == "ROLE_ALREADY_EXISTS" ? 409 : 400;
-      return ApiError((result.Code, result.Error!), result.Message!, httpStatus);
+      return ApiError((result.Code, result.Error!), result.Message!, httpStatus, result.Errors);
     }
     return StatusCode(201, ApiResponse<AdminRoleDetailResponse>.Success(result.Data));
   }
@@ -80,7 +80,7 @@ public class RolesController : BaseController
         "ROLE_NOT_FOUND" => 404,
         _ => 400
       };
-      return ApiError((result.Code, result.Error!), result.Message!, httpStatus);
+      return ApiError((result.Code, result.Error!), result.Message!, httpStatus, result.Errors);
     }
     return ApiOk(result.Data);
   }

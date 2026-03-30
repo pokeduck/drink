@@ -5,13 +5,20 @@
  */
 import { useMenuStore } from "~/stores/menu";
 import { useAuthStore } from "~/stores/auth";
+import { useApiPending } from "~/composable/useApi";
 import { storeToRefs } from "pinia";
 import { EditPen, SwitchButton } from "@element-plus/icons-vue";
 import defaultAvatar from "~/assets/avatar.png";
 
 const authStore = useAuthStore();
 const menuStore = useMenuStore();
+const isApiPending = useApiPending();
 const { isCollapsed } = storeToRefs(menuStore);
+
+// 在 layout 層級立即發起 menu fetch，避免等到 SideMenu onMounted 才抓
+if (menuStore.menuData.length === 0) {
+  menuStore.fetchMenuData();
+}
 
 // Mobile 判斷
 const isMobile = ref(false);
@@ -57,10 +64,27 @@ const nuxtApp = useNuxtApp();
 
 // 2. 全站初始化邏輯 (onMounted)
 onMounted(() => {
-  // 設定最低載入時間為 1000ms (1秒)，確保使用者能看清楚初始化文字，並提供平滑過渡
-  setTimeout(() => {
-    isInitialLoading.value = false;
-  }, 1000);
+  const startTime = Date.now();
+
+  const hideInitialLoading = () => {
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, 1000 - elapsed);
+    setTimeout(() => {
+      isInitialLoading.value = false;
+    }, remaining);
+  };
+
+  // 等 API 請求（如 menu fetch）完成
+  if (isApiPending.value) {
+    const stop = watch(isApiPending, (pending) => {
+      if (!pending) {
+        stop();
+        hideInitialLoading();
+      }
+    });
+  } else {
+    hideInitialLoading();
+  }
 });
 
 // 3. 路由切換監聽 (useNuxtApp hooks)
@@ -75,17 +99,29 @@ nuxtApp.hook("page:start", () => {
   }
 });
 
-// 監聽換頁完成 (包含新頁面的 async data 獲取完畢)
+// 監聽換頁完成 — 等 API 請求也結束後才關閉 loading
 nuxtApp.hook("page:finish", () => {
   if (!isPageLoading.value) return;
 
-  // 確保局部 Loading 至少顯示 1000ms (1秒)
-  const elapsed = Date.now() - pageLoadStartTime;
-  const remaining = Math.max(0, 1000 - elapsed);
+  const hideLoading = () => {
+    const elapsed = Date.now() - pageLoadStartTime;
+    const remaining = Math.max(0, 1000 - elapsed);
+    setTimeout(() => {
+      isPageLoading.value = false;
+    }, remaining);
+  };
 
-  setTimeout(() => {
-    isPageLoading.value = false;
-  }, remaining);
+  // 如果還有 API 請求在跑，等它們完成
+  if (isApiPending.value) {
+    const stop = watch(isApiPending, (pending) => {
+      if (!pending) {
+        stop();
+        hideLoading();
+      }
+    });
+  } else {
+    hideLoading();
+  }
 });
 
 // 錯誤兜底：萬一換頁出錯 (例如 404)，把 Loading 關掉，避免畫面卡死

@@ -43,4 +43,7 @@ public class ApiResponse<T>
 
   public static ApiResponse<T> Fail((int Code, string Error) errorCode, string message)
       => new() { Code = errorCode.Code, Error = errorCode.Error, Message = message };
+
+  public static ApiResponse<T> Fail((int Code, string Error) errorCode, string message, Dictionary<string, string[]> errors)
+      => new() { Code = errorCode.Code, Error = errorCode.Error, Message = message, Errors = errors };
 }

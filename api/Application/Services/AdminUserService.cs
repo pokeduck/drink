@@ -63,7 +63,9 @@ public class AdminUserService : BaseService
     var roleRepo = GetRepository<AdminRole>();
 
     if (await userRepo.Any(u => u.Username == request.Username))
-      return Fail<AdminUserDetailResponse>(ErrorCodes.UsernameAlreadyExists, "帳號已存在");
+      return Fail<AdminUserDetailResponse>(
+        ErrorCodes.UsernameAlreadyExists, "帳號已存在",
+        new Dictionary<string, string[]> { ["username"] = ["帳號已存在"] });
 
     if (!await roleRepo.Any(r => r.Id == request.RoleId))
       return Fail<AdminUserDetailResponse>(ErrorCodes.RoleNotFound, "角色不存在");
