@@ -99,7 +99,8 @@ public class AdminAuthService : BaseService
       return Fail(ErrorCodes.Unauthorized, "使用者不存在");
 
     if (!HashHelper.VerifyPassword(request.OldPassword, _pepper, user.PasswordHash))
-      return Fail(ErrorCodes.InvalidPassword, "舊密碼錯誤");
+      return Fail(ErrorCodes.InvalidPassword, "舊密碼錯誤",
+        new Dictionary<string, string[]> { ["old_password"] = ["舊密碼錯誤"] });
 
     user.PasswordHash = HashHelper.HashPassword(request.NewPassword, _pepper);
     await userRepo.Update(user);

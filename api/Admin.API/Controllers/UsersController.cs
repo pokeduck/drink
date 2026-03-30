@@ -81,7 +81,7 @@ public class UsersController : BaseController
     if (result.Code != 0)
     {
       var httpStatus = result.Error == "CANNOT_CHANGE_ADMIN_ROLE" ? 403 : 400;
-      return ApiError((result.Code, result.Error!), result.Message!, httpStatus);
+      return ApiError((result.Code, result.Error!), result.Message!, httpStatus, result.Errors);
     }
     return ApiOk(result.Data);
   }

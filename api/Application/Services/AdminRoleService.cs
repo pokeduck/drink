@@ -87,7 +87,8 @@ public class AdminRoleService : BaseService
 
     // 驗證所有 MenuId 合法（僅葉節點）
     if (!await ValidateMenuIds(request.Menus.Select(m => m.MenuId).ToList()))
-      return Fail<AdminRoleDetailResponse>(ErrorCodes.InvalidMenuId, "包含無效的 Menu ID");
+      return Fail<AdminRoleDetailResponse>(ErrorCodes.InvalidMenuId, "包含無效的 Menu ID",
+        new Dictionary<string, string[]> { ["menus"] = ["包含無效的 Menu ID"] });
 
     var role = new AdminRole
     {
@@ -125,7 +126,8 @@ public class AdminRoleService : BaseService
 
     // 驗證所有 MenuId 合法
     if (!await ValidateMenuIds(request.Menus.Select(m => m.MenuId).ToList()))
-      return Fail<AdminRoleDetailResponse>(ErrorCodes.InvalidMenuId, "包含無效的 Menu ID");
+      return Fail<AdminRoleDetailResponse>(ErrorCodes.InvalidMenuId, "包含無效的 Menu ID",
+        new Dictionary<string, string[]> { ["menus"] = ["包含無效的 Menu ID"] });
 
     role.Name = request.Name;
     await roleRepo.Update(role);

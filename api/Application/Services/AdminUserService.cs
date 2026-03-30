@@ -68,7 +68,8 @@ public class AdminUserService : BaseService
         new Dictionary<string, string[]> { ["username"] = ["帳號已存在"] });
 
     if (!await roleRepo.Any(r => r.Id == request.RoleId))
-      return Fail<AdminUserDetailResponse>(ErrorCodes.RoleNotFound, "角色不存在");
+      return Fail<AdminUserDetailResponse>(ErrorCodes.RoleNotFound, "角色不存在",
+        new Dictionary<string, string[]> { ["role_id"] = ["角色不存在"] });
 
     var user = new AdminUser
     {
@@ -96,10 +97,12 @@ public class AdminUserService : BaseService
 
     // admin 帳號的 Role 不可改為非 Admin Role
     if (user.Role.IsSystem && !await IsSystemRole(request.RoleId))
-      return Fail<AdminUserDetailResponse>(ErrorCodes.CannotChangeAdminRole, "不可將 Admin 帳號的角色改為非 Admin");
+      return Fail<AdminUserDetailResponse>(ErrorCodes.CannotChangeAdminRole, "不可將 Admin 帳號的角色改為非 Admin",
+        new Dictionary<string, string[]> { ["role_id"] = ["不可將 Admin 帳號的角色改為非 Admin"] });
 
     if (!await roleRepo.Any(r => r.Id == request.RoleId))
-      return Fail<AdminUserDetailResponse>(ErrorCodes.RoleNotFound, "角色不存在");
+      return Fail<AdminUserDetailResponse>(ErrorCodes.RoleNotFound, "角色不存在",
+        new Dictionary<string, string[]> { ["role_id"] = ["角色不存在"] });
 
     user.RoleId = request.RoleId;
     user.IsActive = request.IsActive;

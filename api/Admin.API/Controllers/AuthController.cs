@@ -69,7 +69,7 @@ public class AuthController : BaseController
   {
     var result = await _authService.ChangePassword(request);
     if (result.Code != 0)
-      return ApiError((result.Code, result.Error!), result.Message!);
+      return ApiError((result.Code, result.Error!), result.Message!, errors: result.Errors);
     return ApiOk();
   }
 }

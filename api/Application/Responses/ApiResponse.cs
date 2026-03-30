@@ -17,6 +17,9 @@ public class ApiResponse
   public static ApiResponse Fail((int Code, string Error) errorCode, string message)
       => new() { Code = errorCode.Code, Error = errorCode.Error, Message = message };
 
+  public static ApiResponse Fail((int Code, string Error) errorCode, string message, Dictionary<string, string[]> errors)
+      => new() { Code = errorCode.Code, Error = errorCode.Error, Message = message, Errors = errors };
+
   public static ApiResponse ValidationFail(Dictionary<string, string[]> errors)
       => new()
       {
