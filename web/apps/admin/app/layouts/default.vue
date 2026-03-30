@@ -13,6 +13,42 @@ const authStore = useAuthStore();
 const menuStore = useMenuStore();
 const { isCollapsed } = storeToRefs(menuStore);
 
+// Mobile 判斷
+const isMobile = ref(false);
+const mobileDrawerVisible = ref(false);
+
+const checkMobile = () => {
+  isMobile.value = window.innerWidth < 768;
+  if (!isMobile.value) {
+    mobileDrawerVisible.value = false;
+  }
+};
+
+onMounted(() => {
+  checkMobile();
+  window.addEventListener("resize", checkMobile);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", checkMobile);
+});
+
+const toggleMenu = () => {
+  if (isMobile.value) {
+    mobileDrawerVisible.value = !mobileDrawerVisible.value;
+  } else {
+    menuStore.toggleCollapse();
+  }
+};
+
+// Mobile 點選 menu item 後自動關閉 drawer
+const route = useRoute();
+watch(() => route.path, () => {
+  if (isMobile.value) {
+    mobileDrawerVisible.value = false;
+  }
+});
+
 // 1. 狀態宣告：一開始就設為 true，確保全站 Loading 立即啟動
 const isInitialLoading = ref(true); // 全站初次載入 (Fullscreen)
 const isPageLoading = ref(false); // 局部路由換頁載入 (Main Region)
@@ -81,6 +117,7 @@ const handleCommand = async (command: string) => {
       <!-- 頂部導覽列 (固定高度) -->
       <el-header class="admin-header" height="60px">
         <div class="header-left">
+          <el-link v-if="isMobile" underline="never" icon="Menu" @click="toggleMenu" class="collapse-btn" />
           <el-link underline="never" href="/" class="logo-link">
             <div class="logo-wrapper">
               <el-icon :size="24" class="logo-icon">
@@ -89,27 +126,47 @@ const handleCommand = async (command: string) => {
               <span class="logo-text">DRINK ADMIN</span>
             </div>
           </el-link>
-          <el-link underline="never" :icon="isCollapsed ? 'Expand' : 'Fold'" @click="menuStore.toggleCollapse" class="collapse-btn" />
+          <el-link v-if="!isMobile" underline="never" :icon="isCollapsed ? 'Expand' : 'Fold'" @click="toggleMenu" class="collapse-btn" />
         </div>
         <div class="header-right">
-          <el-dropdown @command="handleCommand">
-            <el-avatar :size="32" :src="defaultAvatar" class="avatar-trigger" />
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="change-password" :icon="EditPen">修改密碼</el-dropdown-item>
-                <el-dropdown-item command="logout" :icon="SwitchButton" divided>登出</el-dropdown-item>
-              </el-dropdown-menu>
+          <el-popover placement="bottom-end" :width="160" :offset="8" trigger="click" popper-class="header-user-popover">
+            <template #reference>
+              <el-avatar :size="32" :src="defaultAvatar" class="avatar-trigger" />
             </template>
-          </el-dropdown>
+            <div class="user-popover-menu">
+              <div class="user-popover-item" @click="handleCommand('change-password')">
+                <el-icon><EditPen /></el-icon>
+                <span>修改密碼</span>
+              </div>
+              <div class="user-popover-divider" />
+              <div class="user-popover-item" @click="handleCommand('logout')">
+                <el-icon><SwitchButton /></el-icon>
+                <span>登出</span>
+              </div>
+            </div>
+          </el-popover>
         </div>
       </el-header>
 
       <!-- 下半部主體 -->
       <el-container class="admin-body">
-        <!-- 左側側邊欄 -->
-        <el-aside :width="isCollapsed ? '0' : '250px'" class="admin-aside" :class="{ 'is-collapsed': isCollapsed }">
+        <!-- Desktop 側邊欄 -->
+        <el-aside v-if="!isMobile" :width="isCollapsed ? '0' : '250px'" class="admin-aside" :class="{ 'is-collapsed': isCollapsed }">
           <SideMenu :collapsed="isCollapsed" />
         </el-aside>
+
+        <!-- Mobile Drawer -->
+        <el-drawer
+          v-if="isMobile"
+          v-model="mobileDrawerVisible"
+          direction="ltr"
+          :with-header="false"
+          size="250px"
+          :z-index="999"
+          class="mobile-menu-drawer"
+        >
+          <SideMenu />
+        </el-drawer>
 
         <!-- 右側主要內容區：綁定局部 Loading -->
         <el-main class="admin-main" v-loading="isPageLoading" element-loading-text="載入中...">
@@ -140,7 +197,7 @@ const handleCommand = async (command: string) => {
   align-items: center;
   justify-content: space-between;
   color: #fff;
-  padding: 0 20px;
+  padding: 0 32px 0 20px;
   z-index: 1000;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
@@ -211,5 +268,41 @@ const handleCommand = async (command: string) => {
 
 .avatar-trigger {
   cursor: pointer;
+}
+</style>
+
+<style>
+.mobile-menu-drawer .el-drawer__body {
+  padding: 0;
+  overflow: hidden;
+}
+
+.header-user-popover {
+  padding: 0 !important;
+}
+
+.user-popover-menu {
+  padding: 4px 0;
+}
+
+.user-popover-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--el-text-color-regular);
+  transition: background-color 0.2s;
+}
+
+.user-popover-item:hover {
+  background-color: var(--el-fill-color-light);
+}
+
+.user-popover-divider {
+  height: 1px;
+  background-color: var(--el-border-color-lighter);
+  margin: 4px 0;
 }
 </style>

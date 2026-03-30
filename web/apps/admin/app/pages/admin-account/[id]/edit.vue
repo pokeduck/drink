@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useApi } from '~/composable/useApi'
+import { useFormLayout } from '~/composable/useFormLayout'
 
 interface AdminUserDetail {
   id: number
@@ -27,6 +28,7 @@ const api = useApi()
 const router = useRouter()
 const route = useRoute()
 const userId = Number(route.params.id)
+const { labelPosition } = useFormLayout()
 
 const formRef = ref()
 const loading = ref(false)
@@ -100,28 +102,46 @@ onMounted(async () => {
   <div>
     <AppBreadcrumb />
 
-    <el-page-header @back="router.push('/admin-account/list')">
+    <el-page-header title="返回上一頁" @back="router.push('/admin-account/list')">
       <template #content>編輯帳號</template>
     </el-page-header>
 
-    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px; max-width: 600px">
-      <el-descriptions :column="2" border style="margin-bottom: 24px">
-        <el-descriptions-item label="帳號">{{ username }}</el-descriptions-item>
-        <el-descriptions-item label="ID">{{ userId }}</el-descriptions-item>
-        <el-descriptions-item label="建立時間">{{ createdAt }}</el-descriptions-item>
-        <el-descriptions-item label="更新時間">{{ updatedAt }}</el-descriptions-item>
-      </el-descriptions>
-
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="80px" label-position="right">
-        <el-form-item label="角色" prop="role_id">
-          <el-select v-model="form.role_id" placeholder="請選擇角色" style="width: 100%">
-            <el-option v-for="role in roles" :key="role.id" :label="role.name" :value="role.id" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="狀態">
-          <el-switch v-model="form.is_active" active-text="啟用" inactive-text="停用" />
-        </el-form-item>
+    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
+      <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large">
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <el-form-item label="帳號">
+              <el-input :model-value="username" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="ID">
+              <el-input :model-value="String(userId)" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="建立時間">
+              <el-input :model-value="createdAt" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="更新時間">
+              <el-input :model-value="updatedAt" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="角色" prop="role_id">
+              <el-select v-model="form.role_id" placeholder="請選擇角色" style="width: 100%">
+                <el-option v-for="role in roles" :key="role.id" :label="role.name" :value="role.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="狀態">
+              <el-switch v-model="form.is_active" active-text="啟用" inactive-text="停用" />
+            </el-form-item>
+          </el-col>
+        </el-row>
 
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="handleSubmit">儲存</el-button>

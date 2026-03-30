@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useApi } from '~/composable/useApi'
+import { useFormLayout } from '~/composable/useFormLayout'
 
 interface AdminRole {
   id: number
@@ -15,6 +16,7 @@ interface ApiResponse<T> {
 
 const api = useApi()
 const router = useRouter()
+const { labelPosition } = useFormLayout()
 
 const formRef = ref()
 const loading = ref(false)
@@ -72,29 +74,36 @@ onMounted(() => {
   <div>
     <AppBreadcrumb />
 
-    <el-page-header @back="router.push('/admin-account/list')">
+    <el-page-header title="返回上一頁" @back="router.push('/admin-account/list')">
       <template #content>新增帳號</template>
     </el-page-header>
 
-    <el-card shadow="never" style="margin-top: 16px; max-width: 600px">
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="80px" label-position="right">
-        <el-form-item label="帳號" prop="username">
-          <el-input v-model="form.username" placeholder="請輸入帳號" maxlength="50" />
-        </el-form-item>
-
-        <el-form-item label="密碼" prop="password">
-          <el-input v-model="form.password" type="password" placeholder="請輸入密碼" show-password />
-        </el-form-item>
-
-        <el-form-item label="角色" prop="role_id">
-          <el-select v-model="form.role_id" placeholder="請選擇角色" style="width: 100%">
-            <el-option v-for="role in roles" :key="role.id" :label="role.name" :value="role.id" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="狀態">
-          <el-switch v-model="form.is_active" active-text="啟用" inactive-text="停用" />
-        </el-form-item>
+    <el-card shadow="never" style="margin-top: 16px">
+      <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large">
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <el-form-item label="帳號" prop="username">
+              <el-input v-model="form.username" placeholder="請輸入帳號" maxlength="50" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="密碼" prop="password">
+              <el-input v-model="form.password" type="password" placeholder="請輸入密碼" show-password />
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="角色" prop="role_id">
+              <el-select v-model="form.role_id" placeholder="請選擇角色" style="width: 100%">
+                <el-option v-for="role in roles" :key="role.id" :label="role.name" :value="role.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="狀態">
+              <el-switch v-model="form.is_active" active-text="啟用" inactive-text="停用" />
+            </el-form-item>
+          </el-col>
+        </el-row>
 
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="handleSubmit">建立</el-button>

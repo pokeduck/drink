@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useApi } from '~/composable/useApi'
+import { useFormLayout } from '~/composable/useFormLayout'
 import { useAuthStore } from '~/stores/auth'
 
 const api = useApi()
 const authStore = useAuthStore()
 const router = useRouter()
+const { labelPosition } = useFormLayout()
 
 const formRef = ref()
 const loading = ref(false)
@@ -58,23 +60,31 @@ const handleSubmit = async () => {
   <div>
     <AppBreadcrumb />
 
-    <el-page-header @back="router.back()">
+    <el-page-header title="返回上一頁" @back="router.back()">
       <template #content>修改密碼</template>
     </el-page-header>
 
-    <el-card shadow="never" style="margin-top: 16px; max-width: 500px">
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" label-position="right">
-        <el-form-item label="舊密碼" prop="old_password">
-          <el-input v-model="form.old_password" type="password" placeholder="請輸入舊密碼" show-password />
-        </el-form-item>
-
-        <el-form-item label="新密碼" prop="new_password">
-          <el-input v-model="form.new_password" type="password" placeholder="請輸入新密碼" show-password />
-        </el-form-item>
-
-        <el-form-item label="確認新密碼" prop="confirm_password">
-          <el-input v-model="form.confirm_password" type="password" placeholder="請再次輸入新密碼" show-password />
-        </el-form-item>
+    <el-card shadow="never" style="margin-top: 16px">
+      <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large">
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <el-form-item label="舊密碼" prop="old_password">
+              <el-input v-model="form.old_password" type="password" placeholder="請輸入舊密碼" show-password />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <el-form-item label="新密碼" prop="new_password">
+              <el-input v-model="form.new_password" type="password" placeholder="請輸入新密碼" show-password />
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="確認新密碼" prop="confirm_password">
+              <el-input v-model="form.confirm_password" type="password" placeholder="請再次輸入新密碼" show-password />
+            </el-form-item>
+          </el-col>
+        </el-row>
 
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="handleSubmit">確認修改</el-button>

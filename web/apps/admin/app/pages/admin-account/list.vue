@@ -63,16 +63,6 @@ const handleSearch = () => {
   fetchList()
 }
 
-const handlePageChange = (newPage: number) => {
-  page.value = newPage
-  fetchList()
-}
-
-const handleSizeChange = (newSize: number) => {
-  pageSize.value = newSize
-  page.value = 1
-  fetchList()
-}
 
 // 刪除
 const handleDelete = async (user: AdminUser) => {
@@ -190,18 +180,7 @@ onMounted(() => {
       </el-table>
 
       <!-- 分頁 -->
-      <div class="pagination-wrapper">
-        <el-pagination
-          v-model:current-page="page"
-          v-model:page-size="pageSize"
-          :total="total"
-          :page-sizes="[10, 20, 50]"
-          layout="total, sizes, prev, pager, next, jumper"
-          background
-          @current-change="handlePageChange"
-          @size-change="handleSizeChange"
-        />
-      </div>
+      <AppPagination v-model:page="page" v-model:page-size="pageSize" :total="total" @change="fetchList" />
     </el-card>
 
     <!-- 重設密碼 Dialog -->

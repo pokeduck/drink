@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useApi } from '~/composable/useApi'
+import { useFormLayout } from '~/composable/useFormLayout'
 
 interface MenuCrudItem {
   menu_id: number
@@ -26,6 +27,7 @@ const api = useApi()
 const router = useRouter()
 const route = useRoute()
 const roleId = Number(route.params.roleId)
+const { labelPosition } = useFormLayout()
 
 const formRef = ref()
 const loading = ref(false)
@@ -98,11 +100,11 @@ onMounted(() => {
   <div>
     <AppBreadcrumb />
 
-    <el-page-header @back="router.push('/admin-account/role')">
+    <el-page-header title="返回上一頁" @back="router.push('/admin-account/role')">
       <template #content>{{ isSystem ? '檢視角色' : '編輯角色' }}</template>
     </el-page-header>
 
-    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px; max-width: 800px">
+    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
       <el-alert
         v-if="isSystem"
         type="info"
@@ -113,16 +115,19 @@ onMounted(() => {
         <template #title>系統角色無法修改</template>
       </el-alert>
 
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" label-position="right" @submit.prevent>
-        <el-form-item label="角色名稱" prop="name">
-          <el-input
-            v-model="form.name"
-            placeholder="請輸入角色名稱"
-            maxlength="50"
-            :disabled="isSystem"
-            style="max-width: 300px"
-          />
-        </el-form-item>
+      <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large" @submit.prevent>
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <el-form-item label="角色名稱" prop="name">
+              <el-input
+                v-model="form.name"
+                placeholder="請輸入角色名稱"
+                maxlength="50"
+                :disabled="isSystem"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
 
       <!-- Menu CRUD 矩陣 -->

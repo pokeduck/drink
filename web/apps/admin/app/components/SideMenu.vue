@@ -11,6 +11,38 @@ const route = useRoute()
 const menuStore = useMenuStore()
 const { menuData, loading } = storeToRefs(menuStore)
 
+// 收集所有 leaf menu 的 index（即有 endpoint 的項目）
+function collectLeafIndexes(items: MenuModel[]): string[] {
+  const result: string[] = []
+  for (const item of items) {
+    if (item.children?.length) {
+      result.push(...collectLeafIndexes(item.children))
+    } else {
+      result.push(item.index)
+    }
+  }
+  return result
+}
+
+// 匹配當前路徑到最接近的 menu index
+// e.g. /admin-account/create → /admin-account/list
+// e.g. /admin-account/role/create → /admin-account/role
+const activeIndex = computed(() => {
+  const path = route.path
+  const indexes = collectLeafIndexes(menuData.value)
+  // 優先完全匹配
+  if (indexes.includes(path)) return path
+  // 找最長前綴匹配的 menu index
+  let best = ''
+  for (const idx of indexes) {
+    const prefix = idx.replace(/\/list$/, '')
+    if (path.startsWith(prefix) && prefix.length > best.length) {
+      best = idx
+    }
+  }
+  return best || path
+})
+
 // 在組件初始化時獲取選單資料
 onMounted(() => {
   if (menuData.value.length === 0) {
@@ -27,7 +59,7 @@ onMounted(() => {
     <el-scrollbar>
       <el-menu
         v-if="menuData.length > 0"
-        :default-active="route.path"
+        :default-active="activeIndex"
         class="recursive-menu"
         router
         unique-opened
