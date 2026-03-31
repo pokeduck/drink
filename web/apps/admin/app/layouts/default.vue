@@ -16,7 +16,8 @@ const isApiPending = useApiPending();
 const { isCollapsed } = storeToRefs(menuStore);
 
 // 在 layout 層級立即發起 menu fetch，避免等到 SideMenu onMounted 才抓
-if (menuStore.menuData.length === 0) {
+// 僅在 client 端執行，避免 SSR 時 Node.js 發 HTTPS 請求遇到 self-signed cert 錯誤
+if (import.meta.client && menuStore.menuData.length === 0) {
   menuStore.fetchMenuData();
 }
 

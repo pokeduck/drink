@@ -25,18 +25,24 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = computed(() => !!accessToken.value)
 
   async function login(payload: LoginPayload) {
-    const res = await $fetch<ApiResponse<AuthTokens>>('/admin/auth/login', {
-      baseURL: config.public.apiBase,
-      method: 'POST',
-      body: payload,
-    })
+    try {
+      const res = await $fetch<ApiResponse<AuthTokens>>('/admin/auth/login', {
+        baseURL: config.public.apiBase,
+        method: 'POST',
+        body: payload,
+      })
 
-    if (res.code !== 0) {
-      throw new Error(res.message || '登入失敗')
+      if (res.code !== 0) {
+        throw new Error(res.message || '登入失敗')
+      }
+
+      accessToken.value = res.data.access_token
+      refreshToken.value = res.data.refresh_token
+    } catch (err: any) {
+      // $fetch 在非 2xx 時拋 FetchError，從 response body 取 message
+      const msg = err?.data?.message || err?.message || '登入失敗'
+      throw new Error(msg)
     }
-
-    accessToken.value = res.data.access_token
-    refreshToken.value = res.data.refresh_token
   }
 
   async function refresh(): Promise<boolean> {
