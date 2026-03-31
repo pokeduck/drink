@@ -36,6 +36,10 @@ const page = ref(1)
 const pageSize = ref(20)
 const total = ref(0)
 
+// 排序
+const sortBy = ref('created_at')
+const sortOrder = ref('desc')
+
 // 資料
 const tableData = ref<AdminUser[]>([])
 const loading = ref(false)
@@ -45,10 +49,12 @@ const fetchList = async () => {
   try {
     const params: Record<string, any> = {
       page: page.value,
-      pageSize: pageSize.value,
+      page_size: pageSize.value,
+      sort_by: sortBy.value,
+      sort_order: sortOrder.value,
     }
     if (keyword.value) params.keyword = keyword.value
-    if (filterActive.value !== undefined) params.isActive = filterActive.value
+    if (filterActive.value !== undefined) params.is_active = filterActive.value
 
     const res = await api.get<ApiResponse<PaginationList>>('/admin/users', { params })
     tableData.value = res.data.items
@@ -65,6 +71,17 @@ const handleSearch = () => {
   fetchList()
 }
 
+const handleSortChange = ({ prop, order }: { prop: string; order: string | null }) => {
+  if (order) {
+    sortBy.value = prop
+    sortOrder.value = order === 'ascending' ? 'asc' : 'desc'
+  } else {
+    sortBy.value = 'created_at'
+    sortOrder.value = 'desc'
+  }
+  page.value = 1
+  fetchList()
+}
 
 // 刪除
 const handleDelete = async (user: AdminUser) => {
@@ -149,8 +166,8 @@ onMounted(() => {
       </div>
 
       <!-- 表格 -->
-      <el-table :data="tableData" v-loading="loading" stripe style="width: 100%">
-        <el-table-column prop="id" label="ID" width="80" />
+      <el-table :data="tableData" v-loading="loading" stripe style="width: 100%" @sort-change="handleSortChange">
+        <el-table-column prop="id" label="ID" width="80" sortable="custom" />
         <el-table-column prop="username" label="帳號" min-width="150" />
         <el-table-column prop="role_name" label="角色" width="150" />
         <el-table-column label="狀態" width="100">
@@ -160,7 +177,7 @@ onMounted(() => {
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="建立時間" width="180">
+        <el-table-column prop="created_at" label="建立時間" width="180" sortable="custom">
           <template #default="{ row }">
             {{ new Date(row.created_at).toLocaleString('zh-TW') }}
           </template>

@@ -27,6 +27,10 @@ public class AdminRoleSeeder : ISeeder
     });
 
     await context.SaveChangesAsync();
+
+    await context.Database.ExecuteSqlRawAsync(
+      "SELECT setval(pg_get_serial_sequence('admin_role', 'id'), COALESCE((SELECT MAX(id) FROM admin_role), 0) + 1, false)");
+
     Console.WriteLine("  - AdminRole seeded");
   }
 }

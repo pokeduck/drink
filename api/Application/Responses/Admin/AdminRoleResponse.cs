@@ -6,6 +6,7 @@ public class AdminRoleListResponse
   public string Name { get; set; } = null!;
   public bool IsSystem { get; set; }
   public int StaffCount { get; set; }
+  public DateTime CreatedAt { get; set; }
 }
 
 public class AdminRoleDetailResponse

@@ -166,12 +166,14 @@ public class AdminUserService : BaseService
   {
     var isDesc = string.Equals(sortOrder, "desc", StringComparison.OrdinalIgnoreCase);
 
-    return sortBy?.ToLower() switch
+    var ordered = sortBy?.ToLower() switch
     {
+      "id" => isDesc ? query.OrderByDescending(u => u.Id) : query.OrderBy(u => u.Id),
       "username" => isDesc ? query.OrderByDescending(u => u.Username) : query.OrderBy(u => u.Username),
       "is_active" => isDesc ? query.OrderByDescending(u => u.IsActive) : query.OrderBy(u => u.IsActive),
       "role_id" => isDesc ? query.OrderByDescending(u => u.RoleId) : query.OrderBy(u => u.RoleId),
       _ => isDesc ? query.OrderByDescending(u => u.CreatedAt) : query.OrderBy(u => u.CreatedAt)
     };
+    return ordered.ThenBy(u => u.Id);
   }
 }

@@ -7,6 +7,7 @@ interface AdminRole {
   name: string
   is_system: boolean
   staff_count: number
+  created_at: string
 }
 
 interface ApiResponse<T> {
@@ -106,6 +107,11 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column prop="staff_count" label="帳號數量" width="120" />
+        <el-table-column label="建立時間" width="180">
+          <template #default="{ row }">
+            {{ new Date(row.created_at).toLocaleString('zh-TW') }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
             <el-button size="small" @click="router.push(`/admin-account/role/${row.id}/edit`)">

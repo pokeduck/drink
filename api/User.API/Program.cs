@@ -1,15 +1,21 @@
 using System.Text.Json;
+using Drink.Application.Conventions;
 using Drink.Application.Middleware;
 using Drink.Application.Extensions;
 using Drink.Infrastructure.Extensions;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Serilog
 builder.AddSerilog();
 
-// JSON snake_case
-builder.Services.AddControllers()
+// kebab-case routes + snake_case query binding + JSON snake_case
+builder.Services.AddControllers(options =>
+    {
+      options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
+      options.ValueProviderFactories.Insert(0, new SnakeCaseQueryValueProviderFactory());
+    })
     .AddJsonOptions(options =>
     {
       options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;

@@ -56,6 +56,10 @@ public class AdminMenuSeeder : ISeeder
 
     context.Set<AdminMenu>().AddRange(menus);
     await context.SaveChangesAsync();
+
+    await context.Database.ExecuteSqlRawAsync(
+      "SELECT setval(pg_get_serial_sequence('admin_menu', 'id'), COALESCE((SELECT MAX(id) FROM admin_menu), 0) + 1, false)");
+
     Console.WriteLine("  - AdminMenu seeded");
   }
 }
