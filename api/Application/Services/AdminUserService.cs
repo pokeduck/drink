@@ -1,4 +1,5 @@
 using Drink.Application.Constants;
+using Drink.Application.Mappings;
 using Drink.Application.Requests.Admin;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
@@ -37,7 +38,7 @@ public class AdminUserService : BaseService
 
     var mapped = new PaginationExtension.PaginationList<AdminUserListResponse>
     {
-      Items = Mapper.Map<List<AdminUserListResponse>>(result.Items),
+      Items = result.Items.ToAdminUserListResponseList(),
       Total = result.Total,
       Page = result.Page,
       PageSize = result.PageSize
@@ -54,7 +55,7 @@ public class AdminUserService : BaseService
     if (user is null)
       return Fail<AdminUserDetailResponse>(ErrorCodes.NotFound, "帳號不存在");
 
-    return Success(Mapper.Map<AdminUserDetailResponse>(user));
+    return Success(user.ToAdminUserDetailResponse());
   }
 
   public async Task<ApiResponse<AdminUserDetailResponse>> Create(CreateAdminUserRequest request)
@@ -82,8 +83,8 @@ public class AdminUserService : BaseService
     await userRepo.Insert(user);
 
     // Reload with Role
-    var created = await userRepo.GetById(user.Id, include: q => q.Include(u => u.Role));
-    return Success(Mapper.Map<AdminUserDetailResponse>(created));
+    var created = (await userRepo.GetById(user.Id, include: q => q.Include(u => u.Role)))!;
+    return Success(created.ToAdminUserDetailResponse());
   }
 
   public async Task<ApiResponse<AdminUserDetailResponse>> Update(int id, UpdateAdminUserRequest request)
@@ -109,8 +110,8 @@ public class AdminUserService : BaseService
     await userRepo.Update(user);
 
     // Reload
-    var updated = await userRepo.GetById(user.Id, include: q => q.Include(u => u.Role));
-    return Success(Mapper.Map<AdminUserDetailResponse>(updated));
+    var updated = (await userRepo.GetById(user.Id, include: q => q.Include(u => u.Role)))!;
+    return Success(updated.ToAdminUserDetailResponse());
   }
 
   public async Task<ApiResponse> ResetPassword(int id, ResetAdminUserPasswordRequest request)

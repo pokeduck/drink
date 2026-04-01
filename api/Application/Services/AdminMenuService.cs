@@ -1,3 +1,4 @@
+using Drink.Application.Mappings;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
 using Drink.Domain.Entities;
@@ -57,7 +58,7 @@ public class AdminMenuService : BaseService
       if (!isLeaf && subTree.Count == 0)
         continue;
 
-      var dto = Mapper.Map<MenuTreeResponse>(menu);
+      var dto = menu.ToMenuTreeResponse();
       dto.Children = subTree;
       result.Add(dto);
     }

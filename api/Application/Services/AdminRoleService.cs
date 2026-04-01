@@ -1,4 +1,5 @@
 using Drink.Application.Constants;
+using Drink.Application.Mappings;
 using Drink.Application.Requests.Admin;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
@@ -22,7 +23,7 @@ public class AdminRoleService : BaseService
       include: q => q.Include(r => r.Users),
       order: q => q.OrderBy(r => r.Id));
 
-    return Success(Mapper.Map<List<AdminRoleListResponse>>(roles));
+    return Success(roles.ToAdminRoleListResponseList());
   }
 
   /// <summary>

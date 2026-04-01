@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Drink.Application.Constants;
+using Drink.Application.Mappings;
 using Drink.Application.Requests.Admin;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
@@ -20,12 +21,14 @@ public class DrinkOptionService : BaseService
     return await GetPaginatedList<DrinkItem, DrinkItemListResponse>(
       page, pageSize, sortBy, sortOrder, keyword,
       kw => x => x.Name.Contains(kw),
-      BuildDrinkItemOrder);
+      BuildDrinkItemOrder,
+      DrinkOptionMapper.ToDrinkItemListResponse);
   }
 
   public async Task<ApiResponse<DrinkItemDetailResponse>> GetDrinkItemById(int id)
   {
-    return await GetDetailById<DrinkItem, DrinkItemDetailResponse>(id, ErrorCodes.DrinkItemNotFound, "品名不存在");
+    return await GetDetailById<DrinkItem, DrinkItemDetailResponse>(id, ErrorCodes.DrinkItemNotFound, "品名不存在",
+      DrinkOptionMapper.ToDrinkItemDetailResponse);
   }
 
   public async Task<ApiResponse<DrinkItemDetailResponse>> CreateDrinkItem(CreateDrinkItemRequest request)
@@ -40,7 +43,7 @@ public class DrinkOptionService : BaseService
     var entity = new DrinkItem { Name = request.Name, Sort = request.Sort };
     await repo.Insert(entity);
 
-    return Success(Mapper.Map<DrinkItemDetailResponse>(await repo.GetById(entity.Id)));
+    return Success((await repo.GetById(entity.Id))!.ToDrinkItemDetailResponse());
   }
 
   public async Task<ApiResponse<DrinkItemDetailResponse>> UpdateDrinkItem(int id, UpdateDrinkItemRequest request)
@@ -60,7 +63,7 @@ public class DrinkOptionService : BaseService
     entity.Sort = request.Sort;
     await repo.Update(entity);
 
-    return Success(Mapper.Map<DrinkItemDetailResponse>(await repo.GetById(id)));
+    return Success((await repo.GetById(id))!.ToDrinkItemDetailResponse());
   }
 
   public async Task<ApiResponse> DeleteDrinkItem(int id)
@@ -93,12 +96,14 @@ public class DrinkOptionService : BaseService
     return await GetPaginatedList<Sugar, SugarListResponse>(
       page, pageSize, sortBy, sortOrder, keyword,
       kw => x => x.Name.Contains(kw),
-      BuildSugarOrder);
+      BuildSugarOrder,
+      DrinkOptionMapper.ToSugarListResponse);
   }
 
   public async Task<ApiResponse<SugarDetailResponse>> GetSugarById(int id)
   {
-    return await GetDetailById<Sugar, SugarDetailResponse>(id, ErrorCodes.SugarNotFound, "甜度不存在");
+    return await GetDetailById<Sugar, SugarDetailResponse>(id, ErrorCodes.SugarNotFound, "甜度不存在",
+      DrinkOptionMapper.ToSugarDetailResponse);
   }
 
   public async Task<ApiResponse<SugarDetailResponse>> CreateSugar(CreateSugarRequest request)
@@ -113,7 +118,7 @@ public class DrinkOptionService : BaseService
     var entity = new Sugar { Name = request.Name, DefaultPrice = request.DefaultPrice, Sort = request.Sort };
     await repo.Insert(entity);
 
-    return Success(Mapper.Map<SugarDetailResponse>(await repo.GetById(entity.Id)));
+    return Success((await repo.GetById(entity.Id))!.ToSugarDetailResponse());
   }
 
   public async Task<ApiResponse<SugarDetailResponse>> UpdateSugar(int id, UpdateSugarRequest request)
@@ -134,7 +139,7 @@ public class DrinkOptionService : BaseService
     entity.Sort = request.Sort;
     await repo.Update(entity);
 
-    return Success(Mapper.Map<SugarDetailResponse>(await repo.GetById(id)));
+    return Success((await repo.GetById(id))!.ToSugarDetailResponse());
   }
 
   public async Task<ApiResponse> DeleteSugar(int id)
@@ -167,12 +172,14 @@ public class DrinkOptionService : BaseService
     return await GetPaginatedList<Ice, IceListResponse>(
       page, pageSize, sortBy, sortOrder, keyword,
       kw => x => x.Name.Contains(kw),
-      BuildIceOrder);
+      BuildIceOrder,
+      DrinkOptionMapper.ToIceListResponse);
   }
 
   public async Task<ApiResponse<IceDetailResponse>> GetIceById(int id)
   {
-    return await GetDetailById<Ice, IceDetailResponse>(id, ErrorCodes.IceNotFound, "冰塊不存在");
+    return await GetDetailById<Ice, IceDetailResponse>(id, ErrorCodes.IceNotFound, "冰塊不存在",
+      DrinkOptionMapper.ToIceDetailResponse);
   }
 
   public async Task<ApiResponse<IceDetailResponse>> CreateIce(CreateIceRequest request)
@@ -187,7 +194,7 @@ public class DrinkOptionService : BaseService
     var entity = new Ice { Name = request.Name, Sort = request.Sort };
     await repo.Insert(entity);
 
-    return Success(Mapper.Map<IceDetailResponse>(await repo.GetById(entity.Id)));
+    return Success((await repo.GetById(entity.Id))!.ToIceDetailResponse());
   }
 
   public async Task<ApiResponse<IceDetailResponse>> UpdateIce(int id, UpdateIceRequest request)
@@ -207,7 +214,7 @@ public class DrinkOptionService : BaseService
     entity.Sort = request.Sort;
     await repo.Update(entity);
 
-    return Success(Mapper.Map<IceDetailResponse>(await repo.GetById(id)));
+    return Success((await repo.GetById(id))!.ToIceDetailResponse());
   }
 
   public async Task<ApiResponse> DeleteIce(int id)
@@ -240,12 +247,14 @@ public class DrinkOptionService : BaseService
     return await GetPaginatedList<Topping, ToppingListResponse>(
       page, pageSize, sortBy, sortOrder, keyword,
       kw => x => x.Name.Contains(kw),
-      BuildToppingOrder);
+      BuildToppingOrder,
+      DrinkOptionMapper.ToToppingListResponse);
   }
 
   public async Task<ApiResponse<ToppingDetailResponse>> GetToppingById(int id)
   {
-    return await GetDetailById<Topping, ToppingDetailResponse>(id, ErrorCodes.ToppingNotFound, "加料不存在");
+    return await GetDetailById<Topping, ToppingDetailResponse>(id, ErrorCodes.ToppingNotFound, "加料不存在",
+      DrinkOptionMapper.ToToppingDetailResponse);
   }
 
   public async Task<ApiResponse<ToppingDetailResponse>> CreateTopping(CreateToppingRequest request)
@@ -260,7 +269,7 @@ public class DrinkOptionService : BaseService
     var entity = new Topping { Name = request.Name, DefaultPrice = request.DefaultPrice, Sort = request.Sort };
     await repo.Insert(entity);
 
-    return Success(Mapper.Map<ToppingDetailResponse>(await repo.GetById(entity.Id)));
+    return Success((await repo.GetById(entity.Id))!.ToToppingDetailResponse());
   }
 
   public async Task<ApiResponse<ToppingDetailResponse>> UpdateTopping(int id, UpdateToppingRequest request)
@@ -281,7 +290,7 @@ public class DrinkOptionService : BaseService
     entity.Sort = request.Sort;
     await repo.Update(entity);
 
-    return Success(Mapper.Map<ToppingDetailResponse>(await repo.GetById(id)));
+    return Success((await repo.GetById(id))!.ToToppingDetailResponse());
   }
 
   public async Task<ApiResponse> DeleteTopping(int id)
@@ -314,12 +323,14 @@ public class DrinkOptionService : BaseService
     return await GetPaginatedList<Size, SizeListResponse>(
       page, pageSize, sortBy, sortOrder, keyword,
       kw => x => x.Name.Contains(kw),
-      BuildSizeOrder);
+      BuildSizeOrder,
+      DrinkOptionMapper.ToSizeListResponse);
   }
 
   public async Task<ApiResponse<SizeDetailResponse>> GetSizeById(int id)
   {
-    return await GetDetailById<Size, SizeDetailResponse>(id, ErrorCodes.SizeNotFound, "容量不存在");
+    return await GetDetailById<Size, SizeDetailResponse>(id, ErrorCodes.SizeNotFound, "容量不存在",
+      DrinkOptionMapper.ToSizeDetailResponse);
   }
 
   public async Task<ApiResponse<SizeDetailResponse>> CreateSize(CreateSizeRequest request)
@@ -334,7 +345,7 @@ public class DrinkOptionService : BaseService
     var entity = new Size { Name = request.Name, Sort = request.Sort };
     await repo.Insert(entity);
 
-    return Success(Mapper.Map<SizeDetailResponse>(await repo.GetById(entity.Id)));
+    return Success((await repo.GetById(entity.Id))!.ToSizeDetailResponse());
   }
 
   public async Task<ApiResponse<SizeDetailResponse>> UpdateSize(int id, UpdateSizeRequest request)
@@ -354,7 +365,7 @@ public class DrinkOptionService : BaseService
     entity.Sort = request.Sort;
     await repo.Update(entity);
 
-    return Success(Mapper.Map<SizeDetailResponse>(await repo.GetById(id)));
+    return Success((await repo.GetById(id))!.ToSizeDetailResponse());
   }
 
   public async Task<ApiResponse> DeleteSize(int id)
@@ -382,7 +393,8 @@ public class DrinkOptionService : BaseService
   // ==================== Private Helpers ====================
 
   private async Task<ApiResponse<TResponse>> GetDetailById<TEntity, TResponse>(
-    int id, (int Code, string Error) notFoundCode, string notFoundMessage)
+    int id, (int Code, string Error) notFoundCode, string notFoundMessage,
+    Func<TEntity, TResponse> mapper)
     where TEntity : BaseDataEntity
   {
     var repo = GetRepository<TEntity>();
@@ -391,13 +403,14 @@ public class DrinkOptionService : BaseService
     if (entity is null)
       return Fail<TResponse>(notFoundCode, notFoundMessage);
 
-    return Success(Mapper.Map<TResponse>(entity));
+    return Success(mapper(entity));
   }
 
   private async Task<ApiResponse<PaginationExtension.PaginationList<TResponse>>> GetPaginatedList<TEntity, TResponse>(
     int page, int pageSize, string? sortBy, string? sortOrder, string? keyword,
     Func<string, Expression<Func<TEntity, bool>>> keywordFilterBuilder,
-    Func<IQueryable<TEntity>, string?, string?, IQueryable<TEntity>> orderBuilder)
+    Func<IQueryable<TEntity>, string?, string?, IQueryable<TEntity>> orderBuilder,
+    Func<TEntity, TResponse> mapper)
     where TEntity : BaseDataEntity
     where TResponse : class
   {
@@ -414,7 +427,7 @@ public class DrinkOptionService : BaseService
 
     var mapped = new PaginationExtension.PaginationList<TResponse>
     {
-      Items = Mapper.Map<List<TResponse>>(result.Items),
+      Items = result.Items.Select(mapper).ToList(),
       Total = result.Total,
       Page = result.Page,
       PageSize = result.PageSize

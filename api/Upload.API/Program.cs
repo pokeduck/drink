@@ -27,9 +27,6 @@ builder.Services.AddFileUpload(builder.Configuration);
 // Application Services (auto-scan all BaseService subclasses)
 builder.Services.AddApplicationServices();
 
-// AutoMapper (auto-scan all Profiles)
-builder.Services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
-
 // HttpContextAccessor (required by BaseService)
 builder.Services.AddHttpContextAccessor();
 

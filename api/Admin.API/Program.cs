@@ -27,9 +27,6 @@ builder.Services.AddInfrastructure(builder.Configuration);
 // Application Services (auto-scan all BaseService subclasses, exclude Upload-only services)
 builder.Services.AddApplicationServices(typeof(Drink.Application.Services.FileUploadService));
 
-// AutoMapper (auto-scan all Profiles)
-builder.Services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
-
 // JWT Authentication
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
