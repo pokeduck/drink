@@ -3,6 +3,7 @@ using System;
 using Drink.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Drink.Infrastructure.Migrations
 {
     [DbContext(typeof(DrinkDbContext))]
-    partial class DrinkDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260406174737_AddUserAndUserRefreshToken")]
+    partial class AddUserAndUserRefreshToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -638,83 +641,6 @@ namespace Drink.Infrastructure.Migrations
                     b.ToTable("user_refresh_token", (string)null);
                 });
 
-            modelBuilder.Entity("Drink.Domain.Entities.VerificationEmail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<int>("Creator")
-                        .HasColumnType("integer")
-                        .HasColumnName("creator");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("error_message");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("expires_at");
-
-                    b.Property<bool>("IsSuccess")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_success");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_used");
-
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("sent_at");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("token");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<int>("Updater")
-                        .HasColumnType("integer")
-                        .HasColumnName("updater");
-
-                    b.Property<DateTime?>("UsedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("used_at");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_verification_email");
-
-                    b.HasIndex("Token")
-                        .IsUnique()
-                        .HasDatabaseName("ix_verification_email_token");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_verification_email_user_id");
-
-                    b.ToTable("verification_email", (string)null);
-                });
-
             modelBuilder.Entity("Drink.Domain.Entities.AdminMenu", b =>
                 {
                     b.HasOne("Drink.Domain.Entities.AdminMenu", "Parent")
@@ -779,18 +705,6 @@ namespace Drink.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_refresh_token_user_user_id");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Drink.Domain.Entities.VerificationEmail", b =>
-                {
-                    b.HasOne("Drink.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_verification_email_user_user_id");
 
                     b.Navigation("User");
                 });

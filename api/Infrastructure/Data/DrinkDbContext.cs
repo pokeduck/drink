@@ -1,6 +1,7 @@
 using Drink.Domain.Entities;
 using Drink.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Drink.Infrastructure.Data;
 
@@ -13,6 +14,8 @@ public class DrinkDbContext : DbContext
   {
     base.OnConfiguring(optionsBuilder);
     optionsBuilder.UseSnakeCaseNamingConvention();
+    optionsBuilder.ConfigureWarnings(w =>
+      w.Ignore(RelationalEventId.PendingModelChangesWarning));
   }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -64,6 +67,34 @@ public class DrinkDbContext : DbContext
 
       entity.HasOne(e => e.User)
         .WithMany(u => u.RefreshTokens)
+        .HasForeignKey(e => e.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+    });
+
+    // User (Email 唯一，不分大小寫)
+    modelBuilder.Entity<User>(entity =>
+    {
+      entity.HasIndex(e => e.Email).IsUnique();
+    });
+
+    // UserRefreshToken → User
+    modelBuilder.Entity<UserRefreshToken>(entity =>
+    {
+      entity.HasIndex(e => e.Token).IsUnique();
+
+      entity.HasOne(e => e.User)
+        .WithMany(u => u.RefreshTokens)
+        .HasForeignKey(e => e.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+    });
+
+    // VerificationEmail → User
+    modelBuilder.Entity<VerificationEmail>(entity =>
+    {
+      entity.HasIndex(e => e.Token).IsUnique();
+
+      entity.HasOne(e => e.User)
+        .WithMany()
         .HasForeignKey(e => e.UserId)
         .OnDelete(DeleteBehavior.Cascade);
     });
