@@ -10,14 +10,15 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@app/api-types": "workspace:*",
     "@app/core": "workspace:*",
     "@app/models": "workspace:*",
     "@app/tsconfig": "workspace:*",
-
     "@element-plus/nuxt": "^1.1.5",
     "@pinia/nuxt": "^0.11.3",
     "element-plus": "^2.13.5",
     "nuxt": "^4.3.1",
+    "openapi-fetch": "^0.17.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.30"
   }

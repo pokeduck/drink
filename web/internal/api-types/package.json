@@ -1,0 +1,18 @@
+{
+  "name": "@app/api-types",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./admin": "./src/admin.d.ts",
+    "./user": "./src/user.d.ts",
+    "./upload": "./src/upload.d.ts"
+  },
+  "scripts": {
+    "generate": "NODE_TLS_REJECT_UNAUTHORIZED=0 openapi-typescript https://localhost:5101/swagger/v1/swagger.json -o src/admin.d.ts && NODE_TLS_REJECT_UNAUTHORIZED=0 openapi-typescript https://localhost:5102/swagger/v1/swagger.json -o src/user.d.ts && NODE_TLS_REJECT_UNAUTHORIZED=0 openapi-typescript https://localhost:5103/swagger/v1/swagger.json -o src/upload.d.ts"
+  },
+  "devDependencies": {
+    "@app/tsconfig": "workspace:*",
+    "openapi-typescript": "^7.13.0"
+  }
+}

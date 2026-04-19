@@ -11,17 +11,19 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
+    "@app/api-types": "workspace:*",
+    "@app/core": "workspace:*",
+    "@app/models": "workspace:*",
     "@iconify-json/lucide": "^1.2.96",
     "@iconify-json/simple-icons": "^1.2.72",
     "@nuxt/ui": "^4.5.1",
     "nuxt": "^4.3.1",
-    "tailwindcss": "^4.2.1",
-    "@app/models": "workspace:*",
-    "@app/core": "workspace:*"
+    "openapi-fetch": "^0.17.0",
+    "tailwindcss": "^4.2.1"
   },
   "devDependencies": {
-    "@nuxt/eslint": "^1.15.2",
     "@app/tsconfig": "workspace:*",
+    "@nuxt/eslint": "^1.15.2",
     "eslint": "^10.0.3",
     "typescript": "^5.9.3",
     "vue-tsc": "^3.2.5"
