@@ -1,21 +1,11 @@
 <script setup lang="ts">
-import { useApi } from '~/composable/useApi'
+import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiError } from '~/composable/useApiError'
+import type { components } from '@app/api-types/admin'
 
-interface AdminRole {
-  id: number
-  name: string
-  is_system: boolean
-  staff_count: number
-  created_at: string
-}
+type AdminRole = components['schemas']['AdminRoleListResponse']
 
-interface ApiResponse<T> {
-  data: T
-  code: number
-}
-
-const api = useApi()
+const api = useAdminApi()
 const router = useRouter()
 const { handleError } = useApiError()
 
@@ -25,8 +15,8 @@ const loading = ref(false)
 const fetchList = async () => {
   loading.value = true
   try {
-    const res = await api.get<ApiResponse<AdminRole[]>>('/admin/roles')
-    tableData.value = res.data
+    const { data: res } = await api.GET('/api/admin/roles')
+    tableData.value = res?.data ?? []
   } catch (err) {
     console.error('Failed to fetch roles:', err)
   } finally {
@@ -54,18 +44,21 @@ const availableRolesForReassign = computed(() => {
 const handleDelete = async () => {
   if (!deleteTarget.value) return
 
-  if (deleteTarget.value.staff_count > 0 && !reassignRoleId.value) {
+  if ((deleteTarget.value.staff_count ?? 0) > 0 && !reassignRoleId.value) {
     ElMessage.warning('請選擇要遷移 Staff 的目標角色')
     return
   }
 
   deleteLoading.value = true
   try {
-    const body: Record<string, any> = {}
-    if (deleteTarget.value.staff_count > 0) {
+    const body: { reassign_role_id?: number | null } = {}
+    if ((deleteTarget.value.staff_count ?? 0) > 0) {
       body.reassign_role_id = reassignRoleId.value
     }
-    await api.delete(`/admin/roles/${deleteTarget.value.id}`, { body })
+    await api.DELETE('/api/admin/roles/{roleId}', {
+      params: { path: { roleId: deleteTarget.value.id! } },
+      body,
+    })
     ElMessage.success('刪除成功')
     deleteDialogVisible.value = false
     await fetchList()
@@ -90,7 +83,7 @@ onMounted(() => {
       <div class="toolbar">
         <div />
         <div>
-          <el-button type="primary" :icon="Plus" @click="router.push('/admin-account/role/create')">
+          <el-button type="primary" icon="Plus" @click="router.push('/admin-account/role/create')">
             新增角色
           </el-button>
         </div>
@@ -134,7 +127,7 @@ onMounted(() => {
     <el-dialog v-model="deleteDialogVisible" title="刪除角色" width="480" :close-on-click-modal="false">
       <template v-if="deleteTarget">
         <p>確定要刪除角色「{{ deleteTarget.name }}」嗎？</p>
-        <template v-if="deleteTarget.staff_count > 0">
+        <template v-if="(deleteTarget.staff_count ?? 0) > 0">
           <el-alert
             type="warning"
             :closable="false"
@@ -150,9 +143,9 @@ onMounted(() => {
               <el-select v-model="reassignRoleId" placeholder="請選擇目標角色" style="width: 100%">
                 <el-option
                   v-for="role in availableRolesForReassign"
-                  :key="role.id"
-                  :label="role.name"
-                  :value="role.id"
+                  :key="role.id!"
+                  :label="role.name!"
+                  :value="role.id!"
                 />
               </el-select>
             </el-form-item>
