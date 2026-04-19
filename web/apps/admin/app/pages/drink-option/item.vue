@@ -240,7 +240,7 @@ onMounted(() => {
           <el-button @click="handleSaveSort">
             儲存排序
           </el-button>
-          <el-button type="primary" :icon="Plus" @click="openCreate">
+          <el-button type="primary" icon="Plus" @click="openCreate">
             新增品名
           </el-button>
         </div>

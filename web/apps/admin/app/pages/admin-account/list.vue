@@ -159,7 +159,7 @@ onMounted(() => {
           <el-button type="primary" @click="handleSearch">查詢</el-button>
         </div>
         <div class="toolbar-right">
-          <el-button type="primary" :icon="Plus" @click="router.push('/admin-account/create')">
+          <el-button type="primary" icon="Plus" @click="router.push('/admin-account/create')">
             新增帳號
           </el-button>
         </div>
