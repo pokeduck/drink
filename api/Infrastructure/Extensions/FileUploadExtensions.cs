@@ -1,5 +1,6 @@
+using Drink.Application.Interfaces;
+using Drink.Application.Settings;
 using Drink.Infrastructure.Services;
-using Drink.Infrastructure.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

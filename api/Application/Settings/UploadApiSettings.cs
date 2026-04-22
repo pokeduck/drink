@@ -1,4 +1,4 @@
-namespace Drink.Infrastructure.Settings;
+namespace Drink.Application.Settings;
 
 public class UploadApiSettings
 {

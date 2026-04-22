@@ -1,11 +1,11 @@
 using System.Linq.Expressions;
+using Drink.Application.Models;
 using Drink.Domain.Entities;
-using Drink.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace Drink.Infrastructure.Repositories;
+namespace Drink.Application.Interfaces;
 
 public interface IGenericRepository<TEntity>
   where TEntity : BaseDataEntity
@@ -33,7 +33,7 @@ public interface IGenericRepository<TEntity>
     Func<IQueryable<TEntity>, IQueryable<TEntity>>? order = null,
     bool tracking = false);
 
-  Task<PaginationExtension.PaginationList<TEntity>> GetPaginationList(
+  Task<PaginationList<TEntity>> GetPaginationList(
     int page,
     int pageSize,
     Expression<Func<TEntity, bool>>? predicate = null,

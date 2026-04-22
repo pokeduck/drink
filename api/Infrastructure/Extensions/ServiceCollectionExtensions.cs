@@ -1,8 +1,10 @@
 using System.Text;
+using Drink.Application.Interfaces;
+using Drink.Application.Settings;
 using Drink.Infrastructure.Data;
+using Drink.Infrastructure.Helpers;
 using Drink.Infrastructure.Repositories;
 using Drink.Infrastructure.Services;
-using Drink.Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -28,8 +30,12 @@ public static class ServiceCollectionExtensions
     services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
     services.AddScoped<IJwtTokenService, JwtTokenService>();
 
-    // HttpContext
+    // CurrentUserContext
     services.AddHttpContextAccessor();
+    services.AddScoped<ICurrentUserContext, HttpCurrentUserContext>();
+
+    // PasswordHasher
+    services.AddScoped<IPasswordHasher, Argon2PasswordHasher>();
 
     return services;
   }

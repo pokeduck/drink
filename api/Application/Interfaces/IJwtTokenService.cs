@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace Drink.Infrastructure.Services;
+namespace Drink.Application.Interfaces;
 
 public interface IJwtTokenService
 {
