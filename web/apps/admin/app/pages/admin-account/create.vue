@@ -1,25 +1,16 @@
 <script setup lang="ts">
-import { useApi } from '~/composable/useApi'
+import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
 import { useApiError } from '~/composable/useApiError'
 import { useLoading } from '~/composable/useLoading'
+import type { components } from '@app/api-types/admin'
 
-interface AdminRole {
-  id: number
-  name: string
-}
+type AdminRole = components['schemas']['AdminRoleListResponse']
 
-interface ApiResponse<T> {
-  data: T
-  code: number
-  error?: string
-  message?: string
-}
-
-const api = useApi()
+const api = useAdminApi()
 const router = useRouter()
 const { labelPosition } = useFormLayout()
-const { handleError } = useApiError()
+const { serverErrors, handleError, clearErrors } = useApiError()
 
 const formRef = ref()
 const { loading, start: startLoading, stop: stopLoading } = useLoading()
@@ -43,28 +34,32 @@ const rules = {
 // 載入角色清單
 const roles = ref<AdminRole[]>([])
 const fetchRoles = async () => {
-  try {
-    const res = await api.get<ApiResponse<AdminRole[]>>('/admin/roles')
-    roles.value = res.data
-  } catch {
-    ElMessage.error('載入角色清單失敗')
-  }
+  const { data: res } = await api.GET('/api/admin/roles')
+  roles.value = res?.data ?? []
 }
 
 const handleSubmit = async () => {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
 
+  clearErrors()
   startLoading()
-  try {
-    await api.post('/admin/users', form)
-    ElMessage.success('帳號建立成功')
-    router.push('/admin-account/list')
-  } catch (err: any) {
-    handleError(err, formRef.value, '建立失敗')
-  } finally {
-    stopLoading()
+  const { error } = await api.POST('/api/admin/users', {
+    body: {
+      username: form.username,
+      password: form.password,
+      role_id: form.role_id!,
+      is_active: form.is_active,
+    },
+  })
+  stopLoading()
+
+  if (error) {
+    handleError(error, '建立失敗')
+    return
   }
+  ElMessage.success('帳號建立成功')
+  router.push('/admin-account/list')
 }
 
 onMounted(() => {
@@ -84,19 +79,19 @@ onMounted(() => {
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large">
         <el-row :gutter="24">
           <el-col :span="24">
-            <el-form-item label="帳號" prop="username">
+            <el-form-item label="帳號" prop="username" :error="serverErrors.username">
               <el-input v-model="form.username" placeholder="請輸入帳號" maxlength="50" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="密碼" prop="password">
+            <el-form-item label="密碼" prop="password" :error="serverErrors.password">
               <el-input v-model="form.password" type="password" placeholder="請輸入密碼" show-password />
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="角色" prop="role_id">
+            <el-form-item label="角色" prop="role_id" :error="serverErrors.role_id">
               <el-select v-model="form.role_id" placeholder="請選擇角色" style="width: 100%">
-                <el-option v-for="role in roles" :key="role.id" :label="role.name" :value="role.id" />
+                <el-option v-for="role in roles" :key="role.id!" :label="role.name!" :value="role.id!" />
               </el-select>
             </el-form-item>
           </el-col>

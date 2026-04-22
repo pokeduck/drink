@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useApi } from '~/composable/useApi'
+import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
 import { useApiError } from '~/composable/useApiError'
 import { useLoading } from '~/composable/useLoading'
 
-const api = useApi()
+const api = useAdminApi()
 const router = useRouter()
 const { labelPosition } = useFormLayout()
-const { handleError } = useApiError()
+const { serverErrors, handleError, clearErrors } = useApiError()
 
 const formRef = ref()
 const { loading, start: startLoading, stop: stopLoading } = useLoading()
@@ -36,15 +36,12 @@ const handleSubmit = async () => {
   if (!valid) return
 
   startLoading()
-  try {
-    await api.post('/admin/members', form)
-    ElMessage.success('會員建立成功')
-    router.push('/member/list')
-  } catch (err: any) {
-    handleError(err, formRef.value, '建立失敗')
-  } finally {
-    stopLoading()
-  }
+  clearErrors()
+  const { error } = await api.POST('/api/admin/members', { body: form })
+  stopLoading()
+  if (error) { handleError(error, '建立失敗'); return }
+  ElMessage.success('會員建立成功')
+  router.push('/member/list')
 }
 </script>
 
@@ -60,17 +57,17 @@ const handleSubmit = async () => {
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large">
         <el-row :gutter="24">
           <el-col :span="24">
-            <el-form-item label="名稱" prop="name">
+            <el-form-item label="名稱" prop="name" :error="serverErrors.name">
               <el-input v-model="form.name" placeholder="請輸入名稱" maxlength="100" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="Email" prop="email">
+            <el-form-item label="Email" prop="email" :error="serverErrors.email">
               <el-input v-model="form.email" placeholder="請輸入 Email" maxlength="200" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="密碼" prop="password">
+            <el-form-item label="密碼" prop="password" :error="serverErrors.password">
               <el-input v-model="form.password" type="password" placeholder="請輸入密碼" show-password />
             </el-form-item>
           </el-col>

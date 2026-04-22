@@ -1,29 +1,11 @@
 <script setup lang="ts">
-import { useApi } from '~/composable/useApi'
+import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiError } from '~/composable/useApiError'
+import type { components } from '@app/api-types/admin'
 
-interface AdminUser {
-  id: number
-  username: string
-  role_id: number
-  role_name: string
-  is_active: boolean
-  created_at: string
-}
+type AdminUser = components['schemas']['AdminUserListResponse']
 
-interface PaginationList {
-  items: AdminUser[]
-  total: number
-  page: number
-  page_size: number
-}
-
-interface ApiResponse<T> {
-  data: T
-  code: number
-}
-
-const api = useApi()
+const api = useAdminApi()
 const router = useRouter()
 const { handleError } = useApiError()
 
@@ -46,24 +28,21 @@ const loading = ref(false)
 
 const fetchList = async () => {
   loading.value = true
-  try {
-    const params: Record<string, any> = {
-      page: page.value,
-      page_size: pageSize.value,
-      sort_by: sortBy.value,
-      sort_order: sortOrder.value,
-    }
-    if (keyword.value) params.keyword = keyword.value
-    if (filterActive.value !== undefined) params.is_active = filterActive.value
-
-    const res = await api.get<ApiResponse<PaginationList>>('/admin/users', { params })
-    tableData.value = res.data.items
-    total.value = res.data.total
-  } catch (err) {
-    console.error('Failed to fetch users:', err)
-  } finally {
-    loading.value = false
-  }
+  const { data: res } = await api.GET('/api/admin/users', {
+    params: {
+      query: {
+        page: page.value,
+        pageSize: pageSize.value,
+        sortBy: sortBy.value,
+        sortOrder: sortOrder.value,
+        ...(keyword.value ? { keyword: keyword.value } : {}),
+        ...(filterActive.value !== undefined ? { isActive: filterActive.value } : {}),
+      },
+    },
+  })
+  tableData.value = res?.data?.items ?? []
+  total.value = res?.data?.total ?? 0
+  loading.value = false
 }
 
 const handleSearch = () => {
@@ -91,14 +70,19 @@ const handleDelete = async (user: AdminUser) => {
       confirmButtonText: '刪除',
       cancelButtonText: '取消',
     })
-    await api.delete(`/admin/users/${user.id}`)
-    ElMessage.success('刪除成功')
-    await fetchList()
-  } catch (err: any) {
-    if (err !== 'cancel') {
-      handleError(err, undefined, '刪除失敗')
-    }
+  } catch {
+    return // 使用者取消
   }
+
+  const { error } = await api.DELETE('/api/admin/users/{userId}', {
+    params: { path: { userId: user.id! } },
+  })
+  if (error) {
+    handleError(error, '刪除失敗')
+    return
+  }
+  ElMessage.success('刪除成功')
+  await fetchList()
 }
 
 // 重設密碼
@@ -109,8 +93,8 @@ const newPassword = ref('')
 const resetPasswordLoading = ref(false)
 
 const openResetPasswordDialog = (user: AdminUser) => {
-  resetPasswordUserId.value = user.id
-  resetPasswordUsername.value = user.username
+  resetPasswordUserId.value = user.id!
+  resetPasswordUsername.value = user.username!
   newPassword.value = ''
   resetPasswordDialogVisible.value = true
 }
@@ -121,17 +105,18 @@ const handleResetPassword = async () => {
     return
   }
   resetPasswordLoading.value = true
-  try {
-    await api.put(`/admin/users/${resetPasswordUserId.value}/password`, {
-      new_password: newPassword.value,
-    })
-    ElMessage.success('密碼重設成功')
-    resetPasswordDialogVisible.value = false
-  } catch (err: any) {
-    handleError(err, undefined, '密碼重設失敗')
-  } finally {
-    resetPasswordLoading.value = false
+  const { error } = await api.PUT('/api/admin/users/{userId}/password', {
+    params: { path: { userId: resetPasswordUserId.value! } },
+    body: { new_password: newPassword.value },
+  })
+  resetPasswordLoading.value = false
+
+  if (error) {
+    handleError(error, '密碼重設失敗')
+    return
   }
+  ElMessage.success('密碼重設成功')
+  resetPasswordDialogVisible.value = false
 }
 
 onMounted(() => {

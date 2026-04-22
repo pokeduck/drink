@@ -1,37 +1,18 @@
 <script setup lang="ts">
-import { useApi } from '~/composable/useApi'
+import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
 import { useApiError } from '~/composable/useApiError'
 import { useLoading } from '~/composable/useLoading'
+import type { components } from '@app/api-types/admin'
 
-interface AdminUserDetail {
-  id: number
-  username: string
-  role_id: number
-  role_name: string
-  is_active: boolean
-  created_at: string
-  updated_at: string
-}
+type AdminRole = components['schemas']['AdminRoleListResponse']
 
-interface AdminRole {
-  id: number
-  name: string
-}
-
-interface ApiResponse<T> {
-  data: T
-  code: number
-  error?: string
-  message?: string
-}
-
-const api = useApi()
+const api = useAdminApi()
 const router = useRouter()
 const route = useRoute()
 const userId = Number(route.params.id)
 const { labelPosition } = useFormLayout()
-const { handleError } = useApiError()
+const { serverErrors, handleError, clearErrors } = useApiError()
 
 const formRef = ref()
 const { loading, start: startLoading, stop: stopLoading } = useLoading()
@@ -53,46 +34,52 @@ const rules = {
 // 載入角色清單
 const roles = ref<AdminRole[]>([])
 const fetchRoles = async () => {
-  try {
-    const res = await api.get<ApiResponse<AdminRole[]>>('/admin/roles')
-    roles.value = res.data
-  } catch {
-    ElMessage.error('載入角色清單失敗')
-  }
+  const { data: res } = await api.GET('/api/admin/roles')
+  roles.value = res?.data ?? []
 }
 
 const fetchUser = async () => {
   fetchLoading.value = true
-  try {
-    const res = await api.get<ApiResponse<AdminUserDetail>>(`/admin/users/${userId}`)
-    const user = res.data
-    username.value = user.username
-    form.role_id = user.role_id
-    form.is_active = user.is_active
-    createdAt.value = new Date(user.created_at).toLocaleString('zh-TW')
-    updatedAt.value = new Date(user.updated_at).toLocaleString('zh-TW')
-  } catch (err: any) {
+  const { data: res, error } = await api.GET('/api/admin/users/{userId}', {
+    params: { path: { userId } },
+  })
+
+  if (error) {
     ElMessage.error('載入帳號資料失敗')
     router.push('/admin-account/list')
-  } finally {
-    fetchLoading.value = false
+    return
   }
+
+  const user = res!.data!
+  username.value = user.username!
+  form.role_id = user.role_id!
+  form.is_active = user.is_active!
+  createdAt.value = new Date(user.created_at!).toLocaleString('zh-TW')
+  updatedAt.value = new Date(user.updated_at!).toLocaleString('zh-TW')
+  fetchLoading.value = false
 }
 
 const handleSubmit = async () => {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
 
+  clearErrors()
   startLoading()
-  try {
-    await api.put(`/admin/users/${userId}`, form)
-    ElMessage.success('更新成功')
-    router.push('/admin-account/list')
-  } catch (err: any) {
-    handleError(err, formRef.value, '更新失敗')
-  } finally {
-    stopLoading()
+  const { error } = await api.PUT('/api/admin/users/{userId}', {
+    params: { path: { userId } },
+    body: {
+      role_id: form.role_id!,
+      is_active: form.is_active,
+    },
+  })
+  stopLoading()
+
+  if (error) {
+    handleError(error, '更新失敗')
+    return
   }
+  ElMessage.success('更新成功')
+  router.push('/admin-account/list')
 }
 
 onMounted(async () => {
@@ -132,9 +119,9 @@ onMounted(async () => {
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="角色" prop="role_id">
+            <el-form-item label="角色" prop="role_id" :error="serverErrors.role_id">
               <el-select v-model="form.role_id" placeholder="請選擇角色" style="width: 100%">
-                <el-option v-for="role in roles" :key="role.id" :label="role.name" :value="role.id" />
+                <el-option v-for="role in roles" :key="role.id!" :label="role.name!" :value="role.id!" />
               </el-select>
             </el-form-item>
           </el-col>

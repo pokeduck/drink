@@ -1,36 +1,15 @@
 <script setup lang="ts">
-import { useApi } from '~/composable/useApi'
+import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
 import { useApiError } from '~/composable/useApiError'
 import { useLoading } from '~/composable/useLoading'
 
-interface MemberDetail {
-  id: number
-  name: string
-  email: string
-  avatar: string | null
-  notification_type: number
-  status: number
-  email_verified: boolean
-  is_google_connected: boolean
-  last_login_at: string | null
-  created_at: string
-  updated_at: string
-}
-
-interface ApiResponse<T> {
-  data: T
-  code: number
-  error?: string
-  message?: string
-}
-
-const api = useApi()
+const api = useAdminApi()
 const router = useRouter()
 const route = useRoute()
 const memberId = Number(route.params.id)
 const { labelPosition } = useFormLayout()
-const { handleError } = useApiError()
+const { serverErrors, handleError, clearErrors } = useApiError()
 
 const formRef = ref()
 const { loading, start: startLoading, stop: stopLoading } = useLoading()
@@ -73,25 +52,26 @@ const statusOptions = [
 
 const fetchMember = async () => {
   fetchLoading.value = true
-  try {
-    const res = await api.get<ApiResponse<MemberDetail>>(`/admin/members/${memberId}`)
-    const member = res.data
-    form.name = member.name
-    form.avatar = member.avatar
-    form.notification_type = member.notification_type
-    form.status = member.status
-    email.value = member.email
-    emailVerified.value = member.email_verified
-    isGoogleConnected.value = member.is_google_connected
-    lastLoginAt.value = member.last_login_at ? new Date(member.last_login_at).toLocaleString('zh-TW') : '從未登入'
-    createdAt.value = new Date(member.created_at).toLocaleString('zh-TW')
-    updatedAt.value = new Date(member.updated_at).toLocaleString('zh-TW')
-  } catch (err: any) {
+  const { data: res, error } = await api.GET('/api/admin/members/{memberId}', {
+    params: { path: { memberId } },
+  })
+  fetchLoading.value = false
+  if (error) {
     ElMessage.error('載入會員資料失敗')
     router.push('/member/list')
-  } finally {
-    fetchLoading.value = false
+    return
   }
+  const member = res!.data!
+  form.name = member.name!
+  form.avatar = member.avatar ?? null
+  form.notification_type = member.notification_type!
+  form.status = member.status!
+  email.value = member.email!
+  emailVerified.value = member.email_verified!
+  isGoogleConnected.value = member.is_google_connected!
+  lastLoginAt.value = member.last_login_at ? new Date(member.last_login_at).toLocaleString('zh-TW') : '從未登入'
+  createdAt.value = new Date(member.created_at!).toLocaleString('zh-TW')
+  updatedAt.value = new Date(member.updated_at!).toLocaleString('zh-TW')
 }
 
 const handleSubmit = async () => {
@@ -99,15 +79,15 @@ const handleSubmit = async () => {
   if (!valid) return
 
   startLoading()
-  try {
-    await api.put(`/admin/members/${memberId}`, form)
-    ElMessage.success('更新成功')
-    router.push('/member/list')
-  } catch (err: any) {
-    handleError(err, formRef.value, '更新失敗')
-  } finally {
-    stopLoading()
-  }
+  clearErrors()
+  const { error } = await api.PUT('/api/admin/members/{memberId}', {
+    params: { path: { memberId } },
+    body: form,
+  })
+  stopLoading()
+  if (error) { handleError(error, '更新失敗'); return }
+  ElMessage.success('更新成功')
+  router.push('/member/list')
 }
 
 onMounted(() => {
@@ -169,7 +149,7 @@ onMounted(() => {
 
           <!-- 可編輯欄位 -->
           <el-col :span="24">
-            <el-form-item label="名稱" prop="name">
+            <el-form-item label="名稱" prop="name" :error="serverErrors.name">
               <el-input v-model="form.name" placeholder="請輸入名稱" maxlength="100" />
             </el-form-item>
           </el-col>

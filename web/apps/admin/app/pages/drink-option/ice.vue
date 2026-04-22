@@ -1,30 +1,14 @@
 <script setup lang="ts">
-import { useApi } from '~/composable/useApi'
+import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiError } from '~/composable/useApiError'
 import { useFormLayout } from '~/composable/useFormLayout'
 import { useLoading } from '~/composable/useLoading'
+import type { components } from '@app/api-types/admin'
 
-interface Ice {
-  id: number
-  name: string
-  sort: number
-  created_at: string
-}
+type Ice = components['schemas']['IceListResponse']
 
-interface PaginationList {
-  items: Ice[]
-  total: number
-  page: number
-  page_size: number
-}
-
-interface ApiResponse<T> {
-  data: T
-  code: number
-}
-
-const api = useApi()
-const { handleError } = useApiError()
+const api = useAdminApi()
+const { serverErrors, handleError, clearErrors } = useApiError()
 const { labelPosition } = useFormLayout()
 
 // 搜尋 & 分頁
@@ -32,6 +16,8 @@ const keyword = ref('')
 const page = ref(1)
 const pageSize = ref(20)
 const total = ref(0)
+
+const tableKey = ref(0)
 
 // 排序
 const sortBy = ref('sort')
@@ -47,17 +33,20 @@ const selectedRows = ref<Ice[]>([])
 const fetchList = async () => {
   startLoading()
   try {
-    const params: Record<string, any> = {
-      page: page.value,
-      page_size: pageSize.value,
-      sort_by: sortBy.value,
-      sort_order: sortOrder.value,
-    }
-    if (keyword.value) params.keyword = keyword.value
-
-    const res = await api.get<ApiResponse<PaginationList>>('/admin/ices', { params })
-    tableData.value = res.data.items
-    total.value = res.data.total
+    const { data: res } = await api.GET('/api/admin/ices', {
+      params: {
+        query: {
+          page: page.value,
+          page_size: pageSize.value,
+          sort_by: sortBy.value,
+          sort_order: sortOrder.value,
+          keyword: keyword.value || undefined,
+        },
+      },
+    })
+    tableData.value = res?.data?.items ?? []
+    total.value = res?.data?.total ?? 0
+    tableKey.value++
   } catch (err) {
     console.error('Failed to fetch ices:', err)
   } finally {
@@ -110,10 +99,10 @@ const openCreate = () => {
 }
 
 const openEdit = (row: Ice) => {
-  editingId.value = row.id
+  editingId.value = row.id!
   dialogTitle.value = '編輯冰塊'
-  form.name = row.name
-  form.sort = row.sort
+  form.name = row.name!
+  form.sort = row.sort!
   dialogVisible.value = true
   nextTick(() => formRef.value?.clearValidate())
 }
@@ -123,18 +112,22 @@ const handleSubmit = async () => {
   if (!valid) return
 
   startFormLoading()
+  clearErrors()
   try {
     if (editingId.value) {
-      await api.put(`/admin/ices/${editingId.value}`, form)
+      const { error } = await api.PUT('/api/admin/ices/{id}', {
+        params: { path: { id: editingId.value } },
+        body: form,
+      })
+      if (error) { handleError(error, '更新失敗'); stopFormLoading(); return }
       ElMessage.success('更新成功')
     } else {
-      await api.post('/admin/ices', form)
+      const { error } = await api.POST('/api/admin/ices', { body: form })
+      if (error) { handleError(error, '新增失敗'); stopFormLoading(); return }
       ElMessage.success('新增成功')
     }
     dialogVisible.value = false
     await fetchList()
-  } catch (err: any) {
-    handleError(err, formRef.value, '操作失敗')
   } finally {
     stopFormLoading()
   }
@@ -148,12 +141,15 @@ const handleDelete = async (row: Ice) => {
       confirmButtonText: '刪除',
       cancelButtonText: '取消',
     })
-    await api.delete(`/admin/ices/${row.id}`)
+    const { error } = await api.DELETE('/api/admin/ices/{id}', {
+      params: { path: { id: row.id! } },
+    })
+    if (error) { handleError(error, '刪除失敗'); return }
     ElMessage.success('刪除成功')
     await fetchList()
   } catch (err: any) {
     if (err !== 'cancel') {
-      handleError(err, undefined, '刪除失敗')
+      handleError(err, '刪除失敗')
     }
   }
 }
@@ -168,15 +164,16 @@ const handleBatchDelete = async () => {
       confirmButtonText: '刪除',
       cancelButtonText: '取消',
     })
-    await api.delete('/admin/ices/batch', {
-      body: { ids: selectedRows.value.map((r) => r.id) },
+    const { error } = await api.DELETE('/api/admin/ices/batch', {
+      body: { ids: selectedRows.value.map((r) => r.id!) },
     })
+    if (error) { handleError(error, '批次刪除失敗'); return }
     ElMessage.success('批次刪除成功')
     selectedRows.value = []
     await fetchList()
   } catch (err: any) {
     if (err !== 'cancel') {
-      handleError(err, undefined, '批次刪除失敗')
+      handleError(err, '批次刪除失敗')
     }
   }
 }
@@ -188,14 +185,13 @@ const handleSaveSort = async () => {
   startSortLoading()
   try {
     const items = tableData.value.map((row) => ({
-      id: row.id,
-      sort: row.sort,
+      id: row.id!,
+      sort: row.sort!,
     }))
-    await api.put('/admin/ices/sort', { items })
+    const { error } = await api.PUT('/api/admin/ices/sort', { body: { items } })
+    if (error) { handleError(error, '排序失敗'); return }
     ElMessage.success('排序儲存成功')
     await fetchList()
-  } catch (err: any) {
-    handleError(err, undefined, '排序失敗')
   } finally {
     stopSortLoading()
   }
@@ -247,6 +243,7 @@ onMounted(() => {
 
       <!-- 表格 -->
       <el-table
+        :key="tableKey"
         :data="tableData"
         stripe
         style="width: 100%"
@@ -283,7 +280,7 @@ onMounted(() => {
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="80px" v-loading="formLoading">
         <el-row :gutter="20">
           <el-col :span="24">
-            <el-form-item label="名稱" prop="name">
+            <el-form-item label="名稱" prop="name" :error="serverErrors.name">
               <el-input v-model="form.name" placeholder="請輸入名稱" maxlength="50" />
             </el-form-item>
           </el-col>

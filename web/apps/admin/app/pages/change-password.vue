@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { useApi } from '~/composable/useApi'
+import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
 import { useApiError } from '~/composable/useApiError'
 import { useLoading } from '~/composable/useLoading'
 import { useAuthStore } from '~/stores/auth'
 
-const api = useApi()
+const api = useAdminApi()
 const authStore = useAuthStore()
 const router = useRouter()
 const { labelPosition } = useFormLayout()
-const { handleError } = useApiError()
+const { serverErrors, handleError, clearErrors } = useApiError()
 
 const formRef = ref()
 const { loading, start: startLoading, stop: stopLoading } = useLoading()
@@ -41,20 +41,23 @@ const handleSubmit = async () => {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
 
+  clearErrors()
   startLoading()
-  try {
-    await api.put('/admin/auth/password', {
+  const { error } = await api.PUT('/api/admin/auth/password', {
+    body: {
       old_password: form.old_password,
       new_password: form.new_password,
-    })
-    ElMessage.success('密碼修改成功，請重新登入')
-    await authStore.logout()
-    await router.push('/login')
-  } catch (err: any) {
-    handleError(err, formRef.value, '密碼修改失敗')
-  } finally {
-    stopLoading()
+    },
+  })
+  stopLoading()
+
+  if (error) {
+    handleError(error, '密碼修改失敗')
+    return
   }
+  ElMessage.success('密碼修改成功，請重新登入')
+  await authStore.logout()
+  await router.push('/login')
 }
 </script>
 
@@ -70,14 +73,14 @@ const handleSubmit = async () => {
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large">
         <el-row :gutter="24">
           <el-col :span="24">
-            <el-form-item label="舊密碼" prop="old_password">
+            <el-form-item label="舊密碼" prop="old_password" :error="serverErrors.old_password">
               <el-input v-model="form.old_password" type="password" placeholder="請輸入舊密碼" show-password />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="24">
           <el-col :span="24">
-            <el-form-item label="新密碼" prop="new_password">
+            <el-form-item label="新密碼" prop="new_password" :error="serverErrors.new_password">
               <el-input v-model="form.new_password" type="password" placeholder="請輸入新密碼" show-password />
             </el-form-item>
           </el-col>

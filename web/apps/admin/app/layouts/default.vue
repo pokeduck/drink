@@ -5,15 +5,13 @@
  */
 import { useMenuStore } from "~/stores/menu";
 import { useAuthStore } from "~/stores/auth";
-import { useApiPending } from "~/composable/useApi";
 import { storeToRefs } from "pinia";
 import { EditPen, SwitchButton } from "@element-plus/icons-vue";
 import defaultAvatar from "~/assets/avatar.png";
 
 const authStore = useAuthStore();
 const menuStore = useMenuStore();
-const isApiPending = useApiPending();
-const { isCollapsed } = storeToRefs(menuStore);
+const { isCollapsed, loading: isMenuLoading } = storeToRefs(menuStore);
 
 // 在 layout 層級立即發起 menu fetch，避免等到 SideMenu onMounted 才抓
 // 僅在 client 端執行，避免 SSR 時 Node.js 發 HTTPS 請求遇到 self-signed cert 錯誤
@@ -76,8 +74,8 @@ onMounted(() => {
   };
 
   // 等 API 請求（如 menu fetch）完成
-  if (isApiPending.value) {
-    const stop = watch(isApiPending, (pending) => {
+  if (isMenuLoading.value) {
+    const stop = watch(isMenuLoading, (pending) => {
       if (!pending) {
         stop();
         hideInitialLoading();
@@ -113,8 +111,8 @@ nuxtApp.hook("page:finish", () => {
   };
 
   // 如果還有 API 請求在跑，等它們完成
-  if (isApiPending.value) {
-    const stop = watch(isApiPending, (pending) => {
+  if (isMenuLoading.value) {
+    const stop = watch(isMenuLoading, (pending) => {
       if (!pending) {
         stop();
         hideLoading();

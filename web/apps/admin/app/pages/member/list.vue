@@ -1,33 +1,11 @@
 <script setup lang="ts">
-import { useApi } from '~/composable/useApi'
+import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiError } from '~/composable/useApiError'
+import type { components } from '@app/api-types/admin'
 
-interface Member {
-  id: number
-  name: string
-  email: string
-  avatar: string | null
-  notification_type: number
-  status: number
-  email_verified: boolean
-  is_google_connected: boolean
-  last_login_at: string | null
-  created_at: string
-}
+type Member = components['schemas']['MemberListResponse']
 
-interface PaginationList {
-  items: Member[]
-  total: number
-  page: number
-  page_size: number
-}
-
-interface ApiResponse<T> {
-  data: T
-  code: number
-}
-
-const api = useApi()
+const api = useAdminApi()
 const router = useRouter()
 const { handleError } = useApiError()
 
@@ -52,26 +30,21 @@ const loading = ref(false)
 
 const fetchList = async () => {
   loading.value = true
-  try {
-    const params: Record<string, any> = {
-      page: page.value,
-      page_size: pageSize.value,
-      sort_by: sortBy.value,
-      sort_order: sortOrder.value,
-    }
-    if (keyword.value) params.keyword = keyword.value
-    if (filterStatus.value !== undefined) params.status = filterStatus.value
-    if (filterEmailVerified.value !== undefined) params.email_verified = filterEmailVerified.value
-    if (filterGoogleConnected.value !== undefined) params.is_google_connected = filterGoogleConnected.value
-
-    const res = await api.get<ApiResponse<PaginationList>>('/admin/members', { params })
-    tableData.value = res.data.items
-    total.value = res.data.total
-  } catch (err) {
-    console.error('Failed to fetch members:', err)
-  } finally {
-    loading.value = false
+  const query: Record<string, any> = {
+    page: page.value,
+    page_size: pageSize.value,
+    sort_by: sortBy.value,
+    sort_order: sortOrder.value,
   }
+  if (keyword.value) query.keyword = keyword.value
+  if (filterStatus.value !== undefined) query.status = filterStatus.value
+  if (filterEmailVerified.value !== undefined) query.email_verified = filterEmailVerified.value
+  if (filterGoogleConnected.value !== undefined) query.is_google_connected = filterGoogleConnected.value
+
+  const { data: res } = await api.GET('/api/admin/members', { params: { query } })
+  tableData.value = res?.data?.items ?? []
+  total.value = res?.data?.total ?? 0
+  loading.value = false
 }
 
 const handleSearch = () => {
@@ -112,8 +85,8 @@ const newPassword = ref('')
 const resetPasswordLoading = ref(false)
 
 const openResetPasswordDialog = (member: Member) => {
-  resetPasswordMemberId.value = member.id
-  resetPasswordEmail.value = member.email
+  resetPasswordMemberId.value = member.id!
+  resetPasswordEmail.value = member.email!
   newPassword.value = ''
   resetPasswordDialogVisible.value = true
 }
@@ -124,17 +97,14 @@ const handleResetPassword = async () => {
     return
   }
   resetPasswordLoading.value = true
-  try {
-    await api.put(`/admin/members/${resetPasswordMemberId.value}/password`, {
-      new_password: newPassword.value,
-    })
-    ElMessage.success('密碼重設成功')
-    resetPasswordDialogVisible.value = false
-  } catch (err: any) {
-    handleError(err, undefined, '密碼重設失敗')
-  } finally {
-    resetPasswordLoading.value = false
-  }
+  const { error } = await api.PUT('/api/admin/members/{memberId}/password', {
+    params: { path: { memberId: resetPasswordMemberId.value! } },
+    body: { new_password: newPassword.value },
+  })
+  resetPasswordLoading.value = false
+  if (error) { handleError(error, '密碼重設失敗'); return }
+  ElMessage.success('密碼重設成功')
+  resetPasswordDialogVisible.value = false
 }
 
 onMounted(() => {

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import { useApi } from '~/composable/useApi'
+import { useAdminApi } from '~/composable/useAdminApi'
+import type { components } from '@app/api-types/admin'
 
 export interface MenuModel {
   index: string
@@ -8,21 +9,7 @@ export interface MenuModel {
   children?: MenuModel[]
 }
 
-interface MenuTreeResponse {
-  id: number
-  name: string
-  icon: string | null
-  endpoint: string | null
-  sort: number
-  children: MenuTreeResponse[]
-}
-
-interface ApiResponse<T> {
-  data: T
-  code: number
-  error?: string
-  message?: string
-}
+type MenuTreeResponse = components['schemas']['MenuTreeResponse']
 
 /**
  * 將 API 回傳的 MenuTreeResponse 轉換為前端 MenuModel
@@ -31,7 +18,7 @@ function toMenuModel(items: MenuTreeResponse[]): MenuModel[] {
   return items.map((item) => {
     const model: MenuModel = {
       index: item.endpoint ?? `/menu-${item.id}`,
-      title: item.name,
+      title: item.name!,
       icon: item.icon ?? undefined,
     }
 
@@ -55,9 +42,9 @@ export const useMenuStore = defineStore('menu', () => {
   const fetchMenuData = async () => {
     loading.value = true
     try {
-      const api = useApi()
-      const res = await api.get<ApiResponse<MenuTreeResponse[]>>('/admin/menus/me')
-      menuData.value = toMenuModel(res.data)
+      const api = useAdminApi()
+      const { data: res } = await api.GET('/api/admin/menus/me')
+      menuData.value = toMenuModel(res?.data ?? [])
     } catch (error) {
       console.error('Failed to fetch menu:', error)
     } finally {

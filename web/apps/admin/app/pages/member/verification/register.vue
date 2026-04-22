@@ -1,37 +1,11 @@
 <script setup lang="ts">
-import { useApi } from '~/composable/useApi'
+import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiError } from '~/composable/useApiError'
+import type { components } from '@app/api-types/admin'
 
-interface Verification {
-  id: number
-  user_id: number
-  user_name: string
-  user_email: string
-  is_success: boolean
-  is_used: boolean
-  sent_at: string
-  expires_at: string
-}
+type Verification = components['schemas']['VerificationListResponse']
 
-interface PaginationList {
-  items: Verification[]
-  total: number
-  page: number
-  page_size: number
-}
-
-interface BatchResendResult {
-  success_count: number
-  skip_count: number
-  skipped_ids: number[]
-}
-
-interface ApiResponse<T> {
-  data: T
-  code: number
-}
-
-const api = useApi()
+const api = useAdminApi()
 const { handleError } = useApiError()
 
 // 搜尋 & 篩選
@@ -57,25 +31,20 @@ const selectedRows = ref<Verification[]>([])
 
 const fetchList = async () => {
   loading.value = true
-  try {
-    const params: Record<string, any> = {
-      page: page.value,
-      page_size: pageSize.value,
-      sort_by: sortBy.value,
-      sort_order: sortOrder.value,
-    }
-    if (keyword.value) params.keyword = keyword.value
-    if (filterSuccess.value !== undefined) params.is_success = filterSuccess.value
-    if (filterUsed.value !== undefined) params.is_used = filterUsed.value
-
-    const res = await api.get<ApiResponse<PaginationList>>('/admin/verifications/register', { params })
-    tableData.value = res.data.items
-    total.value = res.data.total
-  } catch (err) {
-    console.error('Failed to fetch verifications:', err)
-  } finally {
-    loading.value = false
+  const query: Record<string, any> = {
+    page: page.value,
+    page_size: pageSize.value,
+    sort_by: sortBy.value,
+    sort_order: sortOrder.value,
   }
+  if (keyword.value) query.keyword = keyword.value
+  if (filterSuccess.value !== undefined) query.is_success = filterSuccess.value
+  if (filterUsed.value !== undefined) query.is_used = filterUsed.value
+
+  const { data: res } = await api.GET('/api/admin/verifications/register', { params: { query } })
+  tableData.value = res?.data?.items ?? []
+  total.value = res?.data?.total ?? 0
+  loading.value = false
 }
 
 const handleSearch = () => {
@@ -107,12 +76,15 @@ const handleResend = async (row: Verification) => {
       confirmButtonText: '確認重發',
       cancelButtonText: '取消',
     })
-    await api.post(`/admin/verifications/${row.id}/resend`)
+    const { error } = await api.POST('/api/admin/verifications/{verificationId}/resend', {
+      params: { path: { verificationId: row.id! } },
+    })
+    if (error) { handleError(error, '重發失敗'); return }
     ElMessage.success('重發成功')
     await fetchList()
   } catch (err: any) {
     if (err !== 'cancel') {
-      handleError(err, undefined, '重發失敗')
+      handleError(err, '重發失敗')
     }
   }
 }
@@ -132,10 +104,14 @@ const handleBatchResend = async () => {
       cancelButtonText: '取消',
     })
     batchResendLoading.value = true
-    const ids = selectedRows.value.map(r => r.id)
-    const res = await api.post<ApiResponse<BatchResendResult>>('/admin/verifications/register/resend', { ids })
-    const data = res.data
-    if (data.skip_count > 0) {
+    const ids = selectedRows.value.map(r => r.id!)
+    const { data: res, error } = await api.POST('/api/admin/verifications/register/resend', {
+      body: { ids },
+    })
+    batchResendLoading.value = false
+    if (error) { handleError(error, '批量重發失敗'); return }
+    const data = res!.data!
+    if (data.skip_count! > 0) {
       ElMessage.warning(`成功 ${data.success_count} 筆，跳過 ${data.skip_count} 筆（已驗證或 10 分鐘內已重發）`)
     } else {
       ElMessage.success(`成功重發 ${data.success_count} 筆`)
@@ -143,10 +119,9 @@ const handleBatchResend = async () => {
     await fetchList()
   } catch (err: any) {
     if (err !== 'cancel') {
-      handleError(err, undefined, '批量重發失敗')
+      batchResendLoading.value = false
+      handleError(err, '批量重發失敗')
     }
-  } finally {
-    batchResendLoading.value = false
   }
 }
 

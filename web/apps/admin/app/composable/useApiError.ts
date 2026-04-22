@@ -1,42 +1,34 @@
-import type { FormInstance } from 'element-plus'
-
-interface ApiErrorData {
-  message?: string
-  error?: string
-  errors?: Record<string, string[]>
-}
-
 /**
  * 處理 API 錯誤：
- * - 有 errors（欄位驗證）→ 設定到 el-form 對應欄位
+ * - 有 errors（欄位驗證）→ 設定到 serverErrors，透過 :error prop 顯示在 el-form-item
  * - 有 message → ElMessageBox alert 顯示
  * - 都沒有 → 顯示預設訊息
  */
 export function useApiError() {
-  const handleError = (err: any, formRef?: FormInstance, fallbackMsg = '操作失敗') => {
-    const data: ApiErrorData = err?.data || err?.response?._data || {}
+  const serverErrors = reactive<Record<string, string>>({})
 
-    // 欄位驗證錯誤 → 對應到 form fields
-    if (data.errors && formRef) {
-      const fields: Record<string, { message: string }[]> = {}
-      for (const [field, messages] of Object.entries(data.errors)) {
-        fields[field] = messages.map((msg) => ({ message: msg }))
+  const clearErrors = () => {
+    for (const key of Object.keys(serverErrors)) {
+      delete serverErrors[key]
+    }
+  }
+
+  const setErrors = (errors: Record<string, string[]>) => {
+    clearErrors()
+    for (const [field, messages] of Object.entries(errors)) {
+      if (messages.length > 0) {
+        serverErrors[field] = messages[0]
       }
-      // 透過 el-form 的 scrollToField + validateField 顯示錯誤
-      for (const [field, messages] of Object.entries(data.errors)) {
-        formRef.fields?.find((f) => f.prop === field)?.validateState
-        // 使用內部方法設置欄位錯誤狀態
-      }
-      // 用更可靠的方式：直接呼叫 validateField 後覆蓋錯誤
-      nextTick(() => {
-        for (const [field, messages] of Object.entries(data.errors!)) {
-          const formItem = formRef.fields?.find((f) => f.prop === field)
-          if (formItem) {
-            formItem.validateState = 'error'
-            formItem.validateMessage = messages[0]
-          }
-        }
-      })
+    }
+  }
+
+  const handleError = (err: any, fallbackMsg = '操作失敗') => {
+    // openapi-fetch 的 error 物件直接就是 response body
+    const data = err?.data || err?.response?._data || err || {}
+
+    // 欄位驗證錯誤 → 設定 serverErrors
+    if (data.errors && typeof data.errors === 'object') {
+      setErrors(data.errors)
       return
     }
 
@@ -48,5 +40,5 @@ export function useApiError() {
     })
   }
 
-  return { handleError }
+  return { serverErrors, handleError, clearErrors }
 }

@@ -1,36 +1,18 @@
 <script setup lang="ts">
-import { useApi } from '~/composable/useApi'
+import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
 import { useApiError } from '~/composable/useApiError'
 import { useLoading } from '~/composable/useLoading'
+import type { components } from '@app/api-types/admin'
 
-interface MenuCrudItem {
-  menu_id: number
-  menu_name: string
-  can_read: boolean
-  can_create: boolean
-  can_update: boolean
-  can_delete: boolean
-}
+type MenuCrudItem = components['schemas']['AdminMenuRoleResponse']
 
-interface RoleDetail {
-  id: number
-  name: string
-  is_system: boolean
-  menus: MenuCrudItem[]
-}
-
-interface ApiResponse<T> {
-  data: T
-  code: number
-}
-
-const api = useApi()
+const api = useAdminApi()
 const router = useRouter()
 const route = useRoute()
 const roleId = Number(route.params.roleId)
 const { labelPosition } = useFormLayout()
-const { handleError } = useApiError()
+const { serverErrors, handleError, clearErrors } = useApiError()
 
 const formRef = ref()
 const { loading, start: startLoading, stop: stopLoading } = useLoading()
@@ -52,18 +34,21 @@ const menuCrudList = ref<MenuCrudItem[]>([])
 
 const fetchRole = async () => {
   fetchLoading.value = true
-  try {
-    const res = await api.get<ApiResponse<RoleDetail>>(`/admin/roles/${roleId}`)
-    const role = res.data
-    form.name = role.name
-    isSystem.value = role.is_system
-    menuCrudList.value = role.menus
-  } catch (err: any) {
+  const { data: res, error } = await api.GET('/api/admin/roles/{roleId}', {
+    params: { path: { roleId } },
+  })
+
+  if (error) {
     ElMessage.error('載入角色資料失敗')
     router.push('/admin-account/role')
-  } finally {
-    fetchLoading.value = false
+    return
   }
+
+  const role = res!.data!
+  form.name = role.name!
+  isSystem.value = role.is_system!
+  menuCrudList.value = role.menus ?? []
+  fetchLoading.value = false
 }
 
 const handleSubmit = async () => {
@@ -72,25 +57,29 @@ const handleSubmit = async () => {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
 
+  clearErrors()
   startLoading()
-  try {
-    await api.put(`/admin/roles/${roleId}`, {
+  const { error } = await api.PUT('/api/admin/roles/{roleId}', {
+    params: { path: { roleId } },
+    body: {
       name: form.name,
       menus: menuCrudList.value.map((m) => ({
-        menu_id: m.menu_id,
+        menu_id: m.menu_id!,
         can_read: m.can_read,
         can_create: m.can_create,
         can_update: m.can_update,
         can_delete: m.can_delete,
       })),
-    })
-    ElMessage.success('角色更新成功')
-    router.push('/admin-account/role')
-  } catch (err: any) {
-    handleError(err, formRef.value, '更新失敗')
-  } finally {
-    stopLoading()
+    },
+  })
+  stopLoading()
+
+  if (error) {
+    handleError(error, '更新失敗')
+    return
   }
+  ElMessage.success('角色更新成功')
+  router.push('/admin-account/role')
 }
 
 onMounted(() => {
@@ -120,7 +109,7 @@ onMounted(() => {
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large" @submit.prevent>
         <el-row :gutter="24">
           <el-col :span="24">
-            <el-form-item label="角色名稱" prop="name">
+            <el-form-item label="角色名稱" prop="name" :error="serverErrors.name">
               <el-input
                 v-model="form.name"
                 placeholder="請輸入角色名稱"
