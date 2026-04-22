@@ -2,7 +2,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace Drink.Application.Conventions;
+namespace Drink.Shared.Web.Conventions;
 
 /// <summary>
 /// 將 snake_case query string 自動綁定到 camelCase / PascalCase 參數。

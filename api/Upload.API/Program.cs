@@ -1,5 +1,6 @@
 using System.Text.Json;
-using Drink.Application.Conventions;
+using Drink.Shared.Web.Conventions;
+using Drink.Shared.Web.Extensions;
 using Drink.Application.Extensions;
 using Drink.Infrastructure.Extensions;
 using Drink.Upload.API.Middleware;

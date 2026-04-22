@@ -8,7 +8,7 @@ using Drink.Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
-namespace Drink.Application.Middleware;
+namespace Drink.Shared.Web.Middleware;
 
 public class RoleMiddleware
 {

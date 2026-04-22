@@ -1,6 +1,7 @@
 using System.Text.Json;
-using Drink.Application.Conventions;
-using Drink.Application.Middleware;
+using Drink.Shared.Web.Conventions;
+using Drink.Shared.Web.Middleware;
+using Drink.Shared.Web.Extensions;
 using Drink.Application.Extensions;
 using Drink.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -34,7 +35,7 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();
 
 // Upload API proxy
-builder.Services.Configure<Drink.Infrastructure.Settings.UploadApiSettings>(
+builder.Services.Configure<Drink.Application.Settings.UploadApiSettings>(
     builder.Configuration.GetSection("UploadApi"));
 builder.Services.AddHttpClient();
 

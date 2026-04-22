@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Routing;
 
-namespace Drink.Application.Conventions;
+namespace Drink.Shared.Web.Conventions;
 
 public partial class SlugifyParameterTransformer : IOutboundParameterTransformer
 {

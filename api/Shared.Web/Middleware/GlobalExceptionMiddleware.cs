@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Drink.Application.Middleware;
+namespace Drink.Shared.Web.Middleware;
 
 public class GlobalExceptionMiddleware
 {

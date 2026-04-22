@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Drink.Application.Extensions;
+namespace Drink.Shared.Web.Extensions;
 
 public static class SwaggerExtensions
 {
