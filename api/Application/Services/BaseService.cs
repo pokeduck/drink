@@ -1,34 +1,18 @@
-using System.Security.Claims;
+using Drink.Application.Interfaces;
 using Drink.Application.Responses;
-using Drink.Domain.Entities;
-using Drink.Infrastructure.Repositories;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Drink.Application.Services;
 
 public abstract class BaseService
 {
-  protected readonly IServiceProvider ServiceProvider;
-  private readonly IHttpContextAccessor _httpContextAccessor;
+  protected readonly ICurrentUserContext CurrentUser;
 
-  protected BaseService(IServiceProvider serviceProvider)
+  protected BaseService(ICurrentUserContext currentUser)
   {
-    ServiceProvider = serviceProvider;
-    _httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+    CurrentUser = currentUser;
   }
 
-  protected int CurrentUserId
-  {
-    get
-    {
-      var claim = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-      return int.TryParse(claim, out var id) ? id : 0;
-    }
-  }
-
-  protected IGenericRepository<TEntity> GetRepository<TEntity>() where TEntity : BaseDataEntity
-      => ServiceProvider.GetRequiredService<IGenericRepository<TEntity>>();
+  protected int CurrentUserId => CurrentUser.UserId;
 
   protected static ApiResponse Success(object? data = null)
       => ApiResponse.Success(data);

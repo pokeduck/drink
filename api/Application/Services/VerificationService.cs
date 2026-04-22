@@ -1,30 +1,36 @@
 using System.Security.Cryptography;
 using Drink.Application.Constants;
+using Drink.Application.Interfaces;
 using Drink.Application.Mappings;
+using Drink.Application.Models;
 using Drink.Application.Requests.Admin;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
 using Drink.Domain.Entities;
 using Drink.Domain.Enums;
-using Drink.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Drink.Application.Services;
 
 public class VerificationService : BaseService
 {
-  public VerificationService(IServiceProvider serviceProvider) : base(serviceProvider) { }
+  private readonly IGenericRepository<VerificationEmail> _verificationRepo;
+
+  public VerificationService(
+    ICurrentUserContext currentUser,
+    IGenericRepository<VerificationEmail> verificationRepo) : base(currentUser)
+  {
+    _verificationRepo = verificationRepo;
+  }
 
   /// <summary>
   /// 依類型取得驗證信列表（後台用）
   /// </summary>
-  public async Task<ApiResponse<PaginationExtension.PaginationList<VerificationListResponse>>> GetList(
+  public async Task<ApiResponse<PaginationList<VerificationListResponse>>> GetList(
     VerificationEmailType type, int page, int pageSize, string? sortBy, string? sortOrder,
     string? keyword, bool? isSuccess, bool? isUsed)
   {
-    var repo = GetRepository<VerificationEmail>();
-
-    var result = await repo.GetPaginationList(
+    var result = await _verificationRepo.GetPaginationList(
       page, pageSize,
       predicate: v =>
         v.Type == type &&
@@ -34,7 +40,7 @@ public class VerificationService : BaseService
       include: q => q.Include(v => v.User),
       order: q => BuildOrder(q, sortBy, sortOrder));
 
-    var mapped = new PaginationExtension.PaginationList<VerificationListResponse>
+    var mapped = new PaginationList<VerificationListResponse>
     {
       Items = result.Items.Select(v => v.ToVerificationListResponse()).ToList(),
       Total = result.Total,
@@ -50,8 +56,7 @@ public class VerificationService : BaseService
   /// </summary>
   public async Task<ApiResponse> Resend(int verificationId)
   {
-    var repo = GetRepository<VerificationEmail>();
-    var original = await repo.GetById(verificationId, include: q => q.Include(v => v.User));
+    var original = await _verificationRepo.GetById(verificationId, include: q => q.Include(v => v.User));
 
     if (original is null)
       return Fail(ErrorCodes.NotFound, "驗證信紀錄不存在");
@@ -74,8 +79,7 @@ public class VerificationService : BaseService
   /// </summary>
   public async Task<ApiResponse<BatchResendResponse>> BatchResend(VerificationEmailType type, BatchResendRequest request)
   {
-    var repo = GetRepository<VerificationEmail>();
-    var originals = await repo.GetList(
+    var originals = await _verificationRepo.GetList(
       predicate: v => request.Ids.Contains(v.Id) && v.Type == type,
       include: q => q.Include(v => v.User));
 
@@ -110,10 +114,9 @@ public class VerificationService : BaseService
 
   private async Task<bool> IsResendTooFrequent(int userId, VerificationEmailType type)
   {
-    var repo = GetRepository<VerificationEmail>();
     var tenMinutesAgo = DateTime.UtcNow.AddMinutes(-10);
 
-    return await repo.Any(v =>
+    return await _verificationRepo.Any(v =>
       v.UserId == userId &&
       v.Type == type &&
       v.SentAt > tenMinutesAgo);
@@ -121,8 +124,6 @@ public class VerificationService : BaseService
 
   private async Task CreateAndSendVerification(int userId, VerificationEmailType type)
   {
-    var repo = GetRepository<VerificationEmail>();
-
     var token = GenerateToken();
     var expiresAt = type == VerificationEmailType.Register
       ? DateTime.UtcNow.AddHours(24)
@@ -139,7 +140,7 @@ public class VerificationService : BaseService
       SentAt = DateTime.UtcNow
     };
 
-    await repo.Insert(verification);
+    await _verificationRepo.Insert(verification);
 
     // TODO: 實際發送郵件邏輯（目前僅建立紀錄）
   }

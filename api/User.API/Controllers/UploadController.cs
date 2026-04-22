@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Drink.Application.Responses;
-using Drink.Infrastructure.Settings;
+using Drink.Application.Settings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;

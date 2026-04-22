@@ -1,7 +1,7 @@
 using Drink.Application.Constants;
+using Drink.Application.Interfaces;
 using Drink.Application.Responses;
-using Drink.Infrastructure.Services;
-using Drink.Infrastructure.Settings;
+using Drink.Application.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
@@ -12,7 +12,7 @@ public class FileUploadService : BaseService
   private readonly IFileStorageService _storageService;
   private readonly UploadSettings _uploadSettings;
 
-  // Extension → allowed MIME types
+  // Extension -> allowed MIME types
   private static readonly Dictionary<string, string[]> AllowedMimeTypes = new(StringComparer.OrdinalIgnoreCase)
   {
     [".jpg"]  = ["image/jpeg"],
@@ -23,7 +23,7 @@ public class FileUploadService : BaseService
     [".pdf"]  = ["application/pdf"],
   };
 
-  // Extension → magic bytes (file signature)
+  // Extension -> magic bytes (file signature)
   private static readonly Dictionary<string, byte[][]> FileSignatures = new(StringComparer.OrdinalIgnoreCase)
   {
     [".jpg"]  = [[0xFF, 0xD8, 0xFF]],
@@ -35,9 +35,9 @@ public class FileUploadService : BaseService
   };
 
   public FileUploadService(
-    IServiceProvider serviceProvider,
+    ICurrentUserContext currentUser,
     IFileStorageService storageService,
-    IOptions<UploadSettings> uploadSettings) : base(serviceProvider)
+    IOptions<UploadSettings> uploadSettings) : base(currentUser)
   {
     _storageService = storageService;
     _uploadSettings = uploadSettings.Value;

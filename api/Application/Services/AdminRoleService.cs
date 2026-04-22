@@ -1,4 +1,5 @@
 using Drink.Application.Constants;
+using Drink.Application.Interfaces;
 using Drink.Application.Mappings;
 using Drink.Application.Requests.Admin;
 using Drink.Application.Responses;
@@ -10,16 +11,30 @@ namespace Drink.Application.Services;
 
 public class AdminRoleService : BaseService
 {
-  public AdminRoleService(IServiceProvider serviceProvider) : base(serviceProvider) { }
+  private readonly IGenericRepository<AdminRole> _roleRepo;
+  private readonly IGenericRepository<AdminMenu> _menuRepo;
+  private readonly IGenericRepository<AdminMenuRole> _menuRoleRepo;
+  private readonly IGenericRepository<AdminUser> _userRepo;
+
+  public AdminRoleService(
+    ICurrentUserContext currentUser,
+    IGenericRepository<AdminRole> roleRepo,
+    IGenericRepository<AdminMenu> menuRepo,
+    IGenericRepository<AdminMenuRole> menuRoleRepo,
+    IGenericRepository<AdminUser> userRepo) : base(currentUser)
+  {
+    _roleRepo = roleRepo;
+    _menuRepo = menuRepo;
+    _menuRoleRepo = menuRoleRepo;
+    _userRepo = userRepo;
+  }
 
   /// <summary>
   /// 取得所有 Role（含 StaffCount）
   /// </summary>
   public async Task<ApiResponse<List<AdminRoleListResponse>>> GetList()
   {
-    var repo = GetRepository<AdminRole>();
-
-    var roles = await repo.GetList(
+    var roles = await _roleRepo.GetList(
       include: q => q.Include(r => r.Users),
       order: q => q.OrderBy(r => r.Id));
 
@@ -31,21 +46,18 @@ public class AdminRoleService : BaseService
   /// </summary>
   public async Task<ApiResponse<AdminRoleDetailResponse>> GetById(int roleId)
   {
-    var roleRepo = GetRepository<AdminRole>();
-    var role = await roleRepo.GetById(roleId);
+    var role = await _roleRepo.GetById(roleId);
 
     if (role is null)
       return Fail<AdminRoleDetailResponse>(ErrorCodes.RoleNotFound, "角色不存在");
 
     // 取得所有葉節點 Menu（有 Endpoint 的）
-    var menuRepo = GetRepository<AdminMenu>();
-    var leafMenus = await menuRepo.GetList(
+    var leafMenus = await _menuRepo.GetList(
       predicate: m => m.Endpoint != null,
       order: q => q.OrderBy(m => m.Sort));
 
     // 取得該 Role 的所有 MenuRole
-    var menuRoleRepo = GetRepository<AdminMenuRole>();
-    var menuRoles = await menuRoleRepo.GetList(
+    var menuRoles = await _menuRoleRepo.GetList(
       predicate: mr => mr.RoleId == roleId);
 
     var menuRoleDict = menuRoles.ToDictionary(mr => mr.MenuId);
@@ -78,10 +90,8 @@ public class AdminRoleService : BaseService
   /// </summary>
   public async Task<ApiResponse<AdminRoleDetailResponse>> Create(CreateAdminRoleRequest request)
   {
-    var roleRepo = GetRepository<AdminRole>();
-
     // 名稱唯一
-    if (await roleRepo.Any(r => r.Name == request.Name))
+    if (await _roleRepo.Any(r => r.Name == request.Name))
       return Fail<AdminRoleDetailResponse>(
         ErrorCodes.RoleAlreadyExists, "角色名稱已存在",
         new Dictionary<string, string[]> { ["name"] = ["角色名稱已存在"] });
@@ -97,7 +107,7 @@ public class AdminRoleService : BaseService
       IsSystem = false,
     };
 
-    await roleRepo.Insert(role);
+    await _roleRepo.Insert(role);
 
     // 建立 MenuRole
     await SaveMenuRoles(role.Id, request.Menus);
@@ -110,8 +120,7 @@ public class AdminRoleService : BaseService
   /// </summary>
   public async Task<ApiResponse<AdminRoleDetailResponse>> Update(int roleId, UpdateAdminRoleRequest request)
   {
-    var roleRepo = GetRepository<AdminRole>();
-    var role = await roleRepo.GetById(roleId, tracking: true);
+    var role = await _roleRepo.GetById(roleId, tracking: true);
 
     if (role is null)
       return Fail<AdminRoleDetailResponse>(ErrorCodes.RoleNotFound, "角色不存在");
@@ -120,7 +129,7 @@ public class AdminRoleService : BaseService
       return Fail<AdminRoleDetailResponse>(ErrorCodes.CannotModifySystemRole, "不可修改系統角色");
 
     // 名稱唯一（排除自己）
-    if (await roleRepo.Any(r => r.Name == request.Name && r.Id != roleId))
+    if (await _roleRepo.Any(r => r.Name == request.Name && r.Id != roleId))
       return Fail<AdminRoleDetailResponse>(
         ErrorCodes.RoleAlreadyExists, "角色名稱已存在",
         new Dictionary<string, string[]> { ["name"] = ["角色名稱已存在"] });
@@ -131,11 +140,10 @@ public class AdminRoleService : BaseService
         new Dictionary<string, string[]> { ["menus"] = ["包含無效的 Menu ID"] });
 
     role.Name = request.Name;
-    await roleRepo.Update(role);
+    await _roleRepo.Update(role);
 
     // 整批覆蓋 MenuRole：先刪後建
-    var menuRoleRepo = GetRepository<AdminMenuRole>();
-    await menuRoleRepo.ExecuteDelete(mr => mr.RoleId == roleId);
+    await _menuRoleRepo.ExecuteDelete(mr => mr.RoleId == roleId);
     await SaveMenuRoles(roleId, request.Menus);
 
     return await GetById(roleId);
@@ -146,8 +154,7 @@ public class AdminRoleService : BaseService
   /// </summary>
   public async Task<ApiResponse> Delete(int roleId, DeleteAdminRoleRequest? request)
   {
-    var roleRepo = GetRepository<AdminRole>();
-    var role = await roleRepo.GetById(roleId, include: q => q.Include(r => r.Users));
+    var role = await _roleRepo.GetById(roleId, include: q => q.Include(r => r.Users));
 
     if (role is null)
       return Fail(ErrorCodes.RoleNotFound, "角色不存在");
@@ -169,22 +176,20 @@ public class AdminRoleService : BaseService
         return Fail(ErrorCodes.RoleHasStaff, "不可遷移到相同角色");
 
       // 目標 Role 必須存在
-      if (!await roleRepo.Any(r => r.Id == targetRoleId))
+      if (!await _roleRepo.Any(r => r.Id == targetRoleId))
         return Fail(ErrorCodes.RoleNotFound, "目標角色不存在");
 
       // 遷移 Staff
-      var userRepo = GetRepository<AdminUser>();
-      await userRepo.ExecuteUpdate(
+      await _userRepo.ExecuteUpdate(
         u => u.RoleId == roleId,
         setters => setters.SetProperty(u => u.RoleId, targetRoleId));
     }
 
     // 刪除 MenuRole
-    var menuRoleRepo = GetRepository<AdminMenuRole>();
-    await menuRoleRepo.ExecuteDelete(mr => mr.RoleId == roleId);
+    await _menuRoleRepo.ExecuteDelete(mr => mr.RoleId == roleId);
 
     // 刪除 Role
-    await roleRepo.DeleteById(roleId);
+    await _roleRepo.DeleteById(roleId);
 
     return Success();
   }
@@ -193,8 +198,7 @@ public class AdminRoleService : BaseService
   {
     if (menuIds.Count == 0) return true;
 
-    var menuRepo = GetRepository<AdminMenu>();
-    var validCount = await menuRepo.Count(m => m.Endpoint != null && menuIds.Contains(m.Id));
+    var validCount = await _menuRepo.Count(m => m.Endpoint != null && menuIds.Contains(m.Id));
     return validCount == menuIds.Count;
   }
 
@@ -202,7 +206,6 @@ public class AdminRoleService : BaseService
   {
     if (menus.Count == 0) return;
 
-    var menuRoleRepo = GetRepository<AdminMenuRole>();
     var entities = menus.Select(m => new AdminMenuRole
     {
       RoleId = roleId,
@@ -213,6 +216,6 @@ public class AdminRoleService : BaseService
       CanDelete = m.CanDelete,
     });
 
-    await menuRoleRepo.InsertRange(entities);
+    await _menuRoleRepo.InsertRange(entities);
   }
 }

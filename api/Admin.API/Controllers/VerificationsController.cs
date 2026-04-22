@@ -3,7 +3,7 @@ using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
 using Drink.Application.Services;
 using Drink.Domain.Enums;
-using Drink.Infrastructure.Extensions;
+using Drink.Application.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +23,7 @@ public class VerificationsController : BaseController
   /// 註冊驗證信列表
   /// </summary>
   [HttpGet("register")]
-  [ProducesResponseType(typeof(ApiResponse<PaginationExtension.PaginationList<VerificationListResponse>>), 200)]
+  [ProducesResponseType(typeof(ApiResponse<PaginationList<VerificationListResponse>>), 200)]
   public async Task<IActionResult> GetRegisterList(
     [FromQuery] int page = 1,
     [FromQuery] int pageSize = 20,
@@ -42,7 +42,7 @@ public class VerificationsController : BaseController
   /// 忘記密碼驗證信列表
   /// </summary>
   [HttpGet("forgot-password")]
-  [ProducesResponseType(typeof(ApiResponse<PaginationExtension.PaginationList<VerificationListResponse>>), 200)]
+  [ProducesResponseType(typeof(ApiResponse<PaginationList<VerificationListResponse>>), 200)]
   public async Task<IActionResult> GetForgotPasswordList(
     [FromQuery] int page = 1,
     [FromQuery] int pageSize = 20,

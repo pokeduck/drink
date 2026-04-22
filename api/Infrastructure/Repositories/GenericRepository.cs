@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
-using System.Security.Claims;
+using Drink.Application.Interfaces;
+using Drink.Application.Models;
 using Drink.Domain.Entities;
 using Drink.Domain.Interfaces;
 using Drink.Infrastructure.Data;
 using Drink.Infrastructure.Extensions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query;
@@ -16,27 +16,20 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity>
   where TEntity : BaseDataEntity
 {
   private readonly DrinkDbContext _context;
-  private readonly IHttpContextAccessor _httpContextAccessor;
+  private readonly ICurrentUserContext _currentUserContext;
   private readonly ILogger<GenericRepository<TEntity>> _logger;
 
   public GenericRepository(
     DrinkDbContext context,
-    IHttpContextAccessor httpContextAccessor,
+    ICurrentUserContext currentUserContext,
     ILogger<GenericRepository<TEntity>> logger)
   {
     _context = context;
-    _httpContextAccessor = httpContextAccessor;
+    _currentUserContext = currentUserContext;
     _logger = logger;
   }
 
-  private int CurrentUserId
-  {
-    get
-    {
-      var claim = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-      return int.TryParse(claim, out var id) ? id : 0;
-    }
-  }
+  private int CurrentUserId => _currentUserContext.UserId;
 
   public DatabaseFacade Database => _context.Database;
   public DbSet<TEntity> DbSet => _context.Set<TEntity>();
@@ -69,7 +62,7 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity>
     return await BuildQuery(predicate, include, order, tracking).ToListAsync();
   }
 
-  public async Task<PaginationExtension.PaginationList<TEntity>> GetPaginationList(
+  public async Task<PaginationList<TEntity>> GetPaginationList(
     int page,
     int pageSize,
     Expression<Func<TEntity, bool>>? predicate = null,

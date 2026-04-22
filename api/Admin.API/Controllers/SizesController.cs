@@ -2,7 +2,7 @@ using Drink.Application.Requests.Admin;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
 using Drink.Application.Services;
-using Drink.Infrastructure.Extensions;
+using Drink.Application.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +19,7 @@ public class SizesController : BaseController
   }
 
   [HttpGet]
-  [ProducesResponseType(typeof(ApiResponse<PaginationExtension.PaginationList<SizeListResponse>>), 200)]
+  [ProducesResponseType(typeof(ApiResponse<PaginationList<SizeListResponse>>), 200)]
   public async Task<IActionResult> GetList(
     [FromQuery] int page = 1,
     [FromQuery] int pageSize = 20,

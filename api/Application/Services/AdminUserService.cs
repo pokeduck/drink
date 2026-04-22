@@ -1,33 +1,44 @@
 using Drink.Application.Constants;
+using Drink.Application.Interfaces;
 using Drink.Application.Mappings;
+using Drink.Application.Models;
 using Drink.Application.Requests.Admin;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
 using Drink.Domain.Entities;
-using Drink.Infrastructure.Extensions;
-using Drink.Infrastructure.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Drink.Application.Services;
 
 public class AdminUserService : BaseService
 {
+  private readonly IGenericRepository<AdminUser> _userRepo;
+  private readonly IGenericRepository<AdminRole> _roleRepo;
+  private readonly IGenericRepository<AdminRefreshToken> _tokenRepo;
+  private readonly IPasswordHasher _passwordHasher;
   private readonly string _pepper;
 
-  public AdminUserService(IServiceProvider serviceProvider) : base(serviceProvider)
+  public AdminUserService(
+    ICurrentUserContext currentUser,
+    IGenericRepository<AdminUser> userRepo,
+    IGenericRepository<AdminRole> roleRepo,
+    IGenericRepository<AdminRefreshToken> tokenRepo,
+    IPasswordHasher passwordHasher,
+    IConfiguration configuration) : base(currentUser)
   {
-    _pepper = serviceProvider.GetRequiredService<IConfiguration>()["Security:Pepper"]
+    _userRepo = userRepo;
+    _roleRepo = roleRepo;
+    _tokenRepo = tokenRepo;
+    _passwordHasher = passwordHasher;
+    _pepper = configuration["Security:Pepper"]
               ?? throw new InvalidOperationException("Security:Pepper is not configured.");
   }
 
-  public async Task<ApiResponse<PaginationExtension.PaginationList<AdminUserListResponse>>> GetList(
+  public async Task<ApiResponse<PaginationList<AdminUserListResponse>>> GetList(
     int page, int pageSize, string? sortBy, string? sortOrder, string? keyword, bool? isActive, int? roleId)
   {
-    var repo = GetRepository<AdminUser>();
-
-    var result = await repo.GetPaginationList(
+    var result = await _userRepo.GetPaginationList(
       page, pageSize,
       predicate: u =>
         (keyword == null || u.Username.Contains(keyword)) &&
@@ -36,7 +47,7 @@ public class AdminUserService : BaseService
       include: q => q.Include(u => u.Role),
       order: q => BuildOrder(q, sortBy, sortOrder));
 
-    var mapped = new PaginationExtension.PaginationList<AdminUserListResponse>
+    var mapped = new PaginationList<AdminUserListResponse>
     {
       Items = result.Items.ToAdminUserListResponseList(),
       Total = result.Total,
@@ -49,8 +60,7 @@ public class AdminUserService : BaseService
 
   public async Task<ApiResponse<AdminUserDetailResponse>> GetById(int id)
   {
-    var repo = GetRepository<AdminUser>();
-    var user = await repo.GetById(id, include: q => q.Include(u => u.Role));
+    var user = await _userRepo.GetById(id, include: q => q.Include(u => u.Role));
 
     if (user is null)
       return Fail<AdminUserDetailResponse>(ErrorCodes.NotFound, "帳號不存在");
@@ -60,39 +70,33 @@ public class AdminUserService : BaseService
 
   public async Task<ApiResponse<AdminUserDetailResponse>> Create(CreateAdminUserRequest request)
   {
-    var userRepo = GetRepository<AdminUser>();
-    var roleRepo = GetRepository<AdminRole>();
-
-    if (await userRepo.Any(u => u.Username == request.Username))
+    if (await _userRepo.Any(u => u.Username == request.Username))
       return Fail<AdminUserDetailResponse>(
         ErrorCodes.UsernameAlreadyExists, "帳號已存在",
         new Dictionary<string, string[]> { ["username"] = ["帳號已存在"] });
 
-    if (!await roleRepo.Any(r => r.Id == request.RoleId))
+    if (!await _roleRepo.Any(r => r.Id == request.RoleId))
       return Fail<AdminUserDetailResponse>(ErrorCodes.RoleNotFound, "角色不存在",
         new Dictionary<string, string[]> { ["role_id"] = ["角色不存在"] });
 
     var user = new AdminUser
     {
       Username = request.Username,
-      PasswordHash = HashHelper.HashPassword(request.Password, _pepper),
+      PasswordHash = _passwordHasher.HashPassword(request.Password, _pepper),
       RoleId = request.RoleId,
       IsActive = request.IsActive
     };
 
-    await userRepo.Insert(user);
+    await _userRepo.Insert(user);
 
     // Reload with Role
-    var created = (await userRepo.GetById(user.Id, include: q => q.Include(u => u.Role)))!;
+    var created = (await _userRepo.GetById(user.Id, include: q => q.Include(u => u.Role)))!;
     return Success(created.ToAdminUserDetailResponse());
   }
 
   public async Task<ApiResponse<AdminUserDetailResponse>> Update(int id, UpdateAdminUserRequest request)
   {
-    var userRepo = GetRepository<AdminUser>();
-    var roleRepo = GetRepository<AdminRole>();
-
-    var user = await userRepo.GetById(id, include: q => q.Include(u => u.Role), tracking: true);
+    var user = await _userRepo.GetById(id, include: q => q.Include(u => u.Role), tracking: true);
     if (user is null)
       return Fail<AdminUserDetailResponse>(ErrorCodes.NotFound, "帳號不存在");
 
@@ -101,33 +105,31 @@ public class AdminUserService : BaseService
       return Fail<AdminUserDetailResponse>(ErrorCodes.CannotChangeAdminRole, "不可將 Admin 帳號的角色改為非 Admin",
         new Dictionary<string, string[]> { ["role_id"] = ["不可將 Admin 帳號的角色改為非 Admin"] });
 
-    if (!await roleRepo.Any(r => r.Id == request.RoleId))
+    if (!await _roleRepo.Any(r => r.Id == request.RoleId))
       return Fail<AdminUserDetailResponse>(ErrorCodes.RoleNotFound, "角色不存在",
         new Dictionary<string, string[]> { ["role_id"] = ["角色不存在"] });
 
     user.RoleId = request.RoleId;
     user.IsActive = request.IsActive;
-    await userRepo.Update(user);
+    await _userRepo.Update(user);
 
     // Reload
-    var updated = (await userRepo.GetById(user.Id, include: q => q.Include(u => u.Role)))!;
+    var updated = (await _userRepo.GetById(user.Id, include: q => q.Include(u => u.Role)))!;
     return Success(updated.ToAdminUserDetailResponse());
   }
 
   public async Task<ApiResponse> ResetPassword(int id, ResetAdminUserPasswordRequest request)
   {
-    var userRepo = GetRepository<AdminUser>();
-    var user = await userRepo.GetById(id, tracking: true);
+    var user = await _userRepo.GetById(id, tracking: true);
 
     if (user is null)
       return Fail(ErrorCodes.NotFound, "帳號不存在");
 
-    user.PasswordHash = HashHelper.HashPassword(request.NewPassword, _pepper);
-    await userRepo.Update(user);
+    user.PasswordHash = _passwordHasher.HashPassword(request.NewPassword, _pepper);
+    await _userRepo.Update(user);
 
     // 撤銷該用戶所有 refresh_token
-    var tokenRepo = GetRepository<AdminRefreshToken>();
-    await tokenRepo.ExecuteUpdate(
+    await _tokenRepo.ExecuteUpdate(
       t => t.UserId == id && t.RevokedAt == null,
       setters => setters.SetProperty(t => t.RevokedAt, DateTime.UtcNow));
 
@@ -136,8 +138,7 @@ public class AdminUserService : BaseService
 
   public async Task<ApiResponse> Delete(int id)
   {
-    var userRepo = GetRepository<AdminUser>();
-    var user = await userRepo.GetById(id, include: q => q.Include(u => u.Role));
+    var user = await _userRepo.GetById(id, include: q => q.Include(u => u.Role));
 
     if (user is null)
       return Fail(ErrorCodes.NotFound, "帳號不存在");
@@ -147,20 +148,18 @@ public class AdminUserService : BaseService
       return Fail(ErrorCodes.CannotDeleteAdmin, "不可刪除 Admin 帳號");
 
     // 撤銷所有 refresh_token
-    var tokenRepo = GetRepository<AdminRefreshToken>();
-    await tokenRepo.ExecuteUpdate(
+    await _tokenRepo.ExecuteUpdate(
       t => t.UserId == id && t.RevokedAt == null,
       setters => setters.SetProperty(t => t.RevokedAt, DateTime.UtcNow));
 
-    await userRepo.DeleteById(id);
+    await _userRepo.DeleteById(id);
 
     return Success();
   }
 
   private async Task<bool> IsSystemRole(int roleId)
   {
-    var roleRepo = GetRepository<AdminRole>();
-    return await roleRepo.Any(r => r.Id == roleId && r.IsSystem);
+    return await _roleRepo.Any(r => r.Id == roleId && r.IsSystem);
   }
 
   private static IQueryable<AdminUser> BuildOrder(IQueryable<AdminUser> query, string? sortBy, string? sortOrder)

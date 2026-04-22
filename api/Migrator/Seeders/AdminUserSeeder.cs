@@ -1,6 +1,6 @@
 using Drink.Domain.Entities;
 using Drink.Infrastructure.Data;
-using Drink.Infrastructure.Helpers;
+using Drink.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -21,7 +21,7 @@ public class AdminUserSeeder : ISeeder
     context.Set<AdminUser>().Add(new AdminUser
     {
       Username = "admin",
-      PasswordHash = HashHelper.HashPassword("admin", pepper),
+      PasswordHash = new Drink.Infrastructure.Helpers.Argon2PasswordHasher().HashPassword("admin", pepper),
       RoleId = 1,
       IsActive = true,
       CreatedAt = now,

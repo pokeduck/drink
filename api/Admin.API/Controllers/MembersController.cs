@@ -3,7 +3,7 @@ using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
 using Drink.Application.Services;
 using Drink.Domain.Enums;
-using Drink.Infrastructure.Extensions;
+using Drink.Application.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +23,7 @@ public class MembersController : BaseController
   /// 會員列表
   /// </summary>
   [HttpGet]
-  [ProducesResponseType(typeof(ApiResponse<PaginationExtension.PaginationList<MemberListResponse>>), 200)]
+  [ProducesResponseType(typeof(ApiResponse<PaginationList<MemberListResponse>>), 200)]
   public async Task<IActionResult> GetList(
     [FromQuery] int page = 1,
     [FromQuery] int pageSize = 20,

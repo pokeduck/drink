@@ -1,3 +1,4 @@
+using Drink.Application.Interfaces;
 using Drink.Application.Mappings;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
@@ -8,27 +9,36 @@ namespace Drink.Application.Services;
 
 public class AdminMenuService : BaseService
 {
-  public AdminMenuService(IServiceProvider serviceProvider) : base(serviceProvider) { }
+  private readonly IGenericRepository<AdminUser> _userRepo;
+  private readonly IGenericRepository<AdminMenuRole> _menuRoleRepo;
+  private readonly IGenericRepository<AdminMenu> _menuRepo;
+
+  public AdminMenuService(
+    ICurrentUserContext currentUser,
+    IGenericRepository<AdminUser> userRepo,
+    IGenericRepository<AdminMenuRole> menuRoleRepo,
+    IGenericRepository<AdminMenu> menuRepo) : base(currentUser)
+  {
+    _userRepo = userRepo;
+    _menuRoleRepo = menuRoleRepo;
+    _menuRepo = menuRepo;
+  }
 
   public async Task<ApiResponse> GetMyMenus()
   {
-    var userRepo = GetRepository<AdminUser>();
-    var menuRoleRepo = GetRepository<AdminMenuRole>();
-    var menuRepo = GetRepository<AdminMenu>();
-
-    var user = await userRepo.Get(u => u.Id == CurrentUserId);
+    var user = await _userRepo.Get(u => u.Id == CurrentUserId);
     if (user is null)
       return Fail(Constants.ErrorCodes.Unauthorized, "使用者不存在");
 
     // 取得該 Role 可存取的 MenuId（至少一個 CRUD 為 true）
-    var accessibleMenuIds = await menuRoleRepo.Query
+    var accessibleMenuIds = await _menuRoleRepo.Query
       .Where(mr => mr.RoleId == user.RoleId
         && (mr.CanRead || mr.CanCreate || mr.CanUpdate || mr.CanDelete))
       .Select(mr => mr.MenuId)
       .ToListAsync();
 
     // 取得所有 Menu
-    var allMenus = await menuRepo.GetList(
+    var allMenus = await _menuRepo.GetList(
       order: q => q.OrderBy(m => m.Sort));
 
     // 建立樹狀結構，僅包含可存取的葉節點及其父節點
