@@ -1,3 +1,5 @@
+using Drink.Application.Attributes;
+using Drink.Application.Constants;
 using Drink.Application.Requests.Admin;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
@@ -21,6 +23,7 @@ public class RolesController : BaseController
   /// 取得所有角色
   /// </summary>
   [HttpGet]
+  [RequireRole(MenuConstants.AdminRole, CrudAction.Read)]
   [ProducesResponseType(typeof(ApiResponse<List<AdminRoleListResponse>>), 200)]
   public async Task<IActionResult> GetList()
   {
@@ -32,6 +35,7 @@ public class RolesController : BaseController
   /// 取得單一角色（含 Menu CRUD 設定）
   /// </summary>
   [HttpGet("{roleId}")]
+  [RequireRole(MenuConstants.AdminRole, CrudAction.Read)]
   [ProducesResponseType(typeof(ApiResponse<AdminRoleDetailResponse>), 200)]
   [ProducesResponseType(typeof(ApiResponse), 404)]
   public async Task<IActionResult> GetById(int roleId)
@@ -46,6 +50,7 @@ public class RolesController : BaseController
   /// 建立角色
   /// </summary>
   [HttpPost]
+  [RequireRole(MenuConstants.AdminRole, CrudAction.Create)]
   [ProducesResponseType(typeof(ApiResponse<AdminRoleDetailResponse>), 201)]
   [ProducesResponseType(typeof(ApiResponse), 400)]
   [ProducesResponseType(typeof(ApiResponse), 409)]
@@ -64,6 +69,7 @@ public class RolesController : BaseController
   /// 更新角色（含 Menu CRUD，整批覆蓋）
   /// </summary>
   [HttpPut("{roleId}")]
+  [RequireRole(MenuConstants.AdminRole, CrudAction.Update)]
   [ProducesResponseType(typeof(ApiResponse<AdminRoleDetailResponse>), 200)]
   [ProducesResponseType(typeof(ApiResponse), 400)]
   [ProducesResponseType(typeof(ApiResponse), 403)]
@@ -89,6 +95,7 @@ public class RolesController : BaseController
   /// 刪除角色
   /// </summary>
   [HttpDelete("{roleId}")]
+  [RequireRole(MenuConstants.AdminRole, CrudAction.Delete)]
   [ProducesResponseType(typeof(ApiResponse), 200)]
   [ProducesResponseType(typeof(ApiResponse), 400)]
   [ProducesResponseType(typeof(ApiResponse), 403)]

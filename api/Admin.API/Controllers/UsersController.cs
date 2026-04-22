@@ -1,3 +1,5 @@
+using Drink.Application.Attributes;
+using Drink.Application.Constants;
 using Drink.Application.Requests.Admin;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
@@ -22,6 +24,7 @@ public class UsersController : BaseController
   /// 帳號列表
   /// </summary>
   [HttpGet]
+  [RequireRole(MenuConstants.AdminAccountList, CrudAction.Read)]
   [ProducesResponseType(typeof(ApiResponse<PaginationList<AdminUserListResponse>>), 200)]
   public async Task<IActionResult> GetList(
     [FromQuery] int page = 1,
@@ -40,6 +43,7 @@ public class UsersController : BaseController
   /// 取得單一帳號
   /// </summary>
   [HttpGet("{userId}")]
+  [RequireRole(MenuConstants.AdminAccountList, CrudAction.Read)]
   [ProducesResponseType(typeof(ApiResponse<AdminUserDetailResponse>), 200)]
   [ProducesResponseType(typeof(ApiResponse), 404)]
   public async Task<IActionResult> GetById(int userId)
@@ -54,6 +58,7 @@ public class UsersController : BaseController
   /// 建立 Staff
   /// </summary>
   [HttpPost]
+  [RequireRole(MenuConstants.AdminAccountList, CrudAction.Create)]
   [ProducesResponseType(typeof(ApiResponse<AdminUserDetailResponse>), 201)]
   [ProducesResponseType(typeof(ApiResponse), 400)]
   [ProducesResponseType(typeof(ApiResponse), 409)]
@@ -72,6 +77,7 @@ public class UsersController : BaseController
   /// 更新 Staff
   /// </summary>
   [HttpPut("{userId}")]
+  [RequireRole(MenuConstants.AdminAccountList, CrudAction.Update)]
   [ProducesResponseType(typeof(ApiResponse<AdminUserDetailResponse>), 200)]
   [ProducesResponseType(typeof(ApiResponse), 400)]
   [ProducesResponseType(typeof(ApiResponse), 403)]
@@ -90,6 +96,7 @@ public class UsersController : BaseController
   /// Admin 重設 Staff 密碼
   /// </summary>
   [HttpPut("{userId}/password")]
+  [RequireRole(MenuConstants.AdminAccountList, CrudAction.Update)]
   [ProducesResponseType(typeof(ApiResponse), 200)]
   [ProducesResponseType(typeof(ApiResponse), 404)]
   public async Task<IActionResult> ResetPassword(int userId, [FromBody] ResetAdminUserPasswordRequest request)
@@ -104,6 +111,7 @@ public class UsersController : BaseController
   /// 刪除 Staff
   /// </summary>
   [HttpDelete("{userId}")]
+  [RequireRole(MenuConstants.AdminAccountList, CrudAction.Delete)]
   [ProducesResponseType(typeof(ApiResponse), 200)]
   [ProducesResponseType(typeof(ApiResponse), 403)]
   [ProducesResponseType(typeof(ApiResponse), 404)]

@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Drink.Shared.Web.Conventions;
 using Drink.Shared.Web.Extensions;
-using Drink.Application.Extensions;
 using Drink.Infrastructure.Extensions;
 using Drink.Upload.API.Middleware;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -25,11 +24,12 @@ builder.Services.AddControllers(options =>
 // File Upload (UploadSettings + IFileStorageService)
 builder.Services.AddFileUpload(builder.Configuration);
 
-// Application Services (auto-scan all BaseService subclasses)
-builder.Services.AddApplicationServices();
+// Application Services (only FileUploadService — Upload.API doesn't need other services)
+builder.Services.AddScoped<Drink.Application.Services.FileUploadService>();
 
-// HttpContextAccessor (required by BaseService)
+// HttpContextAccessor + CurrentUserContext (required by BaseService)
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<Drink.Application.Interfaces.ICurrentUserContext, Drink.Infrastructure.Services.HttpCurrentUserContext>();
 
 // CORS (for static file reads from frontend)
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];

@@ -1,3 +1,5 @@
+using Drink.Application.Attributes;
+using Drink.Application.Constants;
 using Drink.Application.Requests.Admin;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
@@ -19,6 +21,7 @@ public class DrinkItemsController : BaseController
   }
 
   [HttpGet]
+  [RequireRole(MenuConstants.DrinkItem, CrudAction.Read)]
   [ProducesResponseType(typeof(ApiResponse<PaginationList<DrinkItemListResponse>>), 200)]
   public async Task<IActionResult> GetList(
     [FromQuery] int page = 1,
@@ -32,6 +35,7 @@ public class DrinkItemsController : BaseController
   }
 
   [HttpGet("{id}")]
+  [RequireRole(MenuConstants.DrinkItem, CrudAction.Read)]
   [ProducesResponseType(typeof(ApiResponse<DrinkItemDetailResponse>), 200)]
   [ProducesResponseType(typeof(ApiResponse), 404)]
   public async Task<IActionResult> GetById(int id)
@@ -43,6 +47,7 @@ public class DrinkItemsController : BaseController
   }
 
   [HttpPost]
+  [RequireRole(MenuConstants.DrinkItem, CrudAction.Create)]
   [ProducesResponseType(typeof(ApiResponse<DrinkItemDetailResponse>), 201)]
   [ProducesResponseType(typeof(ApiResponse), 409)]
   public async Task<IActionResult> Create([FromBody] CreateDrinkItemRequest request)
@@ -54,6 +59,7 @@ public class DrinkItemsController : BaseController
   }
 
   [HttpPut("{id}")]
+  [RequireRole(MenuConstants.DrinkItem, CrudAction.Update)]
   [ProducesResponseType(typeof(ApiResponse<DrinkItemDetailResponse>), 200)]
   [ProducesResponseType(typeof(ApiResponse), 404)]
   [ProducesResponseType(typeof(ApiResponse), 409)]
@@ -69,6 +75,7 @@ public class DrinkItemsController : BaseController
   }
 
   [HttpDelete("{id}")]
+  [RequireRole(MenuConstants.DrinkItem, CrudAction.Delete)]
   [ProducesResponseType(typeof(ApiResponse), 200)]
   [ProducesResponseType(typeof(ApiResponse), 400)]
   [ProducesResponseType(typeof(ApiResponse), 404)]
@@ -84,6 +91,7 @@ public class DrinkItemsController : BaseController
   }
 
   [HttpPut("sort")]
+  [RequireRole(MenuConstants.DrinkItem, CrudAction.Update)]
   [ProducesResponseType(typeof(ApiResponse), 200)]
   [ProducesResponseType(typeof(ApiResponse), 400)]
   public async Task<IActionResult> BatchSort([FromBody] BatchSortRequest request)
@@ -95,6 +103,7 @@ public class DrinkItemsController : BaseController
   }
 
   [HttpDelete("batch")]
+  [RequireRole(MenuConstants.DrinkItem, CrudAction.Delete)]
   [ProducesResponseType(typeof(ApiResponse), 200)]
   [ProducesResponseType(typeof(ApiResponse), 400)]
   public async Task<IActionResult> BatchDelete([FromBody] BatchDeleteRequest request)

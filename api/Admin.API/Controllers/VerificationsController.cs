@@ -1,3 +1,5 @@
+using Drink.Application.Attributes;
+using Drink.Application.Constants;
 using Drink.Application.Requests.Admin;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
@@ -23,6 +25,7 @@ public class VerificationsController : BaseController
   /// 註冊驗證信列表
   /// </summary>
   [HttpGet("register")]
+  [RequireRole(MenuConstants.VerificationRegister, CrudAction.Read)]
   [ProducesResponseType(typeof(ApiResponse<PaginationList<VerificationListResponse>>), 200)]
   public async Task<IActionResult> GetRegisterList(
     [FromQuery] int page = 1,
@@ -42,6 +45,7 @@ public class VerificationsController : BaseController
   /// 忘記密碼驗證信列表
   /// </summary>
   [HttpGet("forgot-password")]
+  [RequireRole(MenuConstants.VerificationForgotPassword, CrudAction.Read)]
   [ProducesResponseType(typeof(ApiResponse<PaginationList<VerificationListResponse>>), 200)]
   public async Task<IActionResult> GetForgotPasswordList(
     [FromQuery] int page = 1,
@@ -61,6 +65,7 @@ public class VerificationsController : BaseController
   /// 重發單筆驗證信
   /// </summary>
   [HttpPost("{verificationId}/resend")]
+  [RequireRole(MenuConstants.VerificationRegister, CrudAction.Create)]
   [ProducesResponseType(typeof(ApiResponse), 200)]
   [ProducesResponseType(typeof(ApiResponse), 404)]
   [ProducesResponseType(typeof(ApiResponse), 429)]
@@ -84,6 +89,7 @@ public class VerificationsController : BaseController
   /// 批量重發註冊驗證信
   /// </summary>
   [HttpPost("register/resend")]
+  [RequireRole(MenuConstants.VerificationRegister, CrudAction.Create)]
   [ProducesResponseType(typeof(ApiResponse<BatchResendResponse>), 200)]
   public async Task<IActionResult> BatchResendRegister([FromBody] BatchResendRequest request)
   {
@@ -95,6 +101,7 @@ public class VerificationsController : BaseController
   /// 批量重發忘記密碼驗證信
   /// </summary>
   [HttpPost("forgot-password/resend")]
+  [RequireRole(MenuConstants.VerificationForgotPassword, CrudAction.Create)]
   [ProducesResponseType(typeof(ApiResponse<BatchResendResponse>), 200)]
   public async Task<IActionResult> BatchResendForgotPassword([FromBody] BatchResendRequest request)
   {

@@ -1,3 +1,5 @@
+using Drink.Application.Attributes;
+using Drink.Application.Constants;
 using Drink.Application.Requests.Admin;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
@@ -23,6 +25,7 @@ public class MembersController : BaseController
   /// 會員列表
   /// </summary>
   [HttpGet]
+  [RequireRole(MenuConstants.MemberList, CrudAction.Read)]
   [ProducesResponseType(typeof(ApiResponse<PaginationList<MemberListResponse>>), 200)]
   public async Task<IActionResult> GetList(
     [FromQuery] int page = 1,
@@ -42,6 +45,7 @@ public class MembersController : BaseController
   /// 取得單一會員
   /// </summary>
   [HttpGet("{memberId}")]
+  [RequireRole(MenuConstants.MemberList, CrudAction.Read)]
   [ProducesResponseType(typeof(ApiResponse<MemberDetailResponse>), 200)]
   [ProducesResponseType(typeof(ApiResponse), 404)]
   public async Task<IActionResult> GetById(int memberId)
@@ -56,6 +60,7 @@ public class MembersController : BaseController
   /// 建立會員
   /// </summary>
   [HttpPost]
+  [RequireRole(MenuConstants.MemberList, CrudAction.Create)]
   [ProducesResponseType(typeof(ApiResponse<MemberDetailResponse>), 201)]
   [ProducesResponseType(typeof(ApiResponse), 409)]
   public async Task<IActionResult> Create([FromBody] CreateMemberRequest request)
@@ -70,6 +75,7 @@ public class MembersController : BaseController
   /// 編輯會員
   /// </summary>
   [HttpPut("{memberId}")]
+  [RequireRole(MenuConstants.MemberList, CrudAction.Update)]
   [ProducesResponseType(typeof(ApiResponse<MemberDetailResponse>), 200)]
   [ProducesResponseType(typeof(ApiResponse), 404)]
   public async Task<IActionResult> Update(int memberId, [FromBody] UpdateMemberRequest request)
@@ -84,6 +90,7 @@ public class MembersController : BaseController
   /// 重設會員密碼
   /// </summary>
   [HttpPut("{memberId}/password")]
+  [RequireRole(MenuConstants.MemberList, CrudAction.Update)]
   [ProducesResponseType(typeof(ApiResponse), 200)]
   [ProducesResponseType(typeof(ApiResponse), 404)]
   public async Task<IActionResult> ResetPassword(int memberId, [FromBody] ResetMemberPasswordRequest request)
