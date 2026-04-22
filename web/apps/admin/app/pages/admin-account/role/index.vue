@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiError } from '~/composable/useApiError'
+import { usePermission } from '~/composable/usePermission'
+import { MENU } from '@app/core'
 import type { components } from '@app/api-types/admin'
 
 type AdminRole = components['schemas']['AdminRoleListResponse']
@@ -8,6 +10,7 @@ type AdminRole = components['schemas']['AdminRoleListResponse']
 const api = useAdminApi()
 const router = useRouter()
 const { handleError } = useApiError()
+const { can } = usePermission()
 
 const tableData = ref<AdminRole[]>([])
 const loading = ref(false)
@@ -83,7 +86,7 @@ onMounted(() => {
       <div class="toolbar">
         <div />
         <div>
-          <el-button type="primary" icon="Plus" @click="router.push('/admin-account/role/create')">
+          <el-button v-if="can(MENU.AdminRole, 'create')" type="primary" icon="Plus" @click="router.push('/admin-account/role/create')">
             新增角色
           </el-button>
         </div>
@@ -111,7 +114,7 @@ onMounted(() => {
               {{ row.is_system ? '檢視' : '編輯' }}
             </el-button>
             <el-button
-              v-if="!row.is_system"
+              v-if="!row.is_system && can(MENU.AdminRole, 'delete')"
               size="small"
               type="danger"
               @click="openDeleteDialog(row)"

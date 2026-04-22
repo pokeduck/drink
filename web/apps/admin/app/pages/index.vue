@@ -1,4 +1,13 @@
 <script setup lang="ts">
+const route = useRoute()
+const router = useRouter()
+
+onMounted(() => {
+  if (route.query.forbidden === '1') {
+    ElMessage.error('您沒有權限存取該頁面')
+    router.replace({ query: {} })
+  }
+})
 </script>
 
 <template>

@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiError } from '~/composable/useApiError'
+import { usePermission } from '~/composable/usePermission'
+import { MENU } from '@app/core'
 import type { components } from '@app/api-types/admin'
 
 type Verification = components['schemas']['VerificationListResponse']
 
 const api = useAdminApi()
 const { handleError } = useApiError()
+const { can } = usePermission()
 
 // 搜尋 & 篩選
 const keyword = ref('')
@@ -158,7 +161,7 @@ onMounted(() => {
           <el-button type="primary" @click="handleSearch">查詢</el-button>
         </div>
         <div class="toolbar-right">
-          <el-button type="warning" :loading="batchResendLoading" :disabled="selectedRows.length === 0" @click="handleBatchResend">
+          <el-button v-if="can(MENU.VerificationRegister, 'create')" type="warning" :loading="batchResendLoading" :disabled="selectedRows.length === 0" @click="handleBatchResend">
             批量重發 ({{ selectedRows.length }})
           </el-button>
         </div>
@@ -198,7 +201,7 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="操作" width="100" fixed="right">
           <template #default="{ row }">
-            <el-button size="small" type="warning" @click="handleResend(row)">
+            <el-button v-if="can(MENU.VerificationRegister, 'create')" size="small" type="warning" @click="handleResend(row)">
               重發
             </el-button>
           </template>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiError } from '~/composable/useApiError'
+import { usePermission } from '~/composable/usePermission'
+import { MENU } from '@app/core'
 import type { components } from '@app/api-types/admin'
 
 type Member = components['schemas']['MemberListResponse']
@@ -8,6 +10,7 @@ type Member = components['schemas']['MemberListResponse']
 const api = useAdminApi()
 const router = useRouter()
 const { handleError } = useApiError()
+const { can } = usePermission()
 
 // 搜尋 & 篩選
 const keyword = ref('')
@@ -140,7 +143,7 @@ onMounted(() => {
           <el-button type="primary" @click="handleSearch">查詢</el-button>
         </div>
         <div class="toolbar-right">
-          <el-button type="primary" icon="Plus" @click="router.push('/member/create')">
+          <el-button v-if="can(MENU.MemberList, 'create')" type="primary" icon="Plus" @click="router.push('/member/create')">
             新增會員
           </el-button>
         </div>
@@ -184,10 +187,10 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
-            <el-button size="small" @click="router.push(`/member/${row.id}/edit`)">
+            <el-button v-if="can(MENU.MemberList, 'update')" size="small" @click="router.push(`/member/${row.id}/edit`)">
               編輯
             </el-button>
-            <el-button size="small" type="warning" @click="openResetPasswordDialog(row)">
+            <el-button v-if="can(MENU.MemberList, 'update')" size="small" type="warning" @click="openResetPasswordDialog(row)">
               重設密碼
             </el-button>
           </template>

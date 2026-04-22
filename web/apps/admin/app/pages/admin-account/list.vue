@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiError } from '~/composable/useApiError'
+import { usePermission } from '~/composable/usePermission'
+import { MENU } from '@app/core'
 import type { components } from '@app/api-types/admin'
 
 type AdminUser = components['schemas']['AdminUserListResponse']
@@ -8,6 +10,7 @@ type AdminUser = components['schemas']['AdminUserListResponse']
 const api = useAdminApi()
 const router = useRouter()
 const { handleError } = useApiError()
+const { can } = usePermission()
 
 // 搜尋 & 篩選
 const keyword = ref('')
@@ -144,7 +147,7 @@ onMounted(() => {
           <el-button type="primary" @click="handleSearch">查詢</el-button>
         </div>
         <div class="toolbar-right">
-          <el-button type="primary" icon="Plus" @click="router.push('/admin-account/create')">
+          <el-button v-if="can(MENU.AdminAccountList, 'create')" type="primary" icon="Plus" @click="router.push('/admin-account/create')">
             新增帳號
           </el-button>
         </div>
@@ -169,13 +172,13 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="操作" width="250" fixed="right">
           <template #default="{ row }">
-            <el-button size="small" @click="router.push(`/admin-account/${row.id}/edit`)">
+            <el-button v-if="can(MENU.AdminAccountList, 'update')" size="small" @click="router.push(`/admin-account/${row.id}/edit`)">
               編輯
             </el-button>
-            <el-button size="small" type="warning" @click="openResetPasswordDialog(row)">
+            <el-button v-if="can(MENU.AdminAccountList, 'update')" size="small" type="warning" @click="openResetPasswordDialog(row)">
               重設密碼
             </el-button>
-            <el-button size="small" type="danger" @click="handleDelete(row)">
+            <el-button v-if="can(MENU.AdminAccountList, 'delete')" size="small" type="danger" @click="handleDelete(row)">
               刪除
             </el-button>
           </template>

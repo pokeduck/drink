@@ -3,6 +3,8 @@ import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiError } from '~/composable/useApiError'
 import { useFormLayout } from '~/composable/useFormLayout'
 import { useLoading } from '~/composable/useLoading'
+import { usePermission } from '~/composable/usePermission'
+import { MENU } from '@app/core'
 import type { components } from '@app/api-types/admin'
 
 type DrinkItem = components['schemas']['DrinkItemListResponse']
@@ -10,6 +12,7 @@ type DrinkItem = components['schemas']['DrinkItemListResponse']
 const api = useAdminApi()
 const { serverErrors, handleError, clearErrors } = useApiError()
 const { labelPosition } = useFormLayout()
+const { can } = usePermission()
 
 // 搜尋 & 分頁
 const keyword = ref('')
@@ -227,16 +230,16 @@ onMounted(() => {
         </div>
         <div class="toolbar-right">
           <el-button
-            v-if="selectedRows.length"
+            v-if="selectedRows.length && can(MENU.DrinkItem, 'delete')"
             type="danger"
             @click="handleBatchDelete"
           >
             批次刪除 ({{ selectedRows.length }})
           </el-button>
-          <el-button @click="handleSaveSort">
+          <el-button v-if="can(MENU.DrinkItem, 'update')" @click="handleSaveSort">
             儲存排序
           </el-button>
-          <el-button type="primary" icon="Plus" @click="openCreate">
+          <el-button v-if="can(MENU.DrinkItem, 'create')" type="primary" icon="Plus" @click="openCreate">
             新增品名
           </el-button>
         </div>
@@ -257,7 +260,8 @@ onMounted(() => {
         <el-table-column prop="name" label="名稱" min-width="200" />
         <el-table-column label="排序" width="120">
           <template #default="{ row }">
-            <el-input-number v-model="row.sort" :min="0" :precision="0" controls-position="right" size="small" style="width: 90px" />
+            <el-input-number v-if="can(MENU.DrinkItem, 'update')" v-model="row.sort" :min="0" :precision="0" controls-position="right" size="small" style="width: 90px" />
+            <span v-else>{{ row.sort }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="created_at" label="建立時間" width="180" sortable="custom">
@@ -267,8 +271,8 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
-            <el-button size="small" @click="openEdit(row)">編輯</el-button>
-            <el-button size="small" type="danger" @click="handleDelete(row)">刪除</el-button>
+            <el-button v-if="can(MENU.DrinkItem, 'update')" size="small" @click="openEdit(row)">編輯</el-button>
+            <el-button v-if="can(MENU.DrinkItem, 'delete')" size="small" type="danger" @click="handleDelete(row)">刪除</el-button>
           </template>
         </el-table-column>
       </el-table>
