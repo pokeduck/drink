@@ -1,21 +1,6 @@
 import { defineStore } from 'pinia'
-
-interface LoginPayload {
-  username: string
-  password: string
-}
-
-interface AuthTokens {
-  access_token: string
-  refresh_token: string
-}
-
-interface ApiResponse<T> {
-  data: T
-  code: number
-  error?: string
-  message?: string
-}
+import createClient from 'openapi-fetch'
+import type { paths } from '@app/api-types/admin'
 
 export const useAuthStore = defineStore('auth', () => {
   const config = useRuntimeConfig()
@@ -24,44 +9,43 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isLoggedIn = computed(() => !!accessToken.value)
 
-  async function login(payload: LoginPayload) {
-    try {
-      const res = await $fetch<ApiResponse<AuthTokens>>('/admin/auth/login', {
-        baseURL: config.public.apiBase,
-        method: 'POST',
-        body: payload,
-      })
+  // 不帶 auth middleware 的 client，專給 login/refresh/logout 用
+  const baseUrl = (config.public.apiBase as string).replace(/\/api\/?$/, '')
+  const authClient = createClient<paths>({ baseUrl })
 
-      if (res.code !== 0) {
-        throw new Error(res.message || '登入失敗')
-      }
+  async function login(payload: { username: string; password: string }) {
+    const { data: res, error } = await authClient.POST('/api/admin/auth/login', {
+      body: payload,
+    })
 
-      accessToken.value = res.data.access_token
-      refreshToken.value = res.data.refresh_token
-    } catch (err: any) {
-      // $fetch 在非 2xx 時拋 FetchError，從 response body 取 message
-      const msg = err?.data?.message || err?.message || '登入失敗'
+    if (error) {
+      const msg = (error as any)?.message || '登入失敗'
       throw new Error(msg)
     }
+
+    if (!res?.data) {
+      throw new Error('登入失敗')
+    }
+
+    accessToken.value = res.data.access_token ?? null
+    refreshToken.value = res.data.refresh_token ?? null
   }
 
   async function refresh(): Promise<boolean> {
     if (!refreshToken.value) return false
 
     try {
-      const res = await $fetch<ApiResponse<AuthTokens>>('/admin/auth/refresh', {
-        baseURL: config.public.apiBase,
-        method: 'POST',
+      const { data: res, error } = await authClient.POST('/api/admin/auth/refresh', {
         body: { refresh_token: refreshToken.value },
       })
 
-      if (res.code !== 0) {
+      if (error || !res?.data) {
         clearTokens()
         return false
       }
 
-      accessToken.value = res.data.access_token
-      refreshToken.value = res.data.refresh_token
+      accessToken.value = res.data.access_token ?? null
+      refreshToken.value = res.data.refresh_token ?? null
       return true
     } catch {
       clearTokens()
@@ -72,11 +56,9 @@ export const useAuthStore = defineStore('auth', () => {
   async function logout() {
     if (refreshToken.value) {
       try {
-        await $fetch('/admin/auth/logout', {
-          baseURL: config.public.apiBase,
-          method: 'POST',
-          headers: { Authorization: `Bearer ${accessToken.value}` },
+        await authClient.POST('/api/admin/auth/logout', {
           body: { refresh_token: refreshToken.value },
+          headers: { Authorization: `Bearer ${accessToken.value}` },
         })
       } catch {
         // ignore logout errors
