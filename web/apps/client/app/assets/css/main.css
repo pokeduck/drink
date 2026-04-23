@@ -1,18 +1,146 @@
 @import "tailwindcss";
-@import "@nuxt/ui";
 
-@theme static {
-  --font-sans: 'Public Sans', sans-serif;
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
 
-  --color-green-50: #EFFDF5;
-  --color-green-100: #D9FBE8;
-  --color-green-200: #B3F5D1;
-  --color-green-300: #75EDAE;
-  --color-green-400: #00DC82;
-  --color-green-500: #00C16A;
-  --color-green-600: #00A155;
-  --color-green-700: #007F45;
-  --color-green-800: #016538;
-  --color-green-900: #0A5331;
-  --color-green-950: #052E16;
+  /* Light palette */
+  --color-brand: #FF5C00;
+  --color-page-bg: #F7F7F2;
+  --color-sidebar-bg: #EBEBE3;
+  --color-dark: #1A1A1A;
+
+  /* Dark palette */
+  --color-dark-bg: #0D0D0D;
+  --color-dark-surface: #1A1A1A;
+  --color-dark-text: #F5F5F5;
+
+  /* Brutalist shadow tokens */
+  --shadow-brutalist: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-brutalist-hover: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-brutalist-sm: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-brutalist-lg: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-brutalist-xl: 10px 10px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-brutalist-2xl: 12px 12px 0px 0px rgba(0, 0, 0, 1);
+
+  --shadow-brutalist-dark: 4px 4px 0px 0px rgba(255, 255, 255, 0.15);
+  --shadow-brutalist-dark-hover: 6px 6px 0px 0px rgba(255, 255, 255, 0.25);
+  --shadow-brutalist-dark-sm: 2px 2px 0px 0px rgba(255, 255, 255, 0.2);
+  --shadow-brutalist-dark-lg: 8px 8px 0px 0px rgba(255, 255, 255, 0.1);
+  --shadow-brutalist-dark-xl: 10px 10px 0px 0px rgba(255, 255, 255, 0.1);
+  --shadow-brutalist-dark-2xl: 12px 12px 0px 0px rgba(255, 255, 255, 0.1);
+
+  --shadow-brutalist-brand: 4px 4px 0px 0px rgba(255, 92, 0, 0.3);
+  --shadow-brutalist-brand-hover: 6px 6px 0px 0px rgba(255, 92, 0, 0.4);
+  --shadow-brutalist-brand-active: 4px 4px 0px 0px #FF5C00;
+
+  --shadow-brutalist-soft: 6px 6px 0px 0px rgba(0, 0, 0, 0.1);
+  --shadow-brutalist-dark-soft: 6px 6px 0px 0px rgba(255, 255, 255, 0.05);
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    @apply bg-page-bg text-dark antialiased transition-colors duration-300;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-black uppercase tracking-tighter italic;
+  }
+
+  .dark body {
+    @apply bg-dark-bg text-dark-text;
+  }
+}
+
+.brutalist-card {
+  @apply bg-white dark:bg-dark-surface border-2 border-black dark:border-white/60
+    shadow-brutalist dark:shadow-brutalist-dark transition-all
+    hover:translate-x-[-2px] hover:translate-y-[-2px]
+    hover:shadow-brutalist-hover dark:hover:shadow-brutalist-dark-hover;
+}
+
+.brutalist-button {
+  @apply border-2 border-black dark:border-white/60 py-2 px-4 font-black uppercase tracking-widest text-sm transition-all;
+}
+
+.brutalist-button-primary {
+  @apply bg-brand text-white border-black dark:border-brand/80
+    shadow-brutalist dark:shadow-brutalist-brand
+    hover:translate-x-[-2px] hover:translate-y-[-2px]
+    hover:shadow-brutalist-hover dark:hover:shadow-brutalist-brand-hover;
+}
+
+.dark header, .dark nav, .dark footer {
+  @apply bg-dark-surface border-white/40;
+}
+
+.dark .brutalist-card {
+  @apply border-white/50;
+}
+
+@layer utilities {
+  .dark input, .dark textarea, .dark select {
+    @apply bg-dark-surface border-white/30 text-dark-text placeholder:text-white/25;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-black/5 dark:bg-white/5;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-black/20 dark:bg-white/15;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-brand/60;
+  }
+}
+
+/* Page transition */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.2s ease;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+
+/* Modal transitions */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.2s ease;
+}
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-content-enter-active,
+.modal-content-leave-active {
+  transition: all 0.2s ease;
+}
+.modal-content-enter-from,
+.modal-content-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Dropdown transition */
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: all 0.15s ease;
+}
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: scale(0.95) translateY(-4px);
+}
+
+.font-black {
+  font-weight: 900;
 }
