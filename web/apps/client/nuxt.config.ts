@@ -1,12 +1,13 @@
 import { createResolver } from '@nuxt/kit'
+import tailwindcss from '@tailwindcss/vite'
 
 const { resolve } = createResolver(import.meta.url)
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
-    '@nuxt/eslint',
-    '@nuxt/ui'
+    '@nuxtjs/color-mode',
+    '@nuxtjs/google-fonts'
   ],
 
   devtools: {
@@ -15,9 +16,33 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  vite: {
+    plugins: [
+      tailwindcss()
+    ]
+  },
+
   ssr: false,
 
   compatibilityDate: '2025-01-15',
+
+  colorMode: {
+    classSuffix: '',
+    preference: 'system',
+    fallback: 'light'
+  },
+
+  googleFonts: {
+    families: {
+      Inter: [400, 500, 600, 700],
+      'Space Grotesk': [700, 800, 900]
+    },
+    display: 'swap'
+  },
+
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' }
+  },
 
   typescript: {
     tsConfig: {
@@ -41,21 +66,12 @@ export default defineNuxtConfig({
   },
 
   devServer: {
-    port: 8082,
+    port: 8082
   },
 
   runtimeConfig: {
     public: {
-      apiBase: "http://localhost:5102/api",
-    },
-  },
-
-  eslint: {
-    config: {
-      stylistic: {
-        commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
+      apiBase: 'http://localhost:5102/api'
     }
   }
 })
