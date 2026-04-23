@@ -13,7 +13,8 @@
       "Bash(git status:*)",
       "Bash(dotnet build:*)",
       "Bash(dotnet add:*)",
-      "Bash(dotnet format:*)"
+      "Bash(dotnet format:*)",
+      "Bash(find /Users/wayne/Desktop/webproj/drink/spec* -type f)"
     ]
   }
 }
