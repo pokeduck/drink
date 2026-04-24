@@ -55,26 +55,16 @@ export const useAdminApi = () => {
     },
   })
 
-  // Error middleware — 非 401 錯誤 toast 通知
+  // Error middleware — 僅處理 fetch 層級錯誤（網路斷線等）
+  // 非 401 的 API 錯誤交由頁面層 useApiFeedback 處理
   client.use({
-    async onResponse({ response }) {
-      if (response.ok || response.status === 401) return
-
-      let msg = '系統發生錯誤，請稍後再試'
-      try {
-        const body = await response.clone().json()
-        if (body?.message) msg = body.message
-      } catch {
-        // 無法解析 body，使用預設訊息
-      }
-
-      ElMessage.error(msg)
-    },
-
     async onError({ error }) {
-      // 網路斷線或其他 fetch 層級錯誤
       const isNetworkError = error instanceof TypeError && (error as TypeError).message === 'Failed to fetch'
-      ElMessage.error(isNetworkError ? '網路連線異常，請檢查網路狀態' : '系統發生錯誤，請稍後再試')
+      ElMessageBox.alert(
+        isNetworkError ? '網路連線異常，請檢查網路狀態' : '系統發生錯誤，請稍後再試',
+        '錯誤提示',
+        { confirmButtonText: '確定', type: 'error' },
+      )
     },
   })
 
