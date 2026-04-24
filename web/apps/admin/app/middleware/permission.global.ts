@@ -45,6 +45,8 @@ const routePermissions: { pattern: RegExp; perm: RoutePermission }[] = [
 
   // 店家
   { pattern: /^\/shop\/list$/, perm: { menuId: MENU.ShopList, action: 'read' } },
+  { pattern: /^\/shop\/create$/, perm: { menuId: MENU.ShopList, action: 'create' } },
+  { pattern: /^\/shop\/[^/]+\/edit$/, perm: { menuId: MENU.ShopList, action: 'update' } },
   { pattern: /^\/shop\/override$/, perm: { menuId: MENU.ShopOverride, action: 'read' } },
 
   // 通知

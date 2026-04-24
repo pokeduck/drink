@@ -1443,6 +1443,927 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/shops": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    page?: number;
+                    pageSize?: number;
+                    sortBy?: string;
+                    sortOrder?: string;
+                    keyword?: string;
+                    status?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopListResponsePaginationListApiResponse"];
+                        "application/json": components["schemas"]["ShopListResponsePaginationListApiResponse"];
+                        "text/json": components["schemas"]["ShopListResponsePaginationListApiResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateShopRequest"];
+                    "text/json": components["schemas"]["CreateShopRequest"];
+                    "application/*+json": components["schemas"]["CreateShopRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopDetailResponseApiResponse"];
+                        "application/json": components["schemas"]["ShopDetailResponseApiResponse"];
+                        "text/json": components["schemas"]["ShopDetailResponseApiResponse"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopDetailResponseApiResponse"];
+                        "application/json": components["schemas"]["ShopDetailResponseApiResponse"];
+                        "text/json": components["schemas"]["ShopDetailResponseApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateShopRequest"];
+                    "text/json": components["schemas"]["UpdateShopRequest"];
+                    "application/*+json": components["schemas"]["UpdateShopRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopDetailResponseApiResponse"];
+                        "application/json": components["schemas"]["ShopDetailResponseApiResponse"];
+                        "text/json": components["schemas"]["ShopDetailResponseApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/sort": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BatchSortRequest"];
+                    "text/json": components["schemas"]["BatchSortRequest"];
+                    "application/*+json": components["schemas"]["BatchSortRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BatchDeleteRequest"];
+                    "text/json": components["schemas"]["BatchDeleteRequest"];
+                    "application/*+json": components["schemas"]["BatchDeleteRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/{shopId}/menu": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminShopMenuResponseApiResponse"];
+                        "application/json": components["schemas"]["AdminShopMenuResponseApiResponse"];
+                        "text/json": components["schemas"]["AdminShopMenuResponseApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/{shopId}/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateShopCategoryRequest"];
+                    "text/json": components["schemas"]["CreateShopCategoryRequest"];
+                    "application/*+json": components["schemas"]["CreateShopCategoryRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["Int32ApiResponse"];
+                        "application/json": components["schemas"]["Int32ApiResponse"];
+                        "text/json": components["schemas"]["Int32ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/{shopId}/categories/{categoryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                    categoryId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateShopCategoryRequest"];
+                    "text/json": components["schemas"]["UpdateShopCategoryRequest"];
+                    "application/*+json": components["schemas"]["UpdateShopCategoryRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                    categoryId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/{shopId}/categories/sort": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BatchSortRequest"];
+                    "text/json": components["schemas"]["BatchSortRequest"];
+                    "application/*+json": components["schemas"]["BatchSortRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/{shopId}/categories/{categoryId}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                    categoryId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateShopMenuItemRequest"];
+                    "text/json": components["schemas"]["CreateShopMenuItemRequest"];
+                    "application/*+json": components["schemas"]["CreateShopMenuItemRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["Int32ApiResponse"];
+                        "application/json": components["schemas"]["Int32ApiResponse"];
+                        "text/json": components["schemas"]["Int32ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/{shopId}/categories/{categoryId}/items/{itemId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                    categoryId: number;
+                    itemId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateShopMenuItemRequest"];
+                    "text/json": components["schemas"]["UpdateShopMenuItemRequest"];
+                    "application/*+json": components["schemas"]["UpdateShopMenuItemRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                    categoryId: number;
+                    itemId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/{shopId}/categories/{categoryId}/items/sort": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                    categoryId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BatchSortRequest"];
+                    "text/json": components["schemas"]["BatchSortRequest"];
+                    "application/*+json": components["schemas"]["BatchSortRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/{shopId}/overrides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopOverrideResponseApiResponse"];
+                        "application/json": components["schemas"]["ShopOverrideResponseApiResponse"];
+                        "text/json": components["schemas"]["ShopOverrideResponseApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateShopOverrideRequest"];
+                    "text/json": components["schemas"]["UpdateShopOverrideRequest"];
+                    "application/*+json": components["schemas"]["UpdateShopOverrideRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/sizes": {
         parameters: {
             query?: never;
@@ -3143,6 +4064,68 @@ export interface components {
                 [key: string]: string[];
             } | null;
         };
+        AdminShopMenuCategoryResponse: {
+            /** Format: int32 */
+            id?: number;
+            name?: string | null;
+            /** Format: int32 */
+            sort?: number;
+            items?: components["schemas"]["AdminShopMenuItemResponse"][] | null;
+        };
+        AdminShopMenuItemResponse: {
+            /** Format: int32 */
+            id?: number;
+            /** Format: int32 */
+            drink_item_id?: number;
+            drink_item_name?: string | null;
+            description?: string | null;
+            /** Format: int32 */
+            sort?: number;
+            sizes?: components["schemas"]["AdminShopMenuItemSizeResponse"][] | null;
+            sugar_ids?: number[] | null;
+            ice_ids?: number[] | null;
+            topping_ids?: number[] | null;
+        };
+        AdminShopMenuItemSizeResponse: {
+            /** Format: int32 */
+            size_id?: number;
+            size_name?: string | null;
+            /** Format: double */
+            price?: number;
+        };
+        AdminShopMenuResponse: {
+            categories?: components["schemas"]["AdminShopMenuCategoryResponse"][] | null;
+            sugar_overrides?: components["schemas"]["AdminShopMenuSugarOverrideResponse"][] | null;
+            topping_overrides?: components["schemas"]["AdminShopMenuToppingOverrideResponse"][] | null;
+        };
+        AdminShopMenuResponseApiResponse: {
+            data?: components["schemas"]["AdminShopMenuResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        AdminShopMenuSugarOverrideResponse: {
+            /** Format: int32 */
+            sugar_id?: number;
+            sugar_name?: string | null;
+            /** Format: double */
+            price?: number | null;
+            /** Format: int32 */
+            sort?: number | null;
+        };
+        AdminShopMenuToppingOverrideResponse: {
+            /** Format: int32 */
+            topping_id?: number;
+            topping_name?: string | null;
+            /** Format: double */
+            price?: number | null;
+            /** Format: int32 */
+            sort?: number | null;
+        };
         AdminUserDetailResponse: {
             /** Format: int32 */
             id?: number;
@@ -3258,6 +4241,37 @@ export interface components {
             /** Format: email */
             email: string;
             password: string;
+        };
+        CreateShopCategoryRequest: {
+            name: string;
+            /** Format: int32 */
+            sort: number;
+        };
+        CreateShopMenuItemRequest: {
+            /** Format: int32 */
+            drink_item_id?: number | null;
+            drink_item_name?: string | null;
+            description?: string | null;
+            /** Format: int32 */
+            sort: number;
+            sizes: components["schemas"]["MenuItemSizeRequest"][];
+            sugar_ids: number[];
+            ice_ids: number[];
+            topping_ids: number[];
+        };
+        CreateShopRequest: {
+            name: string;
+            phone?: string | null;
+            address?: string | null;
+            note?: string | null;
+            /** Format: int32 */
+            status: number;
+            /** Format: int32 */
+            sort: number;
+            /** Format: int32 */
+            max_topping_per_item: number;
+            /** Format: int32 */
+            max_topping_count: number;
         };
         CreateSizeRequest: {
             name: string;
@@ -3397,6 +4411,17 @@ export interface components {
                 [key: string]: string[];
             } | null;
         };
+        Int32ApiResponse: {
+            /** Format: int32 */
+            data?: number;
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
         MemberDetailResponse: {
             /** Format: int32 */
             id?: number;
@@ -3466,6 +4491,12 @@ export interface components {
             can_update?: boolean;
             can_delete?: boolean;
         };
+        MenuItemSizeRequest: {
+            /** Format: int32 */
+            size_id: number;
+            /** Format: double */
+            price: number;
+        };
         MenuTreeResponse: {
             /** Format: int32 */
             id?: number;
@@ -3474,6 +4505,10 @@ export interface components {
             endpoint?: string | null;
             /** Format: int32 */
             sort?: number;
+            can_read?: boolean;
+            can_create?: boolean;
+            can_update?: boolean;
+            can_delete?: boolean;
             children?: components["schemas"]["MenuTreeResponse"][] | null;
         };
         MenuTreeResponseListApiResponse: {
@@ -3496,6 +4531,128 @@ export interface components {
         };
         ResetMemberPasswordRequest: {
             new_password: string;
+        };
+        ShopDetailResponse: {
+            /** Format: int32 */
+            id?: number;
+            name?: string | null;
+            phone?: string | null;
+            address?: string | null;
+            note?: string | null;
+            /** Format: int32 */
+            status?: number;
+            /** Format: int32 */
+            sort?: number;
+            /** Format: int32 */
+            max_topping_per_item?: number;
+            /** Format: int32 */
+            max_topping_count?: number;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        ShopDetailResponseApiResponse: {
+            data?: components["schemas"]["ShopDetailResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        ShopListResponse: {
+            /** Format: int32 */
+            id?: number;
+            name?: string | null;
+            phone?: string | null;
+            address?: string | null;
+            /** Format: int32 */
+            status?: number;
+            /** Format: int32 */
+            sort?: number;
+            /** Format: int32 */
+            category_count?: number;
+            /** Format: int32 */
+            menu_item_count?: number;
+            /** Format: date-time */
+            created_at?: string;
+        };
+        ShopListResponsePaginationList: {
+            items?: components["schemas"]["ShopListResponse"][] | null;
+            /** Format: int32 */
+            total?: number;
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            page_size?: number;
+        };
+        ShopListResponsePaginationListApiResponse: {
+            data?: components["schemas"]["ShopListResponsePaginationList"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        ShopOverrideResponse: {
+            sugar_overrides?: components["schemas"]["ShopSugarOverrideDetailResponse"][] | null;
+            topping_overrides?: components["schemas"]["ShopToppingOverrideDetailResponse"][] | null;
+        };
+        ShopOverrideResponseApiResponse: {
+            data?: components["schemas"]["ShopOverrideResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        ShopSugarOverrideDetailResponse: {
+            /** Format: int32 */
+            sugar_id?: number;
+            sugar_name?: string | null;
+            /** Format: double */
+            default_price?: number;
+            /** Format: double */
+            override_price?: number | null;
+            /** Format: int32 */
+            default_sort?: number;
+            /** Format: int32 */
+            override_sort?: number | null;
+        };
+        ShopSugarOverrideItem: {
+            /** Format: int32 */
+            sugar_id: number;
+            /** Format: double */
+            price?: number | null;
+            /** Format: int32 */
+            sort?: number | null;
+        };
+        ShopToppingOverrideDetailResponse: {
+            /** Format: int32 */
+            topping_id?: number;
+            topping_name?: string | null;
+            /** Format: double */
+            default_price?: number;
+            /** Format: double */
+            override_price?: number | null;
+            /** Format: int32 */
+            default_sort?: number;
+            /** Format: int32 */
+            override_sort?: number | null;
+        };
+        ShopToppingOverrideItem: {
+            /** Format: int32 */
+            topping_id: number;
+            /** Format: double */
+            price?: number | null;
+            /** Format: int32 */
+            sort?: number | null;
         };
         SizeDetailResponse: {
             /** Format: int32 */
@@ -3682,6 +4839,41 @@ export interface components {
             avatar?: string | null;
             notification_type: components["schemas"]["NotificationType"];
             status: components["schemas"]["UserStatus"];
+        };
+        UpdateShopCategoryRequest: {
+            name: string;
+            /** Format: int32 */
+            sort: number;
+        };
+        UpdateShopMenuItemRequest: {
+            /** Format: int32 */
+            drink_item_id?: number | null;
+            drink_item_name?: string | null;
+            description?: string | null;
+            /** Format: int32 */
+            sort: number;
+            sizes: components["schemas"]["MenuItemSizeRequest"][];
+            sugar_ids: number[];
+            ice_ids: number[];
+            topping_ids: number[];
+        };
+        UpdateShopOverrideRequest: {
+            sugar_overrides: components["schemas"]["ShopSugarOverrideItem"][];
+            topping_overrides: components["schemas"]["ShopToppingOverrideItem"][];
+        };
+        UpdateShopRequest: {
+            name: string;
+            phone?: string | null;
+            address?: string | null;
+            note?: string | null;
+            /** Format: int32 */
+            status: number;
+            /** Format: int32 */
+            sort: number;
+            /** Format: int32 */
+            max_topping_per_item: number;
+            /** Format: int32 */
+            max_topping_count: number;
         };
         UpdateSizeRequest: {
             name: string;
