@@ -5,6 +5,9 @@
   },
   "permissions": {
     "allow": [
+      "Write",
+      "Edit",
+      "Bash",
       "Bash(pnpm --filter @drink/client -C web build)",
       "Bash(git add:*)",
       "Bash(git rm:*)",

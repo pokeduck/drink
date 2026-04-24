@@ -7,6 +7,7 @@
   },
   "scripts": {
     "prepare": "pnpm -C web install",
+    "generate": "pnpm -C web --filter @app/api-types generate",
     "build:web": "pnpm -C web build",
     "build:admin": "pnpm -C web --filter @drink/admin build",
     "build:client": "pnpm -C web --filter @drink/client build",
