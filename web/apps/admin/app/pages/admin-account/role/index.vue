@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
-import { useApiError } from '~/composable/useApiError'
+import { useApiFeedback } from '~/composable/useApiFeedback'
 import { usePermission } from '~/composable/usePermission'
 import { MENU } from '@app/core'
 import type { components } from '@app/api-types/admin'
@@ -9,7 +9,7 @@ type AdminRole = components['schemas']['AdminRoleListResponse']
 
 const api = useAdminApi()
 const router = useRouter()
-const { handleError } = useApiError()
+const { handleError, showSuccess, startLoading, stopLoading } = useApiFeedback()
 const { can } = usePermission()
 
 const tableData = ref<AdminRole[]>([])
@@ -31,8 +31,6 @@ const fetchList = async () => {
 const deleteDialogVisible = ref(false)
 const deleteTarget = ref<AdminRole | null>(null)
 const reassignRoleId = ref<number | null>(null)
-const deleteLoading = ref(false)
-
 const openDeleteDialog = (role: AdminRole) => {
   deleteTarget.value = role
   reassignRoleId.value = null
@@ -48,28 +46,28 @@ const handleDelete = async () => {
   if (!deleteTarget.value) return
 
   if ((deleteTarget.value.staff_count ?? 0) > 0 && !reassignRoleId.value) {
-    ElMessage.warning('請選擇要遷移 Staff 的目標角色')
+    handleError({ message: '請選擇要遷移 Staff 的目標角色' }, '請選擇要遷移 Staff 的目標角色')
     return
   }
 
-  deleteLoading.value = true
-  try {
-    const body: { reassign_role_id?: number | null } = {}
-    if ((deleteTarget.value.staff_count ?? 0) > 0) {
-      body.reassign_role_id = reassignRoleId.value
-    }
-    await api.DELETE('/api/admin/roles/{roleId}', {
-      params: { path: { roleId: deleteTarget.value.id! } },
-      body,
-    })
-    ElMessage.success('刪除成功')
-    deleteDialogVisible.value = false
-    await fetchList()
-  } catch (err: any) {
-    handleError(err, undefined, '刪除失敗')
-  } finally {
-    deleteLoading.value = false
+  startLoading()
+  const body: { reassign_role_id?: number | null } = {}
+  if ((deleteTarget.value.staff_count ?? 0) > 0) {
+    body.reassign_role_id = reassignRoleId.value
   }
+  const { error } = await api.DELETE('/api/admin/roles/{roleId}', {
+    params: { path: { roleId: deleteTarget.value.id! } },
+    body,
+  })
+  await stopLoading()
+
+  if (error) {
+    handleError(error, '刪除失敗')
+    return
+  }
+  showSuccess('刪除成功')
+  deleteDialogVisible.value = false
+  await fetchList()
 }
 
 onMounted(() => {
@@ -157,7 +155,7 @@ onMounted(() => {
       </template>
       <template #footer>
         <el-button @click="deleteDialogVisible = false">取消</el-button>
-        <el-button type="danger" :loading="deleteLoading" @click="handleDelete">確認刪除</el-button>
+        <el-button type="danger" @click="handleDelete">確認刪除</el-button>
       </template>
     </el-dialog>
   </div>

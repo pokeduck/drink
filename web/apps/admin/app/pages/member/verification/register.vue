@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
-import { useApiError } from '~/composable/useApiError'
+import { useApiFeedback } from '~/composable/useApiFeedback'
 import { usePermission } from '~/composable/usePermission'
 import { MENU } from '@app/core'
 import type { components } from '@app/api-types/admin'
@@ -8,7 +8,7 @@ import type { components } from '@app/api-types/admin'
 type Verification = components['schemas']['VerificationListResponse']
 
 const api = useAdminApi()
-const { handleError } = useApiError()
+const { handleError, showSuccess, startLoading, stopLoading } = useApiFeedback()
 const { can } = usePermission()
 
 // 搜尋 & 篩選
@@ -79,25 +79,22 @@ const handleResend = async (row: Verification) => {
       confirmButtonText: '確認重發',
       cancelButtonText: '取消',
     })
-    const { error } = await api.POST('/api/admin/verifications/{verificationId}/resend', {
-      params: { path: { verificationId: row.id! } },
-    })
-    if (error) { handleError(error, '重發失敗'); return }
-    ElMessage.success('重發成功')
-    await fetchList()
-  } catch (err: any) {
-    if (err !== 'cancel') {
-      handleError(err, '重發失敗')
-    }
-  }
+  } catch { return }
+
+  startLoading()
+  const { error } = await api.POST('/api/admin/verifications/{verificationId}/resend', {
+    params: { path: { verificationId: row.id! } },
+  })
+  await stopLoading()
+  if (error) { handleError(error, '重發失敗'); return }
+  showSuccess('重發成功')
+  await fetchList()
 }
 
 // 批量重發
-const batchResendLoading = ref(false)
-
 const handleBatchResend = async () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('請先選擇要重發的紀錄')
+    handleError({ message: '請先選擇要重發的紀錄' }, '請先選擇要重發的紀錄')
     return
   }
   try {
@@ -106,26 +103,22 @@ const handleBatchResend = async () => {
       confirmButtonText: '確認重發',
       cancelButtonText: '取消',
     })
-    batchResendLoading.value = true
-    const ids = selectedRows.value.map(r => r.id!)
-    const { data: res, error } = await api.POST('/api/admin/verifications/register/resend', {
-      body: { ids },
-    })
-    batchResendLoading.value = false
-    if (error) { handleError(error, '批量重發失敗'); return }
-    const data = res!.data!
-    if (data.skip_count! > 0) {
-      ElMessage.warning(`成功 ${data.success_count} 筆，跳過 ${data.skip_count} 筆（已驗證或 10 分鐘內已重發）`)
-    } else {
-      ElMessage.success(`成功重發 ${data.success_count} 筆`)
-    }
-    await fetchList()
-  } catch (err: any) {
-    if (err !== 'cancel') {
-      batchResendLoading.value = false
-      handleError(err, '批量重發失敗')
-    }
+  } catch { return }
+
+  startLoading()
+  const ids = selectedRows.value.map(r => r.id!)
+  const { data: res, error } = await api.POST('/api/admin/verifications/register/resend', {
+    body: { ids },
+  })
+  await stopLoading()
+  if (error) { handleError(error, '批量重發失敗'); return }
+  const data = res!.data!
+  if (data.skip_count! > 0) {
+    showSuccess(`成功 ${data.success_count} 筆，跳過 ${data.skip_count} 筆（已驗證或 10 分鐘內已重發）`)
+  } else {
+    showSuccess(`成功重發 ${data.success_count} 筆`)
   }
+  await fetchList()
 }
 
 const isExpired = (expiresAt: string) => {
@@ -161,7 +154,7 @@ onMounted(() => {
           <el-button type="primary" @click="handleSearch">查詢</el-button>
         </div>
         <div class="toolbar-right">
-          <el-button v-if="can(MENU.VerificationRegister, 'create')" type="warning" :loading="batchResendLoading" :disabled="selectedRows.length === 0" @click="handleBatchResend">
+          <el-button v-if="can(MENU.VerificationRegister, 'create')" type="warning" :disabled="selectedRows.length === 0" @click="handleBatchResend">
             批量重發 ({{ selectedRows.length }})
           </el-button>
         </div>

@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
-import { useApiError } from '~/composable/useApiError'
-import { useLoading } from '~/composable/useLoading'
+import { useApiFeedback } from '~/composable/useApiFeedback'
 
 const api = useAdminApi()
 const router = useRouter()
 const route = useRoute()
 const memberId = Number(route.params.id)
 const { labelPosition } = useFormLayout()
-const { serverErrors, handleError, clearErrors } = useApiError()
+const { serverErrors, handleError, clearErrors, showSuccess, startLoading, stopLoading } = useApiFeedback()
 
 const formRef = ref()
-const { loading, start: startLoading, stop: stopLoading } = useLoading()
 const fetchLoading = ref(true)
 
 const form = reactive({
@@ -57,7 +55,7 @@ const fetchMember = async () => {
   })
   fetchLoading.value = false
   if (error) {
-    ElMessage.error('載入會員資料失敗')
+    handleError(error, '載入會員資料失敗')
     router.push('/member/list')
     return
   }
@@ -84,9 +82,9 @@ const handleSubmit = async () => {
     params: { path: { memberId } },
     body: form,
   })
-  stopLoading()
+  await stopLoading()
   if (error) { handleError(error, '更新失敗'); return }
-  ElMessage.success('更新成功')
+  showSuccess('更新成功')
   router.push('/member/list')
 }
 
@@ -103,7 +101,7 @@ onMounted(() => {
       <template #content>編輯會員</template>
     </el-page-header>
 
-    <el-card v-loading="fetchLoading || loading" shadow="never" style="margin-top: 16px">
+    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large">
         <el-row :gutter="24">
           <!-- 唯讀欄位 -->

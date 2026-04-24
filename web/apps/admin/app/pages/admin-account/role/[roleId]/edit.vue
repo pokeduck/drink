@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
-import { useApiError } from '~/composable/useApiError'
-import { useLoading } from '~/composable/useLoading'
+import { useApiFeedback } from '~/composable/useApiFeedback'
 import type { components } from '@app/api-types/admin'
 
 type MenuCrudItem = components['schemas']['AdminMenuRoleResponse']
@@ -12,10 +11,9 @@ const router = useRouter()
 const route = useRoute()
 const roleId = Number(route.params.roleId)
 const { labelPosition } = useFormLayout()
-const { serverErrors, handleError, clearErrors } = useApiError()
+const { serverErrors, handleError, clearErrors, showSuccess, startLoading, stopLoading } = useApiFeedback()
 
 const formRef = ref()
-const { loading, start: startLoading, stop: stopLoading } = useLoading()
 const fetchLoading = ref(true)
 const isSystem = ref(false)
 
@@ -39,7 +37,7 @@ const fetchRole = async () => {
   })
 
   if (error) {
-    ElMessage.error('載入角色資料失敗')
+    handleError(error, '載入角色資料失敗')
     router.push('/admin-account/role')
     return
   }
@@ -72,13 +70,13 @@ const handleSubmit = async () => {
       })),
     },
   })
-  stopLoading()
+  await stopLoading()
 
   if (error) {
     handleError(error, '更新失敗')
     return
   }
-  ElMessage.success('角色更新成功')
+  showSuccess('角色更新成功')
   router.push('/admin-account/role')
 }
 
@@ -95,7 +93,7 @@ onMounted(() => {
       <template #content>{{ isSystem ? '檢視角色' : '編輯角色' }}</template>
     </el-page-header>
 
-    <el-card v-loading="fetchLoading || loading" shadow="never" style="margin-top: 16px">
+    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
       <el-alert
         v-if="isSystem"
         type="info"

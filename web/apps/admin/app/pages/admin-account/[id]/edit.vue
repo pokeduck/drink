@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
-import { useApiError } from '~/composable/useApiError'
-import { useLoading } from '~/composable/useLoading'
+import { useApiFeedback } from '~/composable/useApiFeedback'
 import type { components } from '@app/api-types/admin'
 
 type AdminRole = components['schemas']['AdminRoleListResponse']
@@ -12,10 +11,9 @@ const router = useRouter()
 const route = useRoute()
 const userId = Number(route.params.id)
 const { labelPosition } = useFormLayout()
-const { serverErrors, handleError, clearErrors } = useApiError()
+const { serverErrors, handleError, clearErrors, showSuccess, startLoading, stopLoading } = useApiFeedback()
 
 const formRef = ref()
-const { loading, start: startLoading, stop: stopLoading } = useLoading()
 const fetchLoading = ref(true)
 
 const form = reactive({
@@ -45,7 +43,7 @@ const fetchUser = async () => {
   })
 
   if (error) {
-    ElMessage.error('載入帳號資料失敗')
+    handleError(error, '載入帳號資料失敗')
     router.push('/admin-account/list')
     return
   }
@@ -72,13 +70,13 @@ const handleSubmit = async () => {
       is_active: form.is_active,
     },
   })
-  stopLoading()
+  await stopLoading()
 
   if (error) {
     handleError(error, '更新失敗')
     return
   }
-  ElMessage.success('更新成功')
+  showSuccess('更新成功')
   router.push('/admin-account/list')
 }
 
@@ -95,7 +93,7 @@ onMounted(async () => {
       <template #content>編輯帳號</template>
     </el-page-header>
 
-    <el-card v-loading="fetchLoading || loading" shadow="never" style="margin-top: 16px">
+    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large">
         <el-row :gutter="24">
           <el-col :span="24">

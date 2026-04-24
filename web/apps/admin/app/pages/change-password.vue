@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
-import { useApiError } from '~/composable/useApiError'
-import { useLoading } from '~/composable/useLoading'
+import { useApiFeedback } from '~/composable/useApiFeedback'
 import { useAuthStore } from '~/stores/auth'
 
 const api = useAdminApi()
 const authStore = useAuthStore()
 const router = useRouter()
 const { labelPosition } = useFormLayout()
-const { serverErrors, handleError, clearErrors } = useApiError()
+const { serverErrors, handleError, clearErrors, showSuccess, startLoading, stopLoading } = useApiFeedback()
 
 const formRef = ref()
-const { loading, start: startLoading, stop: stopLoading } = useLoading()
 
 const form = reactive({
   old_password: '',
@@ -49,13 +47,13 @@ const handleSubmit = async () => {
       new_password: form.new_password,
     },
   })
-  stopLoading()
+  await stopLoading()
 
   if (error) {
     handleError(error, '密碼修改失敗')
     return
   }
-  ElMessage.success('密碼修改成功，請重新登入')
+  showSuccess('密碼修改成功，請重新登入')
   await authStore.logout()
   await router.push('/login')
 }
@@ -69,7 +67,7 @@ const handleSubmit = async () => {
       <template #content>修改密碼</template>
     </el-page-header>
 
-    <el-card v-loading="loading" shadow="never" style="margin-top: 16px">
+    <el-card shadow="never" style="margin-top: 16px">
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large">
         <el-row :gutter="24">
           <el-col :span="24">

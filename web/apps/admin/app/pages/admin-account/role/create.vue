@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
-import { useApiError } from '~/composable/useApiError'
-import { useLoading } from '~/composable/useLoading'
+import { useApiFeedback } from '~/composable/useApiFeedback'
 import type { components } from '@app/api-types/admin'
 
 type MenuCrudItem = components['schemas']['AdminMenuRoleResponse']
@@ -10,10 +9,9 @@ type MenuCrudItem = components['schemas']['AdminMenuRoleResponse']
 const api = useAdminApi()
 const router = useRouter()
 const { labelPosition } = useFormLayout()
-const { serverErrors, handleError, clearErrors } = useApiError()
+const { serverErrors, handleError, clearErrors, showSuccess, startLoading, stopLoading } = useApiFeedback()
 
 const formRef = ref()
-const { loading, start: startLoading, stop: stopLoading } = useLoading()
 const fetchLoading = ref(true)
 
 const form = reactive({
@@ -37,7 +35,7 @@ const fetchMenus = async () => {
   })
 
   if (error) {
-    ElMessage.error('載入 Menu 資料失敗')
+    handleError(error, '載入 Menu 資料失敗')
     fetchLoading.value = false
     return
   }
@@ -70,13 +68,13 @@ const handleSubmit = async () => {
       })),
     },
   })
-  stopLoading()
+  await stopLoading()
 
   if (error) {
     handleError(error, '建立失敗')
     return
   }
-  ElMessage.success('角色建立成功')
+  showSuccess('角色建立成功')
   router.push('/admin-account/role')
 }
 
@@ -93,7 +91,7 @@ onMounted(() => {
       <template #content>新增角色</template>
     </el-page-header>
 
-    <el-card v-loading="fetchLoading || loading" shadow="never" style="margin-top: 16px">
+    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large" @submit.prevent>
         <el-row :gutter="24">
           <el-col :span="24">

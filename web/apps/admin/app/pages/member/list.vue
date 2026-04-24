@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
-import { useApiError } from '~/composable/useApiError'
+import { useApiFeedback } from '~/composable/useApiFeedback'
 import { usePermission } from '~/composable/usePermission'
 import { MENU } from '@app/core'
 import type { components } from '@app/api-types/admin'
@@ -9,7 +9,7 @@ type Member = components['schemas']['MemberListResponse']
 
 const api = useAdminApi()
 const router = useRouter()
-const { handleError } = useApiError()
+const { handleError, showSuccess, startLoading, stopLoading } = useApiFeedback()
 const { can } = usePermission()
 
 // 搜尋 & 篩選
@@ -85,28 +85,30 @@ const resetPasswordDialogVisible = ref(false)
 const resetPasswordMemberId = ref<number | null>(null)
 const resetPasswordEmail = ref('')
 const newPassword = ref('')
-const resetPasswordLoading = ref(false)
-
+const resetFormRef = ref()
+const resetRules = {
+  newPassword: [{ required: true, message: '請輸入新密碼', trigger: 'blur' }],
+}
 const openResetPasswordDialog = (member: Member) => {
   resetPasswordMemberId.value = member.id!
   resetPasswordEmail.value = member.email!
   newPassword.value = ''
   resetPasswordDialogVisible.value = true
+  nextTick(() => resetFormRef.value?.clearValidate())
 }
 
 const handleResetPassword = async () => {
-  if (!newPassword.value) {
-    ElMessage.warning('請輸入新密碼')
-    return
-  }
-  resetPasswordLoading.value = true
+  const valid = await resetFormRef.value?.validate().catch(() => false)
+  if (!valid) return
+
+  startLoading()
   const { error } = await api.PUT('/api/admin/members/{memberId}/password', {
     params: { path: { memberId: resetPasswordMemberId.value! } },
     body: { new_password: newPassword.value },
   })
-  resetPasswordLoading.value = false
+  await stopLoading()
   if (error) { handleError(error, '密碼重設失敗'); return }
-  ElMessage.success('密碼重設成功')
+  showSuccess('密碼重設成功')
   resetPasswordDialogVisible.value = false
 }
 
@@ -202,18 +204,18 @@ onMounted(() => {
     </el-card>
 
     <!-- 重設密碼 Dialog -->
-    <el-dialog v-model="resetPasswordDialogVisible" title="重設密碼" width="420" :close-on-click-modal="false">
-      <el-form label-position="top">
+    <el-dialog v-model="resetPasswordDialogVisible" title="重設密碼" width="480" :close-on-click-modal="false">
+      <el-form ref="resetFormRef" :model="{ newPassword }" :rules="resetRules" label-position="top">
         <el-form-item label="Email">
           <el-input :model-value="resetPasswordEmail" disabled />
         </el-form-item>
-        <el-form-item label="新密碼">
+        <el-form-item label="新密碼" prop="newPassword">
           <el-input v-model="newPassword" type="password" placeholder="請輸入新密碼" show-password />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="resetPasswordDialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="resetPasswordLoading" @click="handleResetPassword">確認</el-button>
+        <el-button type="primary" @click="handleResetPassword">確認</el-button>
       </template>
     </el-dialog>
   </div>

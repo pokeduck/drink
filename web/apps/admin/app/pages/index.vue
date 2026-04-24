@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useApiFeedback } from '~/composable/useApiFeedback'
+
 const route = useRoute()
 const router = useRouter()
+const { handleError } = useApiFeedback()
 
 onMounted(() => {
   if (route.query.forbidden === '1') {
-    ElMessage.error('您沒有權限存取該頁面')
+    handleError({ message: '您沒有權限存取該頁面' }, '您沒有權限存取該頁面')
     router.replace({ query: {} })
   }
 })

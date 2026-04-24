@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
-import { useApiError } from '~/composable/useApiError'
-import { useLoading } from '~/composable/useLoading'
+import { useApiFeedback } from '~/composable/useApiFeedback'
 
 const api = useAdminApi()
 const router = useRouter()
 const { labelPosition } = useFormLayout()
-const { serverErrors, handleError, clearErrors } = useApiError()
+const { serverErrors, handleError, clearErrors, showSuccess, startLoading, stopLoading } = useApiFeedback()
 
 const formRef = ref()
-const { loading, start: startLoading, stop: stopLoading } = useLoading()
 
 const form = reactive({
   name: '',
@@ -38,9 +36,9 @@ const handleSubmit = async () => {
   startLoading()
   clearErrors()
   const { error } = await api.POST('/api/admin/members', { body: form })
-  stopLoading()
+  await stopLoading()
   if (error) { handleError(error, '建立失敗'); return }
-  ElMessage.success('會員建立成功')
+  showSuccess('會員建立成功')
   router.push('/member/list')
 }
 </script>
@@ -53,7 +51,7 @@ const handleSubmit = async () => {
       <template #content>新增會員</template>
     </el-page-header>
 
-    <el-card v-loading="loading" shadow="never" style="margin-top: 16px">
+    <el-card shadow="never" style="margin-top: 16px">
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large">
         <el-row :gutter="24">
           <el-col :span="24">
