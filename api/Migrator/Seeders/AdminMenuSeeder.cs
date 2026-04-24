@@ -39,11 +39,11 @@ public class AdminMenuSeeder : ISeeder
 
       // 飲料選項
       new() { Id = 11, ParentId = null, Name = "飲料選項", Icon = "ColdDrink", Endpoint = null,                    Sort = 5, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
-      new() { Id = 12, ParentId = 11,   Name = "通用品名", Icon = "Grape",     Endpoint = "/drink-option/item",    Sort = 1, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
-      new() { Id = 13, ParentId = 11,   Name = "甜度定義", Icon = "Sugar",     Endpoint = "/drink-option/sugar",   Sort = 2, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
-      new() { Id = 14, ParentId = 11,   Name = "冰塊定義", Icon = "IceCream",  Endpoint = "/drink-option/ice",     Sort = 3, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
-      new() { Id = 15, ParentId = 11,   Name = "加料",     Icon = "Plus",      Endpoint = "/drink-option/topping", Sort = 4, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
-      new() { Id = 16, ParentId = 11,   Name = "容量定義", Icon = "CoffeeCup", Endpoint = "/drink-option/size",    Sort = 5, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
+      new() { Id = 12, ParentId = 11,   Name = "通用品名", Icon = "Grape",     Endpoint = "/drink-option/item/list",    Sort = 1, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
+      new() { Id = 13, ParentId = 11,   Name = "甜度定義", Icon = "Sugar",     Endpoint = "/drink-option/sugar/list",   Sort = 2, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
+      new() { Id = 14, ParentId = 11,   Name = "冰塊定義", Icon = "IceCream",  Endpoint = "/drink-option/ice/list",     Sort = 3, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
+      new() { Id = 15, ParentId = 11,   Name = "加料",     Icon = "Plus",      Endpoint = "/drink-option/topping/list", Sort = 4, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
+      new() { Id = 16, ParentId = 11,   Name = "容量定義", Icon = "CoffeeCup", Endpoint = "/drink-option/size/list",    Sort = 5, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
 
       // 通知管理
       new() { Id = 18, ParentId = null, Name = "通知管理", Icon = "Bell",          Endpoint = null,                     Sort = 6, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },

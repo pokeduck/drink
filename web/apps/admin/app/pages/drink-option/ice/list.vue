@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
-import { useApiError } from '~/composable/useApiError'
-import { useFormLayout } from '~/composable/useFormLayout'
+import { useApiFeedback } from '~/composable/useApiFeedback'
 import { useLoading } from '~/composable/useLoading'
 import { usePermission } from '~/composable/usePermission'
 import { MENU } from '@app/core'
 import type { components } from '@app/api-types/admin'
 
-type DrinkItem = components['schemas']['DrinkItemListResponse']
+type Ice = components['schemas']['IceListResponse']
 
 const api = useAdminApi()
-const { serverErrors, handleError, clearErrors } = useApiError()
-const { labelPosition } = useFormLayout()
+const router = useRouter()
+const { handleError, showSuccess, startLoading, stopLoading } = useApiFeedback()
 const { can } = usePermission()
 
 // 搜尋 & 分頁
@@ -27,16 +26,16 @@ const sortBy = ref('sort')
 const sortOrder = ref('asc')
 
 // 資料
-const tableData = ref<DrinkItem[]>([])
-const { loading, start: startLoading, stop: stopLoading } = useLoading()
+const tableData = ref<Ice[]>([])
+const { loading, start: startFetchLoading, stop: stopFetchLoading } = useLoading()
 
 // 多選
-const selectedRows = ref<DrinkItem[]>([])
+const selectedRows = ref<Ice[]>([])
 
 const fetchList = async () => {
-  startLoading()
+  startFetchLoading()
   try {
-    const { data: res } = await api.GET('/api/admin/drink-items', {
+    const { data: res } = await api.GET('/api/admin/ices', {
       params: {
         query: {
           page: page.value,
@@ -51,9 +50,9 @@ const fetchList = async () => {
     total.value = res?.data?.total ?? 0
     tableKey.value++
   } catch (err) {
-    console.error('Failed to fetch drink items:', err)
+    console.error('Failed to fetch ices:', err)
   } finally {
-    stopLoading()
+    stopFetchLoading()
   }
 }
 
@@ -74,82 +73,25 @@ const handleSortChange = ({ prop, order }: { prop: string; order: string | null 
   fetchList()
 }
 
-// 多選
-const handleSelectionChange = (rows: DrinkItem[]) => {
+const handleSelectionChange = (rows: Ice[]) => {
   selectedRows.value = rows
 }
 
-// ---- 新增 / 編輯 Dialog ----
-const dialogVisible = ref(false)
-const dialogTitle = ref('新增通用品名')
-const editingId = ref<number | null>(null)
-const formRef = ref()
-const { loading: formLoading, start: startFormLoading, stop: stopFormLoading } = useLoading()
-const form = reactive({
-  name: '',
-  sort: 0,
-})
-const rules = {
-  name: [{ required: true, message: '請輸入名稱', trigger: 'blur' }],
-}
-
-const openCreate = () => {
-  editingId.value = null
-  dialogTitle.value = '新增通用品名'
-  form.name = ''
-  form.sort = 0
-  dialogVisible.value = true
-  nextTick(() => formRef.value?.clearValidate())
-}
-
-const openEdit = (row: DrinkItem) => {
-  editingId.value = row.id!
-  dialogTitle.value = '編輯通用品名'
-  form.name = row.name!
-  form.sort = row.sort!
-  dialogVisible.value = true
-  nextTick(() => formRef.value?.clearValidate())
-}
-
-const handleSubmit = async () => {
-  const valid = await formRef.value?.validate().catch(() => false)
-  if (!valid) return
-
-  startFormLoading()
-  clearErrors()
-  try {
-    if (editingId.value) {
-      const { error } = await api.PUT('/api/admin/drink-items/{id}', {
-        params: { path: { id: editingId.value } },
-        body: form,
-      })
-      if (error) { handleError(error, '更新失敗'); stopFormLoading(); return }
-      ElMessage.success('更新成功')
-    } else {
-      const { error } = await api.POST('/api/admin/drink-items', { body: form })
-      if (error) { handleError(error, '新增失敗'); stopFormLoading(); return }
-      ElMessage.success('新增成功')
-    }
-    dialogVisible.value = false
-    await fetchList()
-  } finally {
-    stopFormLoading()
-  }
-}
-
 // ---- 刪除 ----
-const handleDelete = async (row: DrinkItem) => {
+const handleDelete = async (row: Ice) => {
   try {
     await ElMessageBox.confirm(`確定要刪除「${row.name}」嗎？`, '刪除確認', {
       type: 'warning',
       confirmButtonText: '刪除',
       cancelButtonText: '取消',
     })
-    const { error } = await api.DELETE('/api/admin/drink-items/{id}', {
+    startLoading()
+    const { error } = await api.DELETE('/api/admin/ices/{id}', {
       params: { path: { id: row.id! } },
     })
+    await stopLoading()
     if (error) { handleError(error, '刪除失敗'); return }
-    ElMessage.success('刪除成功')
+    showSuccess('刪除成功')
     await fetchList()
   } catch (err: any) {
     if (err !== 'cancel') {
@@ -168,11 +110,13 @@ const handleBatchDelete = async () => {
       confirmButtonText: '刪除',
       cancelButtonText: '取消',
     })
-    const { error } = await api.DELETE('/api/admin/drink-items/batch', {
+    startLoading()
+    const { error } = await api.DELETE('/api/admin/ices/batch', {
       body: { ids: selectedRows.value.map((r) => r.id!) },
     })
+    await stopLoading()
     if (error) { handleError(error, '批次刪除失敗'); return }
-    ElMessage.success('批次刪除成功')
+    showSuccess('批次刪除成功')
     selectedRows.value = []
     await fetchList()
   } catch (err: any) {
@@ -183,21 +127,20 @@ const handleBatchDelete = async () => {
 }
 
 // ---- 儲存排序 ----
-const { loading: sortLoading, start: startSortLoading, stop: stopSortLoading } = useLoading()
-
 const handleSaveSort = async () => {
-  startSortLoading()
+  startLoading()
   try {
     const items = tableData.value.map((row) => ({
       id: row.id!,
       sort: row.sort!,
     }))
-    const { error } = await api.PUT('/api/admin/drink-items/sort', { body: { items } })
+    const { error } = await api.PUT('/api/admin/ices/sort', { body: { items } })
+    await stopLoading()
     if (error) { handleError(error, '排序失敗'); return }
-    ElMessage.success('排序儲存成功')
+    showSuccess('排序儲存成功')
     await fetchList()
-  } finally {
-    stopSortLoading()
+  } catch {
+    await stopLoading()
   }
 }
 
@@ -210,13 +153,13 @@ onMounted(() => {
   <div>
     <AppBreadcrumb />
 
-    <el-card shadow="never" v-loading="loading || sortLoading">
+    <el-card shadow="never" v-loading="loading">
       <!-- 工具列 -->
       <div class="toolbar">
         <div class="toolbar-left">
           <el-input
             v-model="keyword"
-            placeholder="搜尋品名"
+            placeholder="搜尋冰塊"
             clearable
             style="width: 240px"
             @keyup.enter="handleSearch"
@@ -230,17 +173,17 @@ onMounted(() => {
         </div>
         <div class="toolbar-right">
           <el-button
-            v-if="selectedRows.length && can(MENU.DrinkItem, 'delete')"
+            v-if="selectedRows.length && can(MENU.Ice, 'delete')"
             type="danger"
             @click="handleBatchDelete"
           >
             批次刪除 ({{ selectedRows.length }})
           </el-button>
-          <el-button v-if="can(MENU.DrinkItem, 'update')" @click="handleSaveSort">
+          <el-button v-if="can(MENU.Ice, 'update')" @click="handleSaveSort">
             儲存排序
           </el-button>
-          <el-button v-if="can(MENU.DrinkItem, 'create')" type="primary" icon="Plus" @click="openCreate">
-            新增品名
+          <el-button v-if="can(MENU.Ice, 'create')" type="primary" icon="Plus" @click="router.push('/drink-option/ice/create')">
+            新增冰塊
           </el-button>
         </div>
       </div>
@@ -260,7 +203,7 @@ onMounted(() => {
         <el-table-column prop="name" label="名稱" min-width="200" />
         <el-table-column label="排序" width="120">
           <template #default="{ row }">
-            <el-input-number v-if="can(MENU.DrinkItem, 'update')" v-model="row.sort" :min="0" :precision="0" controls-position="right" size="small" style="width: 90px" />
+            <el-input-number v-if="can(MENU.Ice, 'update')" v-model="row.sort" :min="0" :precision="0" controls-position="right" size="small" style="width: 90px" />
             <span v-else>{{ row.sort }}</span>
           </template>
         </el-table-column>
@@ -271,37 +214,14 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
-            <el-button v-if="can(MENU.DrinkItem, 'update')" size="small" @click="openEdit(row)">編輯</el-button>
-            <el-button v-if="can(MENU.DrinkItem, 'delete')" size="small" type="danger" @click="handleDelete(row)">刪除</el-button>
+            <el-button v-if="can(MENU.Ice, 'update')" size="small" @click="router.push(`/drink-option/ice/${row.id}/edit`)">編輯</el-button>
+            <el-button v-if="can(MENU.Ice, 'delete')" size="small" type="danger" @click="handleDelete(row)">刪除</el-button>
           </template>
         </el-table-column>
       </el-table>
 
-      <!-- 分頁 -->
       <AppPagination v-model:page="page" v-model:page-size="pageSize" :total="total" @change="fetchList" />
     </el-card>
-
-    <!-- 新增 / 編輯 Dialog -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="480" :close-on-click-modal="false">
-      <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="80px" v-loading="formLoading">
-        <el-row :gutter="20">
-          <el-col :span="24">
-            <el-form-item label="名稱" prop="name" :error="serverErrors.name">
-              <el-input v-model="form.name" placeholder="請輸入名稱" maxlength="100" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="排序" prop="sort">
-              <el-input-number v-model="form.sort" :min="0" controls-position="right" style="width: 100%" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit">確認</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 

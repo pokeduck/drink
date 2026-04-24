@@ -24,11 +24,21 @@ const routePermissions: { pattern: RegExp; perm: RoutePermission }[] = [
   { pattern: /^\/member\/verification\/forgot-password$/, perm: { menuId: MENU.VerificationForgotPassword, action: 'read' } },
 
   // 飲料選項
-  { pattern: /^\/drink-option\/item$/, perm: { menuId: MENU.DrinkItem, action: 'read' } },
-  { pattern: /^\/drink-option\/sugar$/, perm: { menuId: MENU.Sugar, action: 'read' } },
-  { pattern: /^\/drink-option\/ice$/, perm: { menuId: MENU.Ice, action: 'read' } },
-  { pattern: /^\/drink-option\/topping$/, perm: { menuId: MENU.Topping, action: 'read' } },
-  { pattern: /^\/drink-option\/size$/, perm: { menuId: MENU.Size, action: 'read' } },
+  { pattern: /^\/drink-option\/item\/list$/, perm: { menuId: MENU.DrinkItem, action: 'read' } },
+  { pattern: /^\/drink-option\/item\/create$/, perm: { menuId: MENU.DrinkItem, action: 'create' } },
+  { pattern: /^\/drink-option\/item\/[^/]+\/edit$/, perm: { menuId: MENU.DrinkItem, action: 'update' } },
+  { pattern: /^\/drink-option\/sugar\/list$/, perm: { menuId: MENU.Sugar, action: 'read' } },
+  { pattern: /^\/drink-option\/sugar\/create$/, perm: { menuId: MENU.Sugar, action: 'create' } },
+  { pattern: /^\/drink-option\/sugar\/[^/]+\/edit$/, perm: { menuId: MENU.Sugar, action: 'update' } },
+  { pattern: /^\/drink-option\/ice\/list$/, perm: { menuId: MENU.Ice, action: 'read' } },
+  { pattern: /^\/drink-option\/ice\/create$/, perm: { menuId: MENU.Ice, action: 'create' } },
+  { pattern: /^\/drink-option\/ice\/[^/]+\/edit$/, perm: { menuId: MENU.Ice, action: 'update' } },
+  { pattern: /^\/drink-option\/topping\/list$/, perm: { menuId: MENU.Topping, action: 'read' } },
+  { pattern: /^\/drink-option\/topping\/create$/, perm: { menuId: MENU.Topping, action: 'create' } },
+  { pattern: /^\/drink-option\/topping\/[^/]+\/edit$/, perm: { menuId: MENU.Topping, action: 'update' } },
+  { pattern: /^\/drink-option\/size\/list$/, perm: { menuId: MENU.Size, action: 'read' } },
+  { pattern: /^\/drink-option\/size\/create$/, perm: { menuId: MENU.Size, action: 'create' } },
+  { pattern: /^\/drink-option\/size\/[^/]+\/edit$/, perm: { menuId: MENU.Size, action: 'update' } },
 
   // 訂單
   { pattern: /^\/order\/list$/, perm: { menuId: MENU.OrderList, action: 'read' } },

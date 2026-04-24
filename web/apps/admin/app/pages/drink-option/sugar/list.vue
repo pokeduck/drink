@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useAdminApi } from '~/composable/useAdminApi'
-import { useApiError } from '~/composable/useApiError'
-import { useFormLayout } from '~/composable/useFormLayout'
+import { useApiFeedback } from '~/composable/useApiFeedback'
 import { useLoading } from '~/composable/useLoading'
 import { usePermission } from '~/composable/usePermission'
 import { MENU } from '@app/core'
@@ -10,8 +9,8 @@ import type { components } from '@app/api-types/admin'
 type Sugar = components['schemas']['SugarListResponse']
 
 const api = useAdminApi()
-const { serverErrors, handleError, clearErrors } = useApiError()
-const { labelPosition } = useFormLayout()
+const router = useRouter()
+const { handleError, showSuccess, startLoading, stopLoading } = useApiFeedback()
 const { can } = usePermission()
 
 // 搜尋 & 分頁
@@ -28,13 +27,13 @@ const sortOrder = ref('asc')
 
 // 資料
 const tableData = ref<Sugar[]>([])
-const { loading, start: startLoading, stop: stopLoading } = useLoading()
+const { loading, start: startFetchLoading, stop: stopFetchLoading } = useLoading()
 
 // 多選
 const selectedRows = ref<Sugar[]>([])
 
 const fetchList = async () => {
-  startLoading()
+  startFetchLoading()
   try {
     const { data: res } = await api.GET('/api/admin/sugars', {
       params: {
@@ -53,7 +52,7 @@ const fetchList = async () => {
   } catch (err) {
     console.error('Failed to fetch sugars:', err)
   } finally {
-    stopLoading()
+    stopFetchLoading()
   }
 }
 
@@ -78,67 +77,6 @@ const handleSelectionChange = (rows: Sugar[]) => {
   selectedRows.value = rows
 }
 
-// ---- 新增 / 編輯 Dialog ----
-const dialogVisible = ref(false)
-const dialogTitle = ref('新增甜度')
-const editingId = ref<number | null>(null)
-const formRef = ref()
-const { loading: formLoading, start: startFormLoading, stop: stopFormLoading } = useLoading()
-const form = reactive({
-  name: '',
-  default_price: 0,
-  sort: 0,
-})
-const rules = {
-  name: [{ required: true, message: '請輸入名稱', trigger: 'blur' }],
-}
-
-const openCreate = () => {
-  editingId.value = null
-  dialogTitle.value = '新增甜度'
-  form.name = ''
-  form.default_price = 0
-  form.sort = 0
-  dialogVisible.value = true
-  nextTick(() => formRef.value?.clearValidate())
-}
-
-const openEdit = (row: Sugar) => {
-  editingId.value = row.id!
-  dialogTitle.value = '編輯甜度'
-  form.name = row.name!
-  form.default_price = row.default_price!
-  form.sort = row.sort!
-  dialogVisible.value = true
-  nextTick(() => formRef.value?.clearValidate())
-}
-
-const handleSubmit = async () => {
-  const valid = await formRef.value?.validate().catch(() => false)
-  if (!valid) return
-
-  startFormLoading()
-  clearErrors()
-  try {
-    if (editingId.value) {
-      const { error } = await api.PUT('/api/admin/sugars/{id}', {
-        params: { path: { id: editingId.value } },
-        body: form,
-      })
-      if (error) { handleError(error, '更新失敗'); stopFormLoading(); return }
-      ElMessage.success('更新成功')
-    } else {
-      const { error } = await api.POST('/api/admin/sugars', { body: form })
-      if (error) { handleError(error, '新增失敗'); stopFormLoading(); return }
-      ElMessage.success('新增成功')
-    }
-    dialogVisible.value = false
-    await fetchList()
-  } finally {
-    stopFormLoading()
-  }
-}
-
 // ---- 刪除 ----
 const handleDelete = async (row: Sugar) => {
   try {
@@ -147,11 +85,13 @@ const handleDelete = async (row: Sugar) => {
       confirmButtonText: '刪除',
       cancelButtonText: '取消',
     })
+    startLoading()
     const { error } = await api.DELETE('/api/admin/sugars/{id}', {
       params: { path: { id: row.id! } },
     })
+    await stopLoading()
     if (error) { handleError(error, '刪除失敗'); return }
-    ElMessage.success('刪除成功')
+    showSuccess('刪除成功')
     await fetchList()
   } catch (err: any) {
     if (err !== 'cancel') {
@@ -170,11 +110,13 @@ const handleBatchDelete = async () => {
       confirmButtonText: '刪除',
       cancelButtonText: '取消',
     })
+    startLoading()
     const { error } = await api.DELETE('/api/admin/sugars/batch', {
       body: { ids: selectedRows.value.map((r) => r.id!) },
     })
+    await stopLoading()
     if (error) { handleError(error, '批次刪除失敗'); return }
-    ElMessage.success('批次刪除成功')
+    showSuccess('批次刪除成功')
     selectedRows.value = []
     await fetchList()
   } catch (err: any) {
@@ -185,21 +127,20 @@ const handleBatchDelete = async () => {
 }
 
 // ---- 儲存排序 ----
-const { loading: sortLoading, start: startSortLoading, stop: stopSortLoading } = useLoading()
-
 const handleSaveSort = async () => {
-  startSortLoading()
+  startLoading()
   try {
     const items = tableData.value.map((row) => ({
       id: row.id!,
       sort: row.sort!,
     }))
     const { error } = await api.PUT('/api/admin/sugars/sort', { body: { items } })
+    await stopLoading()
     if (error) { handleError(error, '排序失敗'); return }
-    ElMessage.success('排序儲存成功')
+    showSuccess('排序儲存成功')
     await fetchList()
-  } finally {
-    stopSortLoading()
+  } catch {
+    await stopLoading()
   }
 }
 
@@ -212,7 +153,7 @@ onMounted(() => {
   <div>
     <AppBreadcrumb />
 
-    <el-card shadow="never" v-loading="loading || sortLoading">
+    <el-card shadow="never" v-loading="loading">
       <!-- 工具列 -->
       <div class="toolbar">
         <div class="toolbar-left">
@@ -241,7 +182,7 @@ onMounted(() => {
           <el-button v-if="can(MENU.Sugar, 'update')" @click="handleSaveSort">
             儲存排序
           </el-button>
-          <el-button v-if="can(MENU.Sugar, 'create')" type="primary" icon="Plus" @click="openCreate">
+          <el-button v-if="can(MENU.Sugar, 'create')" type="primary" icon="Plus" @click="router.push('/drink-option/sugar/create')">
             新增甜度
           </el-button>
         </div>
@@ -278,7 +219,7 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
-            <el-button v-if="can(MENU.Sugar, 'update')" size="small" @click="openEdit(row)">編輯</el-button>
+            <el-button v-if="can(MENU.Sugar, 'update')" size="small" @click="router.push(`/drink-option/sugar/${row.id}/edit`)">編輯</el-button>
             <el-button v-if="can(MENU.Sugar, 'delete')" size="small" type="danger" @click="handleDelete(row)">刪除</el-button>
           </template>
         </el-table-column>
@@ -286,33 +227,6 @@ onMounted(() => {
 
       <AppPagination v-model:page="page" v-model:page-size="pageSize" :total="total" @change="fetchList" />
     </el-card>
-
-    <!-- 新增 / 編輯 Dialog -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="480" :close-on-click-modal="false">
-      <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="80px" v-loading="formLoading">
-        <el-row :gutter="20">
-          <el-col :span="24">
-            <el-form-item label="名稱" prop="name" :error="serverErrors.name">
-              <el-input v-model="form.name" placeholder="請輸入名稱" maxlength="50" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="預設價格" prop="default_price">
-              <el-input-number v-model="form.default_price" :min="0" :precision="0" controls-position="right" style="width: 100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="排序" prop="sort">
-              <el-input-number v-model="form.sort" :min="0" controls-position="right" style="width: 100%" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit">確認</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
