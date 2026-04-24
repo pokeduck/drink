@@ -34,7 +34,7 @@ public class AdminMenuSeeder : ISeeder
 
       // 店家管理
       new() { Id = 9,  ParentId = null, Name = "店家管理", Icon = "Shop",    Endpoint = null,             Sort = 4, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
-      new() { Id = 10, ParentId = 9,    Name = "店家列表", Icon = "Store",   Endpoint = "/shop/list",     Sort = 1, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
+      new() { Id = 10, ParentId = 9,    Name = "店家列表", Icon = "House",   Endpoint = "/shop/list",     Sort = 1, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
       new() { Id = 17, ParentId = 9,    Name = "覆寫設定", Icon = "Setting", Endpoint = "/shop/override", Sort = 2, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
 
       // 飲料選項

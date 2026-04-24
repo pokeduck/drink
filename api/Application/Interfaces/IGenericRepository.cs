@@ -31,7 +31,8 @@ public interface IGenericRepository<TEntity>
     Expression<Func<TEntity, bool>>? predicate = null,
     Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null,
     Func<IQueryable<TEntity>, IQueryable<TEntity>>? order = null,
-    bool tracking = false);
+    bool tracking = false,
+    bool splitQuery = false);
 
   Task<PaginationList<TEntity>> GetPaginationList(
     int page,

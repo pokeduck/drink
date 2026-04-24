@@ -57,9 +57,12 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity>
     Expression<Func<TEntity, bool>>? predicate = null,
     Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null,
     Func<IQueryable<TEntity>, IQueryable<TEntity>>? order = null,
-    bool tracking = false)
+    bool tracking = false,
+    bool splitQuery = false)
   {
-    return await BuildQuery(predicate, include, order, tracking).ToListAsync();
+    var query = BuildQuery(predicate, include, order, tracking);
+    if (splitQuery) query = query.AsSplitQuery();
+    return await query.ToListAsync();
   }
 
   public async Task<PaginationList<TEntity>> GetPaginationList(
