@@ -3,6 +3,7 @@ using System;
 using Drink.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Drink.Infrastructure.Migrations
 {
     [DbContext(typeof(DrinkDbContext))]
-    partial class DrinkDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260424195942_AddShop")]
+    partial class AddShop
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -407,6 +410,10 @@ namespace Drink.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
 
+                    b.Property<int>("MaxToppingCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_topping_count");
+
                     b.Property<int>("MaxToppingPerItem")
                         .HasColumnType("integer")
                         .HasColumnName("max_topping_per_item");
@@ -539,10 +546,6 @@ namespace Drink.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
-
-                    b.Property<int>("MaxToppingCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("max_topping_count");
 
                     b.Property<int>("Sort")
                         .HasColumnType("integer")

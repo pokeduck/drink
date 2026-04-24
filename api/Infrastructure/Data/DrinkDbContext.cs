@@ -98,5 +98,124 @@ public class DrinkDbContext : DbContext
         .HasForeignKey(e => e.UserId)
         .OnDelete(DeleteBehavior.Cascade);
     });
+
+    // Shop（店家名稱唯一，僅未刪除資料）
+    modelBuilder.Entity<Shop>(entity =>
+    {
+      entity.HasIndex(e => e.Name)
+        .HasFilter("is_deleted = false")
+        .IsUnique();
+    });
+
+    // ShopCategory → Shop
+    modelBuilder.Entity<ShopCategory>(entity =>
+    {
+      entity.HasOne(e => e.Shop)
+        .WithMany(s => s.Categories)
+        .HasForeignKey(e => e.ShopId)
+        .OnDelete(DeleteBehavior.Cascade);
+    });
+
+    // ShopMenuItem → ShopCategory + DrinkItem
+    modelBuilder.Entity<ShopMenuItem>(entity =>
+    {
+      entity.HasOne(e => e.Category)
+        .WithMany(c => c.MenuItems)
+        .HasForeignKey(e => e.CategoryId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.DrinkItem)
+        .WithMany()
+        .HasForeignKey(e => e.DrinkItemId)
+        .OnDelete(DeleteBehavior.Restrict);
+    });
+
+    // ShopMenuItemSize → ShopMenuItem + Size
+    modelBuilder.Entity<ShopMenuItemSize>(entity =>
+    {
+      entity.HasOne(e => e.MenuItem)
+        .WithMany(m => m.Sizes)
+        .HasForeignKey(e => e.MenuItemId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.Size)
+        .WithMany()
+        .HasForeignKey(e => e.SizeId)
+        .OnDelete(DeleteBehavior.Restrict);
+    });
+
+    // ShopMenuItemSugar → ShopMenuItem + Sugar
+    modelBuilder.Entity<ShopMenuItemSugar>(entity =>
+    {
+      entity.HasOne(e => e.MenuItem)
+        .WithMany(m => m.Sugars)
+        .HasForeignKey(e => e.MenuItemId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.Sugar)
+        .WithMany()
+        .HasForeignKey(e => e.SugarId)
+        .OnDelete(DeleteBehavior.Restrict);
+    });
+
+    // ShopMenuItemIce → ShopMenuItem + Ice
+    modelBuilder.Entity<ShopMenuItemIce>(entity =>
+    {
+      entity.HasOne(e => e.MenuItem)
+        .WithMany(m => m.Ices)
+        .HasForeignKey(e => e.MenuItemId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.Ice)
+        .WithMany()
+        .HasForeignKey(e => e.IceId)
+        .OnDelete(DeleteBehavior.Restrict);
+    });
+
+    // ShopMenuItemTopping → ShopMenuItem + Topping
+    modelBuilder.Entity<ShopMenuItemTopping>(entity =>
+    {
+      entity.HasOne(e => e.MenuItem)
+        .WithMany(m => m.Toppings)
+        .HasForeignKey(e => e.MenuItemId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.Topping)
+        .WithMany()
+        .HasForeignKey(e => e.ToppingId)
+        .OnDelete(DeleteBehavior.Restrict);
+    });
+
+    // ShopSugarOverride → Shop + Sugar
+    modelBuilder.Entity<ShopSugarOverride>(entity =>
+    {
+      entity.HasIndex(e => new { e.ShopId, e.SugarId }).IsUnique();
+
+      entity.HasOne(e => e.Shop)
+        .WithMany(s => s.SugarOverrides)
+        .HasForeignKey(e => e.ShopId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.Sugar)
+        .WithMany()
+        .HasForeignKey(e => e.SugarId)
+        .OnDelete(DeleteBehavior.Restrict);
+    });
+
+    // ShopToppingOverride → Shop + Topping
+    modelBuilder.Entity<ShopToppingOverride>(entity =>
+    {
+      entity.HasIndex(e => new { e.ShopId, e.ToppingId }).IsUnique();
+
+      entity.HasOne(e => e.Shop)
+        .WithMany(s => s.ToppingOverrides)
+        .HasForeignKey(e => e.ShopId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.Topping)
+        .WithMany()
+        .HasForeignKey(e => e.ToppingId)
+        .OnDelete(DeleteBehavior.Restrict);
+    });
   }
 }
