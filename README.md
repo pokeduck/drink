@@ -44,7 +44,7 @@ drink/
 │   │   └── admin/            # Nuxt 4 + Element Plus (admin panel)
 │   └── internal/             # Shared utilities and interfaces
 │
-└── specs/                    # Project specifications
+└── specs-legacy/             # Legacy Osmani-style specs (reference only; current dev uses openspec/)
 ```
 
 ## Misc

@@ -31,10 +31,10 @@ drink/
 ├── package.json                      # Root Monorepo 設定（concurrently 統一啟動 API + Web）
 ├── pnpm-lock.yaml                    # Root 依賴鎖定
 │
-├── specs/                            # 功能規格文件（Addy Osmani spec 風格）
-│   ├── SPEC.md                       #   Spec 撰寫指南與模板
-│   ├── index.md                      #   全功能模組總覽與開發進度
-│   └── *.md                          #   各功能模組 spec（admin-role, shop, user-auth...）
+├── specs-legacy/                     # Legacy Osmani-style 規格（僅供參考，現行流程改用 openspec/）
+│   ├── SPEC.md                       #   早期 spec 撰寫指南與模板
+│   ├── index.md                      #   早期全功能模組總覽
+│   └── *.md                          #   各功能模組早期 spec（admin-role, shop, user-auth...）
 │
 ├── api/                              # ── 後端（.NET 10 Clean Architecture）──
 └── web/                              # ── 前端（Nuxt 4 Monorepo）──
