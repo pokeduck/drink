@@ -34,6 +34,16 @@ body {
   }
 }
 
+/* Scroll to top 按鈕：常駐半透明，hover 時完全顯示 */
+.el-backtop {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.el-backtop:hover {
+  opacity: 1;
+}
+
 /* 全站通用：分頁區塊 */
 .pagination-wrapper {
   display: flex;

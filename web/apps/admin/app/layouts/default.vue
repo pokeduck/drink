@@ -207,6 +207,7 @@ const handleCommand = async (command: string) => {
         <el-main class="admin-main" v-loading="isPageLoading" element-loading-text="載入中...">
           <!-- 頁面渲染出口 -->
           <slot />
+          <el-backtop target=".admin-main" :right="40" :bottom="40" :visibility-height="0" />
         </el-main>
       </el-container>
     </el-container>
