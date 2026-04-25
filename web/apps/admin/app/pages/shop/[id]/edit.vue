@@ -3,6 +3,7 @@ import draggable from 'vuedraggable'
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
 import { useApiFeedback } from '~/composable/useApiFeedback'
+import { useUnsavedGuard } from '~/composable/useUnsavedGuard'
 import { useLoading } from '~/composable/useLoading'
 import { usePermission } from '~/composable/usePermission'
 import { MENU } from '@app/core'
@@ -27,6 +28,8 @@ const { can } = usePermission()
 
 const formRef = ref()
 const fetchLoading = ref(true)
+const createdAt = ref('')
+const updatedAt = ref('')
 
 // ==================== 店家基本資訊 ====================
 
@@ -39,6 +42,8 @@ const form = reactive({
   sort: 0,
   max_topping_per_item: 1,
 })
+
+const { takeSnapshot, markSaved } = useUnsavedGuard(form)
 
 const rules = {
   name: [{ required: true, message: '請輸入店家名稱', trigger: 'blur' }],
@@ -62,6 +67,9 @@ const fetchShop = async () => {
   form.status = item.status!
   form.sort = item.sort!
   form.max_topping_per_item = item.max_topping_per_item!
+  createdAt.value = item.created_at!
+  updatedAt.value = item.updated_at!
+  takeSnapshot()
 }
 
 const handleSubmitShop = async () => {
@@ -89,6 +97,7 @@ const handleSubmitShop = async () => {
     return
   }
   showSuccess('店家資訊更新成功')
+  takeSnapshot()
 }
 
 // ==================== 菜單管理 ====================
@@ -443,7 +452,10 @@ onMounted(async () => {
     <!-- 店家基本資訊 -->
     <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
       <template #header>
-        <span>店家基本資訊</span>
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span>店家基本資訊</span>
+          <AppTimestamp v-if="createdAt" :created-at="createdAt" :updated-at="updatedAt" />
+        </div>
       </template>
 
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="120px" size="large">
@@ -478,19 +490,18 @@ onMounted(async () => {
           </el-col>
           <el-col :span="24">
             <el-form-item label="排序" prop="sort">
-              <el-input-number v-model="form.sort" :min="0" controls-position="right" style="width: 100%" />
+              <el-input-number v-model="form.sort" :min="0" style="width: 180px; max-width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="每種加料上限" prop="max_topping_per_item">
-              <el-input-number v-model="form.max_topping_per_item" :min="1" controls-position="right" style="width: 100%" />
+              <el-input-number v-model="form.max_topping_per_item" :min="1" style="width: 180px; max-width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-form-item>
           <el-button type="primary" @click="handleSubmitShop">儲存店家資訊</el-button>
-          <el-button @click="router.push('/shop/list')">返回列表</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -668,18 +679,18 @@ onMounted(async () => {
 
         <!-- 排序 -->
         <el-form-item label="排序">
-          <el-input-number v-model="itemForm.sort" :min="0" controls-position="right" />
+          <el-input-number v-model="itemForm.sort" :min="0" style="width: 180px" />
         </el-form-item>
 
         <!-- 加料總數上限 -->
         <el-form-item label="加料上限">
-          <el-input-number v-model="itemForm.max_topping_count" :min="1" controls-position="right" />
-          <span style="margin-left: 8px; font-size: 12px; color: var(--el-text-color-placeholder)">單杯飲料最多可加的加料總份數</span>
+          <el-input-number v-model="itemForm.max_topping_count" :min="1" style="width: 180px" />
+          <FormHint>單杯飲料最多可加的加料總份數</FormHint>
         </el-form-item>
 
         <!-- 尺寸價格 -->
         <el-form-item label="尺寸價格" prop="sizes">
-          <el-table :data="itemForm.sizes" stripe size="small" style="width: 100%">
+          <el-table :data="itemForm.sizes" stripe size="default" style="width: 100%">
             <el-table-column label="啟用" width="70" align="center">
               <template #default="{ row }">
                 <el-checkbox v-model="row.enabled" />
@@ -692,9 +703,7 @@ onMounted(async () => {
                   v-model="row.price"
                   :min="0"
                   :disabled="!row.enabled"
-                  controls-position="right"
-                  size="small"
-                  style="width: 140px"
+                  style="width: 180px"
                 />
               </template>
             </el-table-column>
@@ -703,18 +712,19 @@ onMounted(async () => {
 
         <!-- 甜度 -->
         <el-form-item label="甜度">
-          <div style="display: flex; gap: 8px; margin-bottom: 4px">
+          <div style="width: 100%; display: flex; gap: 8px; align-items: center; margin-top: 4px">
             <el-button size="small" @click="itemForm.sugar_ids = allSugars.map(s => s.id!)">全選</el-button>
             <el-button size="small" @click="itemForm.sugar_ids = []">取消全選</el-button>
           </div>
           <el-checkbox-group v-model="itemForm.sugar_ids">
             <el-checkbox v-for="s in allSugars" :key="s.id" :value="s.id!">{{ s.name }}</el-checkbox>
           </el-checkbox-group>
+          <FormHint>這是測試提示字</FormHint>
         </el-form-item>
 
         <!-- 冰塊 -->
         <el-form-item label="冰塊">
-          <div style="display: flex; gap: 8px; margin-bottom: 4px">
+          <div style="width: 100%; display: flex; gap: 8px; align-items: center; margin-top: 4px">
             <el-button size="small" @click="itemForm.ice_ids = allIces.map(i => i.id!)">全選</el-button>
             <el-button size="small" @click="itemForm.ice_ids = []">取消全選</el-button>
           </div>
@@ -725,7 +735,7 @@ onMounted(async () => {
 
         <!-- 加料 -->
         <el-form-item label="加料">
-          <div style="display: flex; gap: 8px; margin-bottom: 4px">
+          <div style="width: 100%; display: flex; gap: 8px; align-items: center; margin-top: 4px">
             <el-button size="small" @click="itemForm.topping_ids = allToppings.map(t => t.id!)">全選</el-button>
             <el-button size="small" @click="itemForm.topping_ids = []">取消全選</el-button>
           </div>
@@ -742,6 +752,7 @@ onMounted(async () => {
         </el-button>
       </template>
     </el-dialog>
+
   </div>
 </template>
 
@@ -849,13 +860,18 @@ onMounted(async () => {
 }
 
 :deep(.el-dialog) .el-form-item {
-  margin-bottom: 8px;
-  padding-bottom: 18px;
+  margin-bottom: 0;
+  margin-top: 16px;
+}
+
+:deep(.el-dialog) .el-form-item:first-child {
+  margin-top: 0;
 }
 
 :deep(.el-dialog) .el-form-item__error {
-  position: absolute;
-  bottom: -18px;
-  left: 0;
+  position: relative;
+  top: auto;
+  left: auto;
+  margin-top: 4px;
 }
 </style>

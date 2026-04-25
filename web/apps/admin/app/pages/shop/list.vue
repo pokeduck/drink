@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatDateTime } from '~/utils/format'
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiFeedback } from '~/composable/useApiFeedback'
 import { useLoading } from '~/composable/useLoading'
@@ -242,15 +243,15 @@ onMounted(() => {
         </el-table-column>
         <el-table-column prop="category_count" label="分類數" width="90" align="center" />
         <el-table-column prop="menu_item_count" label="品項數" width="90" align="center" />
-        <el-table-column label="排序" width="120">
+        <el-table-column label="排序" width="150">
           <template #default="{ row }">
-            <el-input-number v-if="can(MENU.ShopList, 'update')" v-model="row.sort" :min="0" :precision="0" controls-position="right" size="small" style="width: 90px" />
+            <el-input-number v-if="can(MENU.ShopList, 'update')" v-model="row.sort" :min="0" :precision="0" style="width: 120px" />
             <span v-else>{{ row.sort }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="created_at" label="建立時間" width="180" sortable="custom">
+        <el-table-column prop="created_at" label="建立時間" width="160" sortable="custom">
           <template #default="{ row }">
-            {{ new Date(row.created_at).toLocaleString('zh-TW') }}
+            {{ formatDateTime(row.created_at) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="160" fixed="right">
