@@ -58,11 +58,13 @@ const handleSubmit = async () => {
   <div>
     <AppBreadcrumb />
 
-    <el-page-header title="返回上一頁" @back="router.push('/shop/list')">
-      <template #content>新增店家</template>
-    </el-page-header>
-
-    <el-card shadow="never" style="margin-top: 16px">
+    <el-card shadow="never">
+      <template #header>
+        <div style="display: flex; align-items: center; gap: 8px">
+          <el-button text @click="router.push('/shop/list')"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+          <span>新增店家</span>
+        </div>
+      </template>
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="120px" size="large">
         <el-row :gutter="24">
           <el-col :span="24">
@@ -95,19 +97,18 @@ const handleSubmit = async () => {
           </el-col>
           <el-col :span="24">
             <el-form-item label="排序" prop="sort">
-              <el-input-number v-model="form.sort" :min="0" controls-position="right" style="width: 100%" />
+              <el-input-number v-model="form.sort" :min="0" :precision="0" style="width: 180px; max-width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="每種加料上限" prop="max_topping_per_item">
-              <el-input-number v-model="form.max_topping_per_item" :min="1" controls-position="right" style="width: 100%" />
+              <el-input-number v-model="form.max_topping_per_item" :min="1" :precision="0" style="width: 180px; max-width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-form-item>
           <el-button type="primary" @click="handleSubmit">建立</el-button>
-          <el-button @click="router.push('/shop/list')">取消</el-button>
         </el-form-item>
       </el-form>
     </el-card>

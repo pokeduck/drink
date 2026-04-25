@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatDateTime } from '~/utils/format'
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiFeedback } from '~/composable/useApiFeedback'
 import { usePermission } from '~/composable/usePermission'
@@ -122,6 +123,7 @@ onMounted(() => {
     <AppBreadcrumb />
 
     <el-card shadow="never">
+      <template #header>會員列表</template>
       <!-- 工具列 -->
       <div class="toolbar">
         <div class="toolbar-left">
@@ -182,9 +184,9 @@ onMounted(() => {
             {{ notificationLabel(row.notification_type) }}
           </template>
         </el-table-column>
-        <el-table-column prop="created_at" label="建立時間" width="180" sortable="custom">
+        <el-table-column prop="created_at" label="建立時間" width="160" sortable="custom">
           <template #default="{ row }">
-            {{ new Date(row.created_at).toLocaleString('zh-TW') }}
+            {{ formatDateTime(row.created_at) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right">

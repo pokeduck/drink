@@ -2,6 +2,7 @@
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
 import { useApiFeedback } from '~/composable/useApiFeedback'
+import { useUnsavedGuard } from '~/composable/useUnsavedGuard'
 import type { components } from '@app/api-types/admin'
 
 type AdminRole = components['schemas']['AdminRoleListResponse']
@@ -24,6 +25,8 @@ const form = reactive({
 const username = ref('')
 const createdAt = ref('')
 const updatedAt = ref('')
+
+const { takeSnapshot } = useUnsavedGuard(form)
 
 const rules = {
   role_id: [{ required: true, message: '請選擇角色', trigger: 'change' }],
@@ -52,9 +55,10 @@ const fetchUser = async () => {
   username.value = user.username!
   form.role_id = user.role_id!
   form.is_active = user.is_active!
-  createdAt.value = new Date(user.created_at!).toLocaleString('zh-TW')
-  updatedAt.value = new Date(user.updated_at!).toLocaleString('zh-TW')
+  createdAt.value = user.created_at!
+  updatedAt.value = user.updated_at!
   fetchLoading.value = false
+  takeSnapshot()
 }
 
 const handleSubmit = async () => {
@@ -77,6 +81,7 @@ const handleSubmit = async () => {
     return
   }
   showSuccess('更新成功')
+  takeSnapshot()
   router.push('/admin-account/list')
 }
 
@@ -89,11 +94,16 @@ onMounted(async () => {
   <div>
     <AppBreadcrumb />
 
-    <el-page-header title="返回上一頁" @back="router.push('/admin-account/list')">
-      <template #content>編輯帳號</template>
-    </el-page-header>
-
-    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
+    <el-card v-loading="fetchLoading" shadow="never">
+      <template #header>
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <div style="display: flex; align-items: center; gap: 8px">
+            <el-button text @click="router.push('/admin-account/list')"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+            <span>編輯帳號</span>
+          </div>
+          <AppTimestamp v-if="createdAt" :created-at="createdAt" :updated-at="updatedAt" />
+        </div>
+      </template>
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large">
         <el-row :gutter="24">
           <el-col :span="24">
@@ -104,16 +114,6 @@ onMounted(async () => {
           <el-col :span="24">
             <el-form-item label="ID">
               <el-input :model-value="String(userId)" disabled />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="建立時間">
-              <el-input :model-value="createdAt" disabled />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="更新時間">
-              <el-input :model-value="updatedAt" disabled />
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -132,7 +132,6 @@ onMounted(async () => {
 
         <el-form-item>
           <el-button type="primary" @click="handleSubmit">儲存</el-button>
-          <el-button @click="router.push('/admin-account/list')">取消</el-button>
         </el-form-item>
       </el-form>
     </el-card>

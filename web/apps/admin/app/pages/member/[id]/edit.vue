@@ -2,6 +2,7 @@
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
 import { useApiFeedback } from '~/composable/useApiFeedback'
+import { useUnsavedGuard } from '~/composable/useUnsavedGuard'
 
 const api = useAdminApi()
 const router = useRouter()
@@ -26,6 +27,8 @@ const isGoogleConnected = ref(false)
 const lastLoginAt = ref('')
 const createdAt = ref('')
 const updatedAt = ref('')
+
+const { takeSnapshot } = useUnsavedGuard(form)
 
 const rules = {
   name: [
@@ -68,8 +71,9 @@ const fetchMember = async () => {
   emailVerified.value = member.email_verified!
   isGoogleConnected.value = member.is_google_connected!
   lastLoginAt.value = member.last_login_at ? new Date(member.last_login_at).toLocaleString('zh-TW') : '從未登入'
-  createdAt.value = new Date(member.created_at!).toLocaleString('zh-TW')
-  updatedAt.value = new Date(member.updated_at!).toLocaleString('zh-TW')
+  createdAt.value = member.created_at!
+  updatedAt.value = member.updated_at!
+  takeSnapshot()
 }
 
 const handleSubmit = async () => {
@@ -85,6 +89,7 @@ const handleSubmit = async () => {
   await stopLoading()
   if (error) { handleError(error, '更新失敗'); return }
   showSuccess('更新成功')
+  takeSnapshot()
   router.push('/member/list')
 }
 
@@ -97,11 +102,16 @@ onMounted(() => {
   <div>
     <AppBreadcrumb />
 
-    <el-page-header title="返回上一頁" @back="router.push('/member/list')">
-      <template #content>編輯會員</template>
-    </el-page-header>
-
-    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
+    <el-card v-loading="fetchLoading" shadow="never">
+      <template #header>
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <div style="display: flex; align-items: center; gap: 8px">
+            <el-button text @click="router.push('/member/list')"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+            <span>編輯會員</span>
+          </div>
+          <AppTimestamp v-if="createdAt" :created-at="createdAt" :updated-at="updatedAt" />
+        </div>
+      </template>
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large">
         <el-row :gutter="24">
           <!-- 唯讀欄位 -->
@@ -134,16 +144,6 @@ onMounted(() => {
               <el-input :model-value="lastLoginAt" disabled />
             </el-form-item>
           </el-col>
-          <el-col :span="24">
-            <el-form-item label="建立時間">
-              <el-input :model-value="createdAt" disabled />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="更新時間">
-              <el-input :model-value="updatedAt" disabled />
-            </el-form-item>
-          </el-col>
 
           <!-- 可編輯欄位 -->
           <el-col :span="24">
@@ -174,7 +174,6 @@ onMounted(() => {
 
         <el-form-item>
           <el-button type="primary" @click="handleSubmit">儲存</el-button>
-          <el-button @click="router.push('/member/list')">取消</el-button>
         </el-form-item>
       </el-form>
     </el-card>

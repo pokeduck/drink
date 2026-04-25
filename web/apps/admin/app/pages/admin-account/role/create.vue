@@ -87,11 +87,13 @@ onMounted(() => {
   <div>
     <AppBreadcrumb />
 
-    <el-page-header title="返回上一頁" @back="router.push('/admin-account/role')">
-      <template #content>新增角色</template>
-    </el-page-header>
-
-    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
+    <el-card v-loading="fetchLoading" shadow="never">
+      <template #header>
+        <div style="display: flex; align-items: center; gap: 8px">
+          <el-button text @click="router.push('/admin-account/role')"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+          <span>新增角色</span>
+        </div>
+      </template>
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="100px" size="large" @submit.prevent>
         <el-row :gutter="24">
           <el-col :span="24">
@@ -130,7 +132,6 @@ onMounted(() => {
 
       <div style="margin-top: 24px">
         <el-button type="primary" @click="handleSubmit">建立</el-button>
-        <el-button @click="router.push('/admin-account/role')">取消</el-button>
       </div>
     </el-card>
   </div>

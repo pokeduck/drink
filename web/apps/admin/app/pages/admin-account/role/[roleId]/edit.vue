@@ -2,6 +2,7 @@
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
 import { useApiFeedback } from '~/composable/useApiFeedback'
+import { useUnsavedGuard } from '~/composable/useUnsavedGuard'
 import type { components } from '@app/api-types/admin'
 
 type MenuCrudItem = components['schemas']['AdminMenuRoleResponse']
@@ -30,6 +31,12 @@ const rules = {
 
 const menuCrudList = ref<MenuCrudItem[]>([])
 
+const guardState = reactive({
+  get name() { return form.name },
+  get menus() { return JSON.stringify(menuCrudList.value) },
+})
+const { takeSnapshot } = useUnsavedGuard(guardState)
+
 const fetchRole = async () => {
   fetchLoading.value = true
   const { data: res, error } = await api.GET('/api/admin/roles/{roleId}', {
@@ -47,6 +54,7 @@ const fetchRole = async () => {
   isSystem.value = role.is_system!
   menuCrudList.value = role.menus ?? []
   fetchLoading.value = false
+  takeSnapshot()
 }
 
 const handleSubmit = async () => {
@@ -77,6 +85,7 @@ const handleSubmit = async () => {
     return
   }
   showSuccess('角色更新成功')
+  takeSnapshot()
   router.push('/admin-account/role')
 }
 
@@ -89,11 +98,13 @@ onMounted(() => {
   <div>
     <AppBreadcrumb />
 
-    <el-page-header title="返回上一頁" @back="router.push('/admin-account/role')">
-      <template #content>{{ isSystem ? '檢視角色' : '編輯角色' }}</template>
-    </el-page-header>
-
-    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
+    <el-card v-loading="fetchLoading" shadow="never">
+      <template #header>
+        <div style="display: flex; align-items: center; gap: 8px">
+          <el-button text @click="router.push('/admin-account/role')"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+          <span>{{ isSystem ? '檢視角色' : '編輯角色' }}</span>
+        </div>
+      </template>
       <el-alert
         v-if="isSystem"
         type="info"
@@ -147,10 +158,6 @@ onMounted(() => {
 
       <div v-if="!isSystem" style="margin-top: 24px">
         <el-button type="primary" @click="handleSubmit">儲存</el-button>
-        <el-button @click="router.push('/admin-account/role')">取消</el-button>
-      </div>
-      <div v-else style="margin-top: 24px">
-        <el-button @click="router.push('/admin-account/role')">返回</el-button>
       </div>
     </el-card>
   </div>

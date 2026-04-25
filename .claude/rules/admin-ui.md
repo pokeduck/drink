@@ -1,5 +1,36 @@
 # Admin 後台 UI 規範
 
+## 頁面結構
+
+- 所有 list / edit / create 頁面必須包含 `<AppBreadcrumb />`（麵包屑）
+- 所有 list / edit / create 頁面的 `el-card` 必須有 `<template #header>` 顯示單元名稱
+  - list 頁面：顯示列表名稱（如「帳號列表」、「冰塊列表」）
+  - edit / create 頁面：card header 左側放返回按鈕 + 標題，edit 右側放 `<AppTimestamp>`（若有）
+- 非 Dialog 的 edit / create 頁面，表單只放「儲存」或「建立」按鈕，不放「取消」按鈕
+- 返回上一頁：不使用 `el-page-header`，改用 card header 內的 `el-button text` + `ArrowLeft` icon
+  - 與標題放在同一行，用 `gap: 8px` 間隔
+  - edit 頁面（有 AppTimestamp）結構：
+    ```html
+    <template #header>
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <el-button text @click="router.push('/xxx/list')"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+          <span>編輯 XXX</span>
+        </div>
+        <AppTimestamp v-if="createdAt" :created-at="createdAt" :updated-at="updatedAt" />
+      </div>
+    </template>
+    ```
+  - create 頁面（無 AppTimestamp）結構：
+    ```html
+    <template #header>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <el-button text @click="router.push('/xxx/list')"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+        <span>新增 XXX</span>
+      </div>
+    </template>
+    ```
+
 ## 表單欄位群組（Field Group）
 
 每個表單欄位視為一個 group，由上到下依序為：
@@ -11,16 +42,20 @@
 
 ### 間距規則
 
-- group 之間：`margin-top: 16px`（第一個 group 不加）
-- 錯誤訊息：`position: relative`，`margin-top: 4px`
+- group 之間：使用 Element Plus `el-form-item` 預設的 `margin-bottom` 控制間距
+- 錯誤訊息：全域 CSS（`app.vue`）覆蓋 Element Plus 預設的 `position: absolute`，改為 `position: relative; top: auto; left: auto; padding-top: 0; margin-top: 4px`，出現時自然往下推
 - 提示字：使用 `<FormHint>` 元件（`~/components/FormHint.vue`），樣式已封裝
 
 ### 數字輸入框（el-input-number）
 
+- 只允許整數（可負數），不允許小數點、千分位
+- 所有 `el-input-number` 必須加上 `:precision="0"`
+- 清空或輸入非數字時，自動補回 `0`（全域 plugin `input-number-defaults.client.ts` 處理）
 - 加減按鈕使用預設位置（左右兩側），不使用 `controls-position="right"`
 - 固定寬度 `width: 180px; max-width: 100%`（可容納 4 位數）
 - 表格內的數字輸入框同樣使用預設位置，寬度 `180px`
 - 列表排序欄位：輸入框寬度 `120px`，欄位寬度 `width="150"`，兩位數即可
+- 表格內有 placeholder 的 input-number（如覆寫頁面）：價格寬度 `240px`/column `280`，排序寬度 `180px`/column `220`
 
 ### Checkbox 群組（全選 / 取消全選）
 
@@ -30,8 +65,8 @@
 
 ## 編輯頁面時間戳記
 
-- 大單元的編輯頁面需顯示「建立時間」與「最後更新時間」
-- 位置：Card header 右上角，與標題同一行
+- 所有非 Dialog 的編輯頁面需顯示「建立時間」與「最後更新時間」
+- 位置：Card header 右側，與左側的返回按鈕 + 標題同一行
 - 使用 `<AppTimestamp>` 元件（`~/components/AppTimestamp.vue`），傳入原始日期字串
 - 格式同全站：`yyyy/MM/dd HH:mm:ss`，內部使用 `formatDateTime()` 格式化
 - 範例：`建立：2026/04/25 14:30:00　｜　更新：2026/04/25 15:00:00`

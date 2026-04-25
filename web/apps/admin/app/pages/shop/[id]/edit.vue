@@ -43,7 +43,7 @@ const form = reactive({
   max_topping_per_item: 1,
 })
 
-const { takeSnapshot, markSaved } = useUnsavedGuard(form)
+const { takeSnapshot } = useUnsavedGuard(form)
 
 const rules = {
   name: [{ required: true, message: '請輸入店家名稱', trigger: 'blur' }],
@@ -445,15 +445,14 @@ onMounted(async () => {
   <div>
     <AppBreadcrumb />
 
-    <el-page-header title="返回上一頁" @back="router.push('/shop/list')">
-      <template #content>編輯店家</template>
-    </el-page-header>
-
     <!-- 店家基本資訊 -->
-    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
+    <el-card v-loading="fetchLoading" shadow="never">
       <template #header>
         <div style="display: flex; justify-content: space-between; align-items: center">
-          <span>店家基本資訊</span>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <el-button text @click="router.push('/shop/list')"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+            <span>店家基本資訊</span>
+          </div>
           <AppTimestamp v-if="createdAt" :created-at="createdAt" :updated-at="updatedAt" />
         </div>
       </template>
@@ -490,12 +489,12 @@ onMounted(async () => {
           </el-col>
           <el-col :span="24">
             <el-form-item label="排序" prop="sort">
-              <el-input-number v-model="form.sort" :min="0" style="width: 180px; max-width: 100%" />
+              <el-input-number v-model="form.sort" :min="0" :precision="0" style="width: 180px; max-width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="每種加料上限" prop="max_topping_per_item">
-              <el-input-number v-model="form.max_topping_per_item" :min="1" style="width: 180px; max-width: 100%" />
+              <el-input-number v-model="form.max_topping_per_item" :min="1" :precision="0" style="width: 180px; max-width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -679,12 +678,12 @@ onMounted(async () => {
 
         <!-- 排序 -->
         <el-form-item label="排序">
-          <el-input-number v-model="itemForm.sort" :min="0" style="width: 180px" />
+          <el-input-number v-model="itemForm.sort" :min="0" :precision="0" style="width: 180px" />
         </el-form-item>
 
         <!-- 加料總數上限 -->
         <el-form-item label="加料上限">
-          <el-input-number v-model="itemForm.max_topping_count" :min="1" style="width: 180px" />
+          <el-input-number v-model="itemForm.max_topping_count" :min="1" :precision="0" style="width: 180px" />
           <FormHint>單杯飲料最多可加的加料總份數</FormHint>
         </el-form-item>
 
@@ -702,6 +701,7 @@ onMounted(async () => {
                 <el-input-number
                   v-model="row.price"
                   :min="0"
+                  :precision="0"
                   :disabled="!row.enabled"
                   style="width: 180px"
                 />
@@ -868,10 +868,4 @@ onMounted(async () => {
   margin-top: 0;
 }
 
-:deep(.el-dialog) .el-form-item__error {
-  position: relative;
-  top: auto;
-  left: auto;
-  margin-top: 4px;
-}
 </style>

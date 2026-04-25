@@ -10,8 +10,12 @@ body {
   font-family: sans-serif;
 }
 
-/* 表單錯誤紅字與輸入框間距 */
-.el-form-item__error {
+/* 表單錯誤紅字：不預留空間，出現時自然往下推 */
+.el-form-item .el-form-item__error {
+  position: relative;
+  top: auto;
+  left: auto;
+  padding-top: 0;
   margin-top: 4px;
 }
 

@@ -171,6 +171,7 @@ onMounted(() => {
     <AppBreadcrumb />
 
     <el-card shadow="never" v-loading="loading">
+      <template #header>店家列表</template>
       <!-- 工具列 -->
       <div class="toolbar">
         <div class="toolbar-left">

@@ -11,6 +11,7 @@ type SugarOverride = components['schemas']['ShopSugarOverrideDetailResponse']
 type ToppingOverride = components['schemas']['ShopToppingOverrideDetailResponse']
 
 const api = useAdminApi()
+const router = useRouter()
 const { handleError, showSuccess, startLoading, stopLoading } = useApiFeedback()
 const { can } = usePermission()
 
@@ -111,7 +112,10 @@ onMounted(() => {
     <el-card shadow="never" v-loading="shopLoading">
       <template #header>
         <div style="display: flex; justify-content: space-between; align-items: center">
-          <span>店家覆寫設定</span>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <el-button text @click="router.push('/shop/list')"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+            <span>店家覆寫設定</span>
+          </div>
           <el-button
             v-if="can(MENU.ShopOverride, 'update') && selectedShopId"
             type="primary"
@@ -147,7 +151,7 @@ onMounted(() => {
           <h4 style="margin-bottom: 12px">甜度覆寫</h4>
           <el-table :data="sugarOverrides" stripe style="width: 100%; margin-bottom: 24px">
             <el-table-column prop="sugar_name" label="名稱" min-width="150" />
-            <el-table-column label="價格" width="200">
+            <el-table-column label="價格" width="280">
               <template #header>
                 價格 <span style="color: var(--el-text-color-placeholder); font-weight: normal">（留空 = 全域）</span>
               </template>
@@ -157,13 +161,12 @@ onMounted(() => {
                   :min="0"
                   :precision="0"
                   :placeholder="`全域 ${row.default_price}`"
-                  controls-position="right"
-                  size="small"
-                  style="width: 150px"
+
+                  style="width: 240px"
                 />
               </template>
             </el-table-column>
-            <el-table-column label="排序" width="200">
+            <el-table-column label="排序" width="220">
               <template #header>
                 排序 <span style="color: var(--el-text-color-placeholder); font-weight: normal">（留空 = 全域）</span>
               </template>
@@ -173,9 +176,8 @@ onMounted(() => {
                   :min="0"
                   :precision="0"
                   :placeholder="`全域 ${row.default_sort}`"
-                  controls-position="right"
-                  size="small"
-                  style="width: 150px"
+
+                  style="width: 180px"
                 />
               </template>
             </el-table-column>
@@ -185,7 +187,7 @@ onMounted(() => {
           <h4 style="margin-bottom: 12px">加料覆寫</h4>
           <el-table :data="toppingOverrides" stripe style="width: 100%">
             <el-table-column prop="topping_name" label="名稱" min-width="150" />
-            <el-table-column label="價格" width="200">
+            <el-table-column label="價格" width="280">
               <template #header>
                 價格 <span style="color: var(--el-text-color-placeholder); font-weight: normal">（留空 = 全域）</span>
               </template>
@@ -195,13 +197,12 @@ onMounted(() => {
                   :min="0"
                   :precision="0"
                   :placeholder="`全域 ${row.default_price}`"
-                  controls-position="right"
-                  size="small"
-                  style="width: 150px"
+
+                  style="width: 240px"
                 />
               </template>
             </el-table-column>
-            <el-table-column label="排序" width="200">
+            <el-table-column label="排序" width="220">
               <template #header>
                 排序 <span style="color: var(--el-text-color-placeholder); font-weight: normal">（留空 = 全域）</span>
               </template>
@@ -211,9 +212,8 @@ onMounted(() => {
                   :min="0"
                   :precision="0"
                   :placeholder="`全域 ${row.default_sort}`"
-                  controls-position="right"
-                  size="small"
-                  style="width: 150px"
+
+                  style="width: 180px"
                 />
               </template>
             </el-table-column>

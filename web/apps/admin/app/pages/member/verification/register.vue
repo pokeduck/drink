@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatDateTime } from '~/utils/format'
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiFeedback } from '~/composable/useApiFeedback'
 import { usePermission } from '~/composable/usePermission'
@@ -135,6 +136,7 @@ onMounted(() => {
     <AppBreadcrumb />
 
     <el-card shadow="never">
+      <template #header>註冊驗證信列表</template>
       <!-- 工具列 -->
       <div class="toolbar">
         <div class="toolbar-left">
@@ -180,15 +182,15 @@ onMounted(() => {
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="sent_at" label="發送時間" width="180" sortable="custom">
+        <el-table-column prop="sent_at" label="發送時間" width="160" sortable="custom">
           <template #default="{ row }">
-            {{ new Date(row.sent_at).toLocaleString('zh-TW') }}
+            {{ formatDateTime(row.sent_at) }}
           </template>
         </el-table-column>
-        <el-table-column label="過期時間" width="180" sortable="custom" prop="expires_at">
+        <el-table-column label="過期時間" width="160" sortable="custom" prop="expires_at">
           <template #default="{ row }">
             <span :class="{ 'text-danger': isExpired(row.expires_at) }">
-              {{ new Date(row.expires_at).toLocaleString('zh-TW') }}
+              {{ formatDateTime(row.expires_at) }}
             </span>
           </template>
         </el-table-column>

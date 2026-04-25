@@ -2,6 +2,7 @@
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useFormLayout } from '~/composable/useFormLayout'
 import { useApiFeedback } from '~/composable/useApiFeedback'
+import { useUnsavedGuard } from '~/composable/useUnsavedGuard'
 
 const api = useAdminApi()
 const router = useRouter()
@@ -12,11 +13,15 @@ const { serverErrors, handleError, clearErrors, showSuccess, startLoading, stopL
 
 const formRef = ref()
 const fetchLoading = ref(true)
+const createdAt = ref('')
+const updatedAt = ref('')
 
 const form = reactive({
   name: '',
   sort: 0,
 })
+
+const { takeSnapshot } = useUnsavedGuard(form)
 
 const rules = {
   name: [
@@ -39,6 +44,9 @@ const fetchSize = async () => {
   const size = res!.data!
   form.name = size.name!
   form.sort = size.sort!
+  createdAt.value = size.created_at!
+  updatedAt.value = size.updated_at!
+  takeSnapshot()
 }
 
 const handleSubmit = async () => {
@@ -54,6 +62,7 @@ const handleSubmit = async () => {
   await stopLoading()
   if (error) { handleError(error, '更新失敗'); return }
   showSuccess('更新成功')
+  takeSnapshot()
   router.push('/drink-option/size/list')
 }
 
@@ -66,11 +75,16 @@ onMounted(() => {
   <div>
     <AppBreadcrumb />
 
-    <el-page-header title="返回上一頁" @back="router.push('/drink-option/size/list')">
-      <template #content>編輯容量</template>
-    </el-page-header>
-
-    <el-card v-loading="fetchLoading" shadow="never" style="margin-top: 16px">
+    <el-card v-loading="fetchLoading" shadow="never">
+      <template #header>
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <div style="display: flex; align-items: center; gap: 8px">
+            <el-button text @click="router.push('/drink-option/size/list')"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+            <span>編輯容量</span>
+          </div>
+          <AppTimestamp v-if="createdAt" :created-at="createdAt" :updated-at="updatedAt" />
+        </div>
+      </template>
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="80px" size="large">
         <el-row :gutter="24">
           <el-col :span="24">
@@ -80,14 +94,13 @@ onMounted(() => {
           </el-col>
           <el-col :span="24">
             <el-form-item label="排序" prop="sort">
-              <el-input-number v-model="form.sort" :min="0" controls-position="right" style="width: 100%" />
+              <el-input-number v-model="form.sort" :min="0" :precision="0" style="width: 180px; max-width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-form-item>
           <el-button type="primary" @click="handleSubmit">儲存</el-button>
-          <el-button @click="router.push('/drink-option/size/list')">取消</el-button>
         </el-form-item>
       </el-form>
     </el-card>
