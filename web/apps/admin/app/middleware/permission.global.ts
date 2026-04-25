@@ -1,3 +1,4 @@
+import { useAuthStore } from '~/stores/auth'
 import { useMenuStore } from '~/stores/menu'
 import { MENU } from '@app/core'
 import type { CrudAction } from '@app/core'
@@ -66,7 +67,11 @@ function findPermission(path: string): RoutePermission | null {
   return null
 }
 
-export default defineNuxtRouteMiddleware((to) => {
+export default defineNuxtRouteMiddleware(async (to) => {
+  // 權限判定僅在 client 執行：menu store 的 fetch 依賴 client-only 環境，
+  // SSR 端無法載入 permissions，會誤判為無權限
+  if (import.meta.server) return
+
   // 登入頁不檢查權限
   if (to.path === '/login') return
 
@@ -75,7 +80,15 @@ export default defineNuxtRouteMiddleware((to) => {
   // 沒有對應的權限規則，允許通過（如首頁、修改密碼等）
   if (!required) return
 
+  const authStore = useAuthStore()
   const menuStore = useMenuStore()
+
+  // 兜底：若已登入但 menu 權限尚未載入（例如登入後首次導航），先 await 載入
+  // 避免 race condition 將有權限的使用者誤判為無權限
+  if (authStore.isLoggedIn && menuStore.permissions.size === 0) {
+    await menuStore.fetchMenuData()
+  }
+
   const perm = menuStore.permissions.get(required.menuId)
 
   if (!perm || !perm[required.action]) {
