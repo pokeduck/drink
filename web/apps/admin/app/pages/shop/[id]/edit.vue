@@ -6,6 +6,8 @@ import { useApiFeedback } from '~/composable/useApiFeedback'
 import { useUnsavedGuard } from '~/composable/useUnsavedGuard'
 import { useLoading } from '~/composable/useLoading'
 import { usePermission } from '~/composable/usePermission'
+import { useAssetHost } from '~/composable/useAssetHost'
+import { useImageUploadQueue } from '~/composable/useImageUploadQueue'
 import { MENU } from '@app/core'
 import type { components } from '@app/api-types/admin'
 
@@ -38,6 +40,8 @@ const form = reactive({
   phone: '',
   address: '',
   note: '',
+  cover_image_path: null as string | null,
+  external_url: '',
   status: 1,
   sort: 0,
   max_topping_per_item: 1,
@@ -64,6 +68,8 @@ const fetchShop = async () => {
   form.phone = item.phone ?? ''
   form.address = item.address ?? ''
   form.note = item.note ?? ''
+  form.cover_image_path = item.cover_image_path ?? null
+  form.external_url = item.external_url ?? ''
   form.status = item.status!
   form.sort = item.sort!
   form.max_topping_per_item = item.max_topping_per_item!
@@ -85,6 +91,8 @@ const handleSubmitShop = async () => {
       phone: form.phone || undefined,
       address: form.address || undefined,
       note: form.note || undefined,
+      cover_image_path: form.cover_image_path,
+      external_url: form.external_url || null,
       status: form.status,
       sort: form.sort,
       max_topping_per_item: form.max_topping_per_item,
@@ -98,6 +106,52 @@ const handleSubmitShop = async () => {
   }
   showSuccess('店家資訊更新成功')
   takeSnapshot()
+}
+
+// ==================== Cover 圖片上傳 ====================
+
+const { ensureBaseUrl, assetUrl } = useAssetHost()
+const coverFileInput = ref<HTMLInputElement | null>(null)
+const coverUploading = ref(false)
+
+const coverQueue = useImageUploadQueue<{ cover_image_path: string }>({
+  uploadEndpoint: `/admin/shops/${shopId}/cover-image`,
+})
+
+watch(() => coverQueue.progress.value.done, (done, prev) => {
+  if (done > prev) {
+    const last = coverQueue.uploads.value[coverQueue.uploads.value.length - 1]
+    if (last?.result?.cover_image_path) {
+      form.cover_image_path = last.result.cover_image_path
+      showSuccess('封面已更新')
+    }
+    coverUploading.value = false
+    coverQueue.clear()
+  }
+})
+
+watch(() => coverQueue.progress.value.failed, (failed, prev) => {
+  if (failed > prev) {
+    const last = coverQueue.uploads.value[coverQueue.uploads.value.length - 1]
+    handleError(new Error(last?.error || '封面上傳失敗'), '封面上傳失敗')
+    coverUploading.value = false
+    coverQueue.clear()
+  }
+})
+
+const handleCoverPick = () => coverFileInput.value?.click()
+
+const handleCoverFileChange = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+  coverUploading.value = true
+  coverQueue.enqueue([file])
+  target.value = ''
+}
+
+const handleCoverRemove = () => {
+  form.cover_image_path = null
 }
 
 // ==================== 菜單管理 ====================
@@ -435,6 +489,7 @@ const handleSubmitItem = async () => {
 // ==================== 初始化 ====================
 
 onMounted(async () => {
+  await ensureBaseUrl()
   await fetchShop()
   await Promise.all([fetchMenu(), fetchOptions()])
   fetchLoading.value = false
@@ -480,6 +535,49 @@ onMounted(async () => {
           <el-col :span="24">
             <el-form-item label="備註" prop="note">
               <el-input v-model="form.note" type="textarea" :rows="3" placeholder="請輸入備註" maxlength="500" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="封面圖片" prop="cover_image_path" :error="serverErrors.cover_image_path || serverErrors.file">
+              <div style="display: flex; flex-direction: column; gap: 8px; width: 100%">
+                <div v-if="form.cover_image_path" class="cover-preview">
+                  <img :src="assetUrl(form.cover_image_path)" alt="cover" />
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center">
+                  <el-button
+                    size="default"
+                    :loading="coverUploading"
+                    @click="handleCoverPick"
+                  >
+                    {{ form.cover_image_path ? '更換封面' : '上傳封面' }}
+                  </el-button>
+                  <el-button
+                    v-if="form.cover_image_path"
+                    size="default"
+                    type="danger"
+                    plain
+                    :disabled="coverUploading"
+                    @click="handleCoverRemove"
+                  >
+                    移除封面
+                  </el-button>
+                  <input
+                    ref="coverFileInput"
+                    type="file"
+                    accept="image/*"
+                    style="display: none"
+                    @change="handleCoverFileChange"
+                  />
+                </div>
+                <FormHint v-if="!form.cover_image_path">每店僅一張封面圖片，移除後需按「儲存」生效</FormHint>
+                <FormHint v-else>更換或移除封面後需按「儲存」才會套用到 PUT 請求；上傳新圖會立即覆蓋</FormHint>
+              </div>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="外部連結" prop="external_url" :error="serverErrors.external_url">
+              <el-input v-model="form.external_url" placeholder="例如 https://maps.google.com/..." maxlength="500" />
+              <FormHint>僅接受 http 或 https 連結（例如 Google Map 分享連結）</FormHint>
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -878,6 +976,23 @@ onMounted(async () => {
 
 :deep(.el-dialog) .el-form-item:first-child {
   margin-top: 0;
+}
+
+.cover-preview {
+  width: 240px;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--el-fill-color-light);
+}
+
+.cover-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 </style>

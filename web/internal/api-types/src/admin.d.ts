@@ -2111,6 +2111,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/shops/{shopId}/cover-image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopCoverImageUploadResponseApiResponse"];
+                        "application/json": components["schemas"]["ShopCoverImageUploadResponseApiResponse"];
+                        "text/json": components["schemas"]["ShopCoverImageUploadResponseApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/shops/{shopId}/menu": {
         parameters: {
             query?: never;
@@ -4667,6 +4735,8 @@ export interface components {
             phone?: string | null;
             address?: string | null;
             note?: string | null;
+            cover_image_path?: string | null;
+            external_url?: string | null;
             /** Format: int32 */
             status: number;
             /** Format: int32 */
@@ -4937,6 +5007,19 @@ export interface components {
         ResetMemberPasswordRequest: {
             new_password: string;
         };
+        ShopCoverImageUploadResponse: {
+            cover_image_path?: string | null;
+        };
+        ShopCoverImageUploadResponseApiResponse: {
+            data?: components["schemas"]["ShopCoverImageUploadResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
         ShopDetailResponse: {
             /** Format: int32 */
             id?: number;
@@ -4944,6 +5027,8 @@ export interface components {
             phone?: string | null;
             address?: string | null;
             note?: string | null;
+            cover_image_path?: string | null;
+            external_url?: string | null;
             /** Format: int32 */
             status?: number;
             /** Format: int32 */
@@ -5368,6 +5453,8 @@ export interface components {
             phone?: string | null;
             address?: string | null;
             note?: string | null;
+            cover_image_path?: string | null;
+            external_url?: string | null;
             /** Format: int32 */
             status: number;
             /** Format: int32 */

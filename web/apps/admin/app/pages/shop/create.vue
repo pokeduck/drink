@@ -15,6 +15,7 @@ const form = reactive({
   phone: '',
   address: '',
   note: '',
+  external_url: '',
   status: 1,
   sort: 0,
   max_topping_per_item: 1,
@@ -32,12 +33,13 @@ const handleSubmit = async () => {
 
   clearErrors()
   startLoading()
-  const { error } = await api.POST('/api/admin/shops', {
+  const { data: res, error } = await api.POST('/api/admin/shops', {
     body: {
       name: form.name,
       phone: form.phone || undefined,
       address: form.address || undefined,
       note: form.note || undefined,
+      external_url: form.external_url || null,
       status: form.status,
       sort: form.sort,
       max_topping_per_item: form.max_topping_per_item,
@@ -50,7 +52,9 @@ const handleSubmit = async () => {
     return
   }
   showSuccess('新增成功')
-  router.push('/shop/list')
+  const newId = res?.data?.id
+  if (newId) router.push(`/shop/${newId}/edit`)
+  else router.push('/shop/list')
 }
 </script>
 
@@ -85,6 +89,17 @@ const handleSubmit = async () => {
           <el-col :span="24">
             <el-form-item label="備註" prop="note">
               <el-input v-model="form.note" type="textarea" :rows="3" placeholder="請輸入備註" maxlength="500" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="封面圖片">
+              <FormHint>店家建立後可在編輯頁上傳封面圖片</FormHint>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="外部連結" prop="external_url" :error="serverErrors.external_url">
+              <el-input v-model="form.external_url" placeholder="例如 https://maps.google.com/..." maxlength="500" />
+              <FormHint>僅接受 http 或 https 連結（例如 Google Map 分享連結）</FormHint>
             </el-form-item>
           </el-col>
           <el-col :span="24">
