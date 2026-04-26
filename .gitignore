@@ -493,3 +493,4 @@ $RECYCLE.BIN/
 *.swp
 
 */.turbo/cache/*
+upload/
