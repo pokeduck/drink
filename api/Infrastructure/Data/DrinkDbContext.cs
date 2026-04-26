@@ -217,5 +217,34 @@ public class DrinkDbContext : DbContext
         .HasForeignKey(e => e.ToppingId)
         .OnDelete(DeleteBehavior.Restrict);
     });
+
+    // ShopImage → Shop + DrinkItem
+    modelBuilder.Entity<ShopImage>(entity =>
+    {
+      entity.HasOne(e => e.Shop)
+        .WithMany()
+        .HasForeignKey(e => e.ShopId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.DrinkItem)
+        .WithMany()
+        .HasForeignKey(e => e.DrinkItemId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+      // 每組 (ShopId, DrinkItemId) 至多一張 IsCover=true
+      entity.HasIndex(e => new { e.ShopId, e.DrinkItemId })
+        .HasFilter("is_cover = true")
+        .IsUnique();
+
+      // 列表排序用
+      entity.HasIndex(e => new { e.ShopId, e.DrinkItemId, e.Sort });
+
+      // 孤兒查詢用
+      entity.HasIndex(e => e.ShopId)
+        .HasFilter("drink_item_id IS NULL");
+
+      // 跨表查相同 hash 用（非 unique）
+      entity.HasIndex(e => e.Hash);
+    });
   }
 }
