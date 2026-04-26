@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Drink.Application.Attributes;
 
 namespace Drink.Application.Requests.Admin;
 
@@ -18,6 +19,13 @@ public class CreateShopRequest
 
   [StringLength(500)]
   public string? Note { get; set; }
+
+  [StringLength(500)]
+  public string? CoverImagePath { get; set; }
+
+  [StringLength(500)]
+  [HttpUrl]
+  public string? ExternalUrl { get; set; }
 
   [Required]
   public int Status { get; set; }
@@ -44,6 +52,13 @@ public class UpdateShopRequest
 
   [StringLength(500)]
   public string? Note { get; set; }
+
+  [StringLength(500)]
+  public string? CoverImagePath { get; set; }
+
+  [StringLength(500)]
+  [HttpUrl]
+  public string? ExternalUrl { get; set; }
 
   [Required]
   public int Status { get; set; }

@@ -113,6 +113,22 @@ public class ShopsController : BaseController
     return ApiOk();
   }
 
+  [HttpPost("{shopId}/cover-image")]
+  [RequireRole(MenuConstants.ShopList, CrudAction.Update)]
+  [ProducesResponseType(typeof(ApiResponse<ShopCoverImageUploadResponse>), 200)]
+  [ProducesResponseType(typeof(ApiResponse), 400)]
+  [ProducesResponseType(typeof(ApiResponse), 404)]
+  public async Task<IActionResult> UploadCoverImage(int shopId, IFormFile file, CancellationToken ct)
+  {
+    var result = await _service.UploadCoverImage(shopId, file, ct);
+    if (result.Code != 0)
+    {
+      var httpStatus = result.Error == "SHOP_NOT_FOUND" ? 404 : 400;
+      return ApiError((result.Code, result.Error!), result.Message!, httpStatus, result.Errors);
+    }
+    return ApiOk(result.Data);
+  }
+
   // ==================== Menu Management ====================
 
   [HttpGet("{shopId}/menu")]

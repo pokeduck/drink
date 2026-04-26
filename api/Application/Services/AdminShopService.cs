@@ -7,6 +7,7 @@ using Drink.Application.Requests.Admin;
 using Drink.Application.Responses;
 using Drink.Application.Responses.Admin;
 using Drink.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Drink.Application.Services;
@@ -123,6 +124,8 @@ public class AdminShopService : BaseService
       Phone = request.Phone,
       Address = request.Address,
       Note = request.Note,
+      CoverImagePath = request.CoverImagePath,
+      ExternalUrl = NormalizeExternalUrl(request.ExternalUrl),
       Status = (ShopStatus)request.Status,
       Sort = request.Sort,
       MaxToppingPerItem = request.MaxToppingPerItem
@@ -148,6 +151,8 @@ public class AdminShopService : BaseService
     entity.Phone = request.Phone;
     entity.Address = request.Address;
     entity.Note = request.Note;
+    entity.CoverImagePath = request.CoverImagePath;
+    entity.ExternalUrl = NormalizeExternalUrl(request.ExternalUrl);
     entity.Status = (ShopStatus)request.Status;
     entity.Sort = request.Sort;
     entity.MaxToppingPerItem = request.MaxToppingPerItem;
@@ -155,6 +160,34 @@ public class AdminShopService : BaseService
 
     return Success((await _shopRepo.GetById(id))!.ToShopDetailResponse());
   }
+
+  public async Task<ApiResponse<ShopCoverImageUploadResponse>> UploadCoverImage(int shopId, IFormFile file, CancellationToken ct = default)
+  {
+    var entity = await _shopRepo.Get(predicate: x => x.Id == shopId && !x.IsDeleted, tracking: true);
+    if (entity is null)
+      return Fail<ShopCoverImageUploadResponse>(ErrorCodes.ShopNotFound, "店家不存在");
+
+    var uploadResp = await _imageService.ForwardToImageUpload(file, ct);
+    if (uploadResp.Code != 0 || uploadResp.Data == null)
+    {
+      return new ApiResponse<ShopCoverImageUploadResponse>
+      {
+        Data = null,
+        Code = uploadResp.Code,
+        Error = uploadResp.Error,
+        Message = uploadResp.Message,
+        Errors = uploadResp.Errors,
+      };
+    }
+
+    entity.CoverImagePath = uploadResp.Data.Path;
+    await _shopRepo.Update(entity);
+
+    return Success(new ShopCoverImageUploadResponse { CoverImagePath = uploadResp.Data.Path });
+  }
+
+  private static string? NormalizeExternalUrl(string? value)
+      => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
   public async Task<ApiResponse> Delete(int id)
   {

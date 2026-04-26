@@ -394,8 +394,9 @@ public class AdminShopImageService : BaseService
 
   /// <summary>
   /// 將 multipart 上傳轉發給 Upload.API 並原樣回傳結果（含成功與錯誤 ApiResponse）。
+  /// 提供 internal 給同一 module 的 service（如 AdminShopService 處理 cover 上傳）共用。
   /// </summary>
-  private async Task<ApiResponse<FileUploadResponse>> ForwardToImageUpload(IFormFile file, CancellationToken ct)
+  internal async Task<ApiResponse<FileUploadResponse>> ForwardToImageUpload(IFormFile file, CancellationToken ct)
   {
     using var client = _httpClientFactory.CreateClient();
     client.DefaultRequestHeaders.Add("X-Api-Key", _uploadApiSettings.ApiKey);

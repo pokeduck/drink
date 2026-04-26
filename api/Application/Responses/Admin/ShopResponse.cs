@@ -22,11 +22,18 @@ public class ShopDetailResponse
   public string? Phone { get; set; }
   public string? Address { get; set; }
   public string? Note { get; set; }
+  public string? CoverImagePath { get; set; }
+  public string? ExternalUrl { get; set; }
   public int Status { get; set; }
   public int Sort { get; set; }
   public int MaxToppingPerItem { get; set; }
   public DateTime CreatedAt { get; set; }
   public DateTime UpdatedAt { get; set; }
+}
+
+public class ShopCoverImageUploadResponse
+{
+  public string CoverImagePath { get; set; } = null!;
 }
 
 // --- Admin Shop Menu ---

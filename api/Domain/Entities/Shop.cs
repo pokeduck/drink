@@ -17,6 +17,12 @@ public class Shop : BaseDataEntity, ICreateEntity, IUpdateEntity, ISoftDeleteEnt
   [StringLength(500)]
   public string? Note { get; set; }
 
+  [StringLength(500)]
+  public string? CoverImagePath { get; set; }
+
+  [StringLength(500)]
+  public string? ExternalUrl { get; set; }
+
   public ShopStatus Status { get; set; }
 
   public int Sort { get; set; }
