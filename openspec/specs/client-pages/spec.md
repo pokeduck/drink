@@ -1,4 +1,10 @@
-## ADDED Requirements
+# client-pages
+
+## Purpose
+
+定義 Client 前台主要頁面契約：Home 揪團列表（Active / History 雙區塊）、Create Group 建立揪團、Group Detail 揪團詳情與點餐、My Orders 個人訂單、Profile 個人頁面、Admin Panel 團主管理，以及共用的 GroupCard 元件視覺與互動規範。
+
+## Requirements
 
 ### Requirement: Home 頁面 — 活動揪團列表
 

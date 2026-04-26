@@ -1,4 +1,10 @@
-## ADDED Requirements
+# client-shared-components
+
+## Purpose
+
+定義 Client 前台跨頁面共用的 Brutalist 元件契約：BackButton（返回導航）、SectionHeader（區塊標題）、EmptyState（空狀態）、StatusBadge（狀態徽章）、BrutalistModal（彈窗），統一視覺、props 與互動行為，避免各頁面各自實作。
+
+## Requirements
 
 ### Requirement: BackButton 元件
 

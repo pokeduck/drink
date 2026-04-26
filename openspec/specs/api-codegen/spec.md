@@ -1,4 +1,10 @@
-## ADDED Requirements
+# api-codegen
+
+## Purpose
+
+定義從後端 OpenAPI spec 產生前端 TypeScript 型別的契約：以 codegen script 從 Admin / User / Upload API 的 Swagger 端點產出 `web/internal/api-types/src/{admin,user,upload}.d.ts`、以 monorepo 套件 `@app/api-types` 提供給 Admin / Client app 引用，產出的 `.d.ts` 進版控以保證 CI 與前端建置不需後端 runtime。
+
+## Requirements
 
 ### Requirement: TypeScript 型別從 OpenAPI spec 自動產生
 系統 SHALL 提供 codegen script，從三個 .NET API 的 Swagger JSON 端點自動產生對應的 TypeScript 型別定義檔。

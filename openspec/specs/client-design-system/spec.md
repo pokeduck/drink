@@ -1,4 +1,10 @@
-## ADDED Requirements
+# client-design-system
+
+## Purpose
+
+定義 Client 前台 Brutalist 風格設計系統契約：Tailwind v4 `@theme` tokens、`.brutalist-card` / `.brutalist-button` 元件樣式、字體（Inter + Space Grotesk）、Dark mode 切換策略與自訂 scrollbar，作為前台所有頁面與元件的視覺基礎。
+
+## Requirements
 
 ### Requirement: Brutalist CSS 設計系統
 

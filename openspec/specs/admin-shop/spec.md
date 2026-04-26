@@ -1,4 +1,10 @@
-## ADDED Requirements
+# admin-shop
+
+## Purpose
+
+定義 Admin 後台店家管理（Shop）資源契約：列表查詢與篩選、單一店家 CRUD、批次排序與批次刪除（soft delete 連動 ShopMenuItem）、加料規則欄位（`MaxToppingPerItem`、`MaxToppingCount`），並透過 `MenuConstants.ShopList` 控制存取。
+
+## Requirements
 
 ### Requirement: 店家列表查詢
 系統 SHALL 提供 `GET /api/admin/shops` 端點，支援分頁、排序、keyword 搜尋（name）、status 篩選。預設排序為 Sort ASC, Id ASC, CreatedAt DESC。回傳欄位包含 id、name、phone、address、status、sort、category_count、menu_item_count、created_at。

@@ -1,4 +1,10 @@
-## ADDED Requirements
+# client-layout
+
+## Purpose
+
+定義 Client 前台全站 layout 契約：固定頂部 Header（含 Logo / 導航 / Dark mode toggle / Create CTA / User avatar dropdown）、Mobile bottom navigation、桌面 / 手機導航斷點切換、登入後個人選單與 logout 行為，作為所有 client 頁面共用的外殼。
+
+## Requirements
 
 ### Requirement: Desktop Header
 

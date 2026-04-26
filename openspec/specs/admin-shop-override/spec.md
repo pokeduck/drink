@@ -1,4 +1,10 @@
-## ADDED Requirements
+# admin-shop-override
+
+## Purpose
+
+定義 Admin 後台店家層級的全域 sugar / topping 覆寫契約：以 ShopSugarOverride / ShopToppingOverride 為各店家覆蓋全域 DrinkOption 的價格與排序，並提供整批 delete-then-insert 的更新流程，未包含項目視為移除覆寫、Price/Sort 為 null 表示沿用全域預設值。
+
+## Requirements
 
 ### Requirement: 取得店家覆寫設定
 系統 SHALL 提供 `GET /api/admin/shops/{shopId}/overrides` 端點，回傳該店家的甜度與加料覆寫設定，每筆包含全域預設值（default_price, default_sort）與覆寫值（override_price, override_sort）。

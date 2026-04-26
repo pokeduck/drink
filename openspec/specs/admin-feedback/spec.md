@@ -1,4 +1,10 @@
-## ADDED Requirements
+# admin-feedback
+
+## Purpose
+
+定義 Admin 後台統一的使用者回饋 UI 約定：API 寫入操作以 `ElNotification` 顯示成功提示、以 `ElMessageBox.alert` 顯示通用錯誤、欄位驗證錯誤 inline 顯示在表單欄位下、寫入操作使用 fullscreen loading，並消除 `useAdminApi` middleware 與頁面層之間的重複錯誤提示，統一表單錯誤文字間距與 drink-option 模組改用獨立頁面的編輯體驗。
+
+## Requirements
 
 ### Requirement: 成功操作使用 ElNotification
 所有 API 寫入操作（新增、更新、刪除）成功後，系統 SHALL 使用 `ElNotification` 在畫面右上角顯示成功提示，取代現有的 `ElMessage.success`。

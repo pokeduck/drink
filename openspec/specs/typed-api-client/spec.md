@@ -1,4 +1,10 @@
-## ADDED Requirements
+# typed-api-client
+
+## Purpose
+
+定義各 Nuxt app 與後端 API 互動的 typed client 契約：以 composable（`useAdminApi()` / `useUserApi()`）暴露 singleton client、透過 `@app/api-types` 自動推導 request / response 型別、auth middleware 自動注入 token、error middleware 統一向使用者回饋錯誤，作為 Admin / Client app 所有 API 呼叫的唯一入口。
+
+## Requirements
 
 ### Requirement: Typed API client composable
 每個 Nuxt app SHALL 提供一個 composable 回傳 typed API client 實例，所有 API 呼叫透過此 client 發出。

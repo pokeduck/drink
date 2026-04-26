@@ -1,4 +1,10 @@
-## ADDED Requirements
+# onion-layer-structure
+
+## Purpose
+
+定義後端 .NET solution 的 Onion Architecture 契約：Domain ← Application ← Infrastructure ← API 的依賴方向、跨層介面定義於 Application、HTTP 層成員歸屬 API 層、Service 透過 constructor injection 取得相依、`CurrentUserId` 等橫切邏輯集中於單一實作，避免層間反向依賴。
+
+## Requirements
 
 ### Requirement: Project reference 依賴方向
 各層的 project reference MUST 遵循 Onion Architecture 依賴方向：Domain ← Application ← Infrastructure ← API。Application MUST NOT reference Infrastructure。

@@ -1,4 +1,10 @@
-## ADDED Requirements
+# admin-permission
+
+## Purpose
+
+定義 Admin 後台 menu / role 權限模型在前後端的契約：`/menus/me` 回傳每個葉節點的 CRUD 權限、前端以 `usePermission()` 與 route middleware 控制按鈕與路由級存取、後端 Controller 以 `[RequireRole]` 確保最終防線，並維持前後端 MenuConstants 一致。
+
+## Requirements
 
 ### Requirement: Menu API 回傳 CRUD 權限
 `/menus/me` API 回傳的每個葉節點 menu MUST 包含該使用者角色的 `can_read`、`can_create`、`can_update`、`can_delete` 權限。

@@ -1,4 +1,10 @@
-## ADDED Requirements
+# admin-forgot-password-verification-ui
+
+## Purpose
+
+定義 Admin 後台 `/member/verification/forgot-password` 頁面契約：以列表呈現前台會員忘記密碼驗證信紀錄，支援關鍵字 / 狀態篩選、server-side 排序、分頁，並依 `MENU.VerificationForgotPassword` 角色提供單筆與批次重發功能。
+
+## Requirements
 
 ### Requirement: 忘記密碼驗證信列表
 

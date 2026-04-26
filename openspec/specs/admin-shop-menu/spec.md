@@ -1,4 +1,10 @@
-## ADDED Requirements
+# admin-shop-menu
+
+## Purpose
+
+定義 Admin 後台店家菜單（分類、品項、尺寸價格）的管理契約：取得店家完整菜單、分類 CRUD（同店家分類名稱唯一）、品項 CRUD、品項所支援的甜度 / 冰塊 / 加料設定，以及與 `admin-shop-override` 的甜度 / 加料覆寫整合。
+
+## Requirements
 
 ### Requirement: 取得店家完整菜單
 系統 SHALL 提供 `GET /api/admin/shops/{shopId}/menu` 端點，回傳該店家所有分類、品項、品項的尺寸價格、支援的甜度/冰塊/加料 ID，以及店家的甜度/加料覆寫。
