@@ -25,6 +25,7 @@ public class AdminShopService : BaseService
   private readonly IGenericRepository<DrinkItem> _drinkItemRepo;
   private readonly IGenericRepository<Sugar> _sugarRepo;
   private readonly IGenericRepository<Topping> _toppingRepo;
+  private readonly AdminShopImageService _imageService;
 
   public AdminShopService(
     ICurrentUserContext currentUser,
@@ -39,7 +40,8 @@ public class AdminShopService : BaseService
     IGenericRepository<ShopToppingOverride> toppingOverrideRepo,
     IGenericRepository<DrinkItem> drinkItemRepo,
     IGenericRepository<Sugar> sugarRepo,
-    IGenericRepository<Topping> toppingRepo) : base(currentUser)
+    IGenericRepository<Topping> toppingRepo,
+    AdminShopImageService imageService) : base(currentUser)
   {
     _shopRepo = shopRepo;
     _categoryRepo = categoryRepo;
@@ -53,6 +55,7 @@ public class AdminShopService : BaseService
     _drinkItemRepo = drinkItemRepo;
     _sugarRepo = sugarRepo;
     _toppingRepo = toppingRepo;
+    _imageService = imageService;
   }
 
   // ==================== Shop CRUD ====================
@@ -337,12 +340,25 @@ public class AdminShopService : BaseService
     if (entity is null)
       return Fail(ErrorCodes.CategoryNotFound, "分類不存在");
 
-    // 底下品項 soft delete
-    await _menuItemRepo.ExecuteUpdate(
-      x => x.CategoryId == categoryId && !x.IsDeleted,
-      s => s.SetProperty(x => x.IsDeleted, true).SetProperty(x => x.DeletedAt, DateTime.UtcNow));
+    // 受影響的品項 (用於 cascade orphan ShopImage)
+    var affectedDrinkItemIds = await _menuItemRepo.Query
+      .Where(m => m.CategoryId == categoryId && !m.IsDeleted)
+      .Select(m => m.DrinkItemId)
+      .ToListAsync();
 
-    await _categoryRepo.DeleteById(categoryId);
+    await _categoryRepo.ExecuteInTransaction(async () =>
+    {
+      // 底下品項 soft delete
+      await _menuItemRepo.ExecuteUpdate(
+        x => x.CategoryId == categoryId && !x.IsDeleted,
+        s => s.SetProperty(x => x.IsDeleted, true).SetProperty(x => x.DeletedAt, DateTime.UtcNow));
+
+      // Cascade orphan ShopImage
+      if (affectedDrinkItemIds.Count > 0)
+        await _imageService.CascadeOrphan(shopId, affectedDrinkItemIds);
+
+      await _categoryRepo.DeleteById(categoryId);
+    }, "刪除分類失敗");
     return Success();
   }
 
@@ -477,9 +493,16 @@ public class AdminShopService : BaseService
     if (entity is null)
       return Fail(ErrorCodes.MenuItemNotFound, "品項不存在");
 
-    entity.IsDeleted = true;
-    entity.DeletedAt = DateTime.UtcNow;
-    await _menuItemRepo.Update(entity);
+    var drinkItemId = entity.DrinkItemId;
+
+    await _menuItemRepo.ExecuteInTransaction(async () =>
+    {
+      entity.IsDeleted = true;
+      entity.DeletedAt = DateTime.UtcNow;
+      await _menuItemRepo.Update(entity);
+
+      await _imageService.CascadeOrphan(shopId, new[] { drinkItemId });
+    }, "刪除品項失敗");
 
     return Success();
   }
