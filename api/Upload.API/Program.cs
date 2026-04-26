@@ -21,6 +21,9 @@ builder.Services.AddControllers(options =>
       options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
     });
 
+// ModelState 驗證失敗回 ApiResponse.ValidationFail 格式（errors key 轉 snake_case）
+builder.Services.ConfigureApiValidationResponse();
+
 // File Upload (UploadSettings + IFileStorageService)
 builder.Services.AddFileUpload(builder.Configuration);
 
