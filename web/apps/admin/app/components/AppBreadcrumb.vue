@@ -56,6 +56,7 @@ function collectLeafPaths(items: MenuModel[]): string[] {
 const subPageTitles: Record<string, string> = {
   create: "新增",
   edit: "編輯",
+  images: "圖庫管理",
 }
 
 const breadcrumbs = computed(() => {

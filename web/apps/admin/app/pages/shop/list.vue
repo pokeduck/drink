@@ -255,8 +255,9 @@ onMounted(() => {
             {{ formatDateTime(row.created_at) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="160" fixed="right">
+        <el-table-column label="操作" width="240" fixed="right">
           <template #default="{ row }">
+            <el-button v-if="can(MENU.ShopList, 'read')" size="small" @click="router.push(`/shop/${row.id}/images`)">圖庫</el-button>
             <el-button v-if="can(MENU.ShopList, 'update')" size="small" @click="router.push(`/shop/${row.id}/edit`)">編輯</el-button>
             <el-button v-if="can(MENU.ShopList, 'delete')" size="small" type="danger" @click="handleDelete(row)">刪除</el-button>
           </template>

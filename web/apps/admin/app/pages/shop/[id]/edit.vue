@@ -453,7 +453,10 @@ onMounted(async () => {
             <el-button text @click="router.push('/shop/list')"><el-icon><ArrowLeft /></el-icon>返回</el-button>
             <span>店家基本資訊</span>
           </div>
-          <AppTimestamp v-if="createdAt" :created-at="createdAt" :updated-at="updatedAt" />
+          <div style="display: flex; align-items: center; gap: 12px">
+            <el-button size="small" @click="router.push(`/shop/${shopId}/images`)">圖庫管理</el-button>
+            <AppTimestamp v-if="createdAt" :created-at="createdAt" :updated-at="updatedAt" />
+          </div>
         </div>
       </template>
 
@@ -744,6 +747,15 @@ onMounted(async () => {
           </el-checkbox-group>
         </el-form-item>
       </el-form>
+
+      <!-- 圖片管理（僅編輯模式 + 已有 drink_item_id 時顯示） -->
+      <div v-if="itemDialogMode === 'edit' && itemForm.drink_item_id" style="margin-top: 16px">
+        <ShopMenuItemImageStrip
+          :key="`${shopId}-${itemForm.drink_item_id}`"
+          :shop-id="shopId"
+          :drink-item-id="itemForm.drink_item_id"
+        />
+      </div>
 
       <template #footer>
         <el-button @click="itemDialogVisible = false">取消</el-button>
