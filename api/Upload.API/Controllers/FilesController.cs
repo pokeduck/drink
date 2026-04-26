@@ -14,15 +14,16 @@ public class FilesController : BaseController
   }
 
   /// <summary>
-  /// Upload a file (internal API, requires X-Api-Key)
+  /// Upload an image (internal API, requires X-Api-Key).
+  /// Pipeline: validate → SkiaSharp decode → resize (max 4000px) → encode webp → SHA-256 dedup.
   /// </summary>
   [HttpPost]
   [ProducesResponseType(typeof(ApiResponse<FileUploadResponse>), 200)]
   [ProducesResponseType(typeof(ApiResponse), 400)]
   [ProducesResponseType(typeof(ApiResponse), 401)]
-  public async Task<IActionResult> Upload(IFormFile file, [FromQuery] string category = "images")
+  public async Task<IActionResult> Upload(IFormFile file, CancellationToken ct)
   {
-    var result = await _uploadService.Upload(file, category);
+    var result = await _uploadService.Upload(file, ct);
     return result.Code == 0 ? Ok(result) : BadRequest(result);
   }
 }

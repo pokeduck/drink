@@ -2,8 +2,10 @@ namespace Drink.Application.Responses;
 
 public class FileUploadResponse
 {
-  public string FileName { get; set; } = null!;
-  public string Url { get; set; } = null!;
-  public string ContentType { get; set; } = null!;
-  public long FileSize { get; set; }
+  public string Path { get; set; } = null!;
+  public string Hash { get; set; } = null!;
+  public long Size { get; set; }
+  public int Width { get; set; }
+  public int Height { get; set; }
+  public string MimeType { get; set; } = "image/webp";
 }

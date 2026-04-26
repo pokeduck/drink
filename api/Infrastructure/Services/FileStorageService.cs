@@ -1,6 +1,5 @@
 using Drink.Application.Interfaces;
 using Drink.Application.Settings;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace Drink.Infrastructure.Services;
@@ -14,44 +13,27 @@ public class FileStorageService : IFileStorageService
     _settings = settings.Value;
   }
 
-  public async Task<FileStorageResult> SaveAsync(IFormFile file, string category)
+  public bool Exists(string relativePath)
   {
-    var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
-    if (!_settings.AllowedExtensions.Contains(extension))
-      throw new InvalidOperationException($"File extension '{extension}' is not allowed.");
-
-    if (file.Length > _settings.MaxFileSizeBytes)
-      throw new InvalidOperationException($"File size exceeds the limit of {_settings.MaxFileSizeBytes / 1024 / 1024}MB.");
-
-    // Generate unique stored filename: {guid}{extension}
-    var storedFileName = $"{Guid.NewGuid():N}{extension}";
-    var categoryDir = Path.Combine(_settings.StoragePath, category);
-    Directory.CreateDirectory(categoryDir);
-
-    var physicalPath = Path.Combine(categoryDir, storedFileName);
-    await using var stream = new FileStream(physicalPath, FileMode.Create);
-    await file.CopyToAsync(stream);
-
-    return new FileStorageResult
-    {
-      StoredFileName = storedFileName,
-      StoredPath = $"{category}/{storedFileName}",
-      OriginalFileName = file.FileName,
-      ContentType = file.ContentType,
-      FileSize = file.Length
-    };
+    return File.Exists(GetPhysicalPath(relativePath));
   }
 
-  public void Delete(string storedPath)
+  public async Task WriteIfNotExistsAsync(string relativePath, byte[] bytes, CancellationToken ct = default)
   {
-    var physicalPath = GetPhysicalPath(storedPath);
+    var physicalPath = GetPhysicalPath(relativePath);
     if (File.Exists(physicalPath))
-      File.Delete(physicalPath);
+      return;
+
+    var dir = Path.GetDirectoryName(physicalPath);
+    if (!string.IsNullOrEmpty(dir))
+      Directory.CreateDirectory(dir);
+
+    await File.WriteAllBytesAsync(physicalPath, bytes, ct);
   }
 
-  public string GetPhysicalPath(string storedPath)
+  public string GetPhysicalPath(string relativePath)
   {
-    return Path.Combine(_settings.StoragePath, storedPath);
+    var safe = relativePath.Replace('\\', '/').TrimStart('/');
+    return Path.Combine(_settings.StoragePath, safe);
   }
 }

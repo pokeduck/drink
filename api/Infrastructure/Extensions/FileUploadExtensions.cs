@@ -2,9 +2,11 @@ using Drink.Application.Interfaces;
 using Drink.Application.Settings;
 using Drink.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Net.Http.Headers;
 
 namespace Drink.Infrastructure.Extensions;
 
@@ -20,6 +22,7 @@ public static class FileUploadExtensions
   /// <summary>
   /// Maps /assets/{**path} to the physical Uploads/ directory,
   /// hiding the real storage path from clients.
+  /// Adds CDN-friendly cache headers (immutable + ETag based on content hash filename).
   /// </summary>
   public static WebApplication UseAssetFileServer(this WebApplication app, IConfiguration configuration)
   {
@@ -34,8 +37,13 @@ public static class FileUploadExtensions
       ServeUnknownFileTypes = false,
       OnPrepareResponse = ctx =>
       {
-        // Cache for 1 day
-        ctx.Context.Response.Headers.CacheControl = "public, max-age=86400";
+        var headers = ctx.Context.Response.Headers;
+        headers[HeaderNames.CacheControl] = "public, max-age=31536000, immutable";
+
+        // ETag = file name without extension (which is the SHA-256 hash for our pipeline)
+        var fileName = Path.GetFileNameWithoutExtension(ctx.File.Name);
+        if (!string.IsNullOrEmpty(fileName))
+          headers[HeaderNames.ETag] = $"\"{fileName}\"";
       }
     });
 
