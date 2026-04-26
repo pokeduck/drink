@@ -13,12 +13,13 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Upload a file (internal API, requires X-Api-Key) */
+        /**
+         * Upload an image (internal API, requires X-Api-Key).
+         *     Pipeline: validate → SkiaSharp decode → resize (max 4000px) → encode webp → SHA-256 dedup.
+         */
         post: {
             parameters: {
-                query?: {
-                    category?: string;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -88,11 +89,15 @@ export interface components {
             } | null;
         };
         FileUploadResponse: {
-            file_name?: string | null;
-            url?: string | null;
-            content_type?: string | null;
+            path?: string | null;
+            hash?: string | null;
             /** Format: int64 */
-            file_size?: number;
+            size?: number;
+            /** Format: int32 */
+            width?: number;
+            /** Format: int32 */
+            height?: number;
+            mime_type?: string | null;
         };
         FileUploadResponseApiResponse: {
             data?: components["schemas"]["FileUploadResponse"];

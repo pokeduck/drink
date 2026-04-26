@@ -13,13 +13,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 上傳檔案（proxy 至 Upload.API） */
+        /** 上傳圖片（proxy 至 Upload.API；單檔，多檔由前端佇列序列呼叫） */
         post: {
             parameters: {
-                query?: {
-                    /** @description 分類資料夾（如 images, pdf） */
-                    category?: string;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -27,10 +24,7 @@ export interface paths {
             requestBody?: {
                 content: {
                     "multipart/form-data": {
-                        /**
-                         * Format: binary
-                         * @description 檔案
-                         */
+                        /** Format: binary */
                         file?: string;
                     };
                 };
@@ -77,6 +71,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/user/upload/asset-host": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取得圖片資產的 base URL（前端拼接圖片 URL 用） */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AssetHostResponseApiResponse"];
+                        "application/json": components["schemas"]["AssetHostResponseApiResponse"];
+                        "text/json": components["schemas"]["AssetHostResponseApiResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -91,12 +134,29 @@ export interface components {
                 [key: string]: string[];
             } | null;
         };
+        AssetHostResponse: {
+            base_url?: string | null;
+        };
+        AssetHostResponseApiResponse: {
+            data?: components["schemas"]["AssetHostResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
         FileUploadResponse: {
-            file_name?: string | null;
-            url?: string | null;
-            content_type?: string | null;
+            path?: string | null;
+            hash?: string | null;
             /** Format: int64 */
-            file_size?: number;
+            size?: number;
+            /** Format: int32 */
+            width?: number;
+            /** Format: int32 */
+            height?: number;
+            mime_type?: string | null;
         };
         FileUploadResponseApiResponse: {
             data?: components["schemas"]["FileUploadResponse"];

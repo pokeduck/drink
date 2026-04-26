@@ -1443,6 +1443,349 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/shops/{shopId}/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Filter?: string;
+                    DrinkItemId?: number;
+                    Keyword?: string;
+                    Page?: number;
+                    PageSize?: number;
+                };
+                header?: never;
+                path: {
+                    shopId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopImageListResponseApiResponse"];
+                        "application/json": components["schemas"]["ShopImageListResponseApiResponse"];
+                        "text/json": components["schemas"]["ShopImageListResponseApiResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: {
+                    drinkItemId?: number;
+                };
+                header?: never;
+                path: {
+                    shopId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopImageResponseApiResponse"];
+                        "application/json": components["schemas"]["ShopImageResponseApiResponse"];
+                        "text/json": components["schemas"]["ShopImageResponseApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ShopImageBatchDeleteRequest"];
+                    "text/json": components["schemas"]["ShopImageBatchDeleteRequest"];
+                    "application/*+json": components["schemas"]["ShopImageBatchDeleteRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopImageBatchDeleteResponseApiResponse"];
+                        "application/json": components["schemas"]["ShopImageBatchDeleteResponseApiResponse"];
+                        "text/json": components["schemas"]["ShopImageBatchDeleteResponseApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/{shopId}/drink-items/{drinkItemId}/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                    drinkItemId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopImageResponseListApiResponse"];
+                        "application/json": components["schemas"]["ShopImageResponseListApiResponse"];
+                        "text/json": components["schemas"]["ShopImageResponseListApiResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/{shopId}/images/{imageId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                    imageId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ShopImageUpdateRequest"];
+                    "text/json": components["schemas"]["ShopImageUpdateRequest"];
+                    "application/*+json": components["schemas"]["ShopImageUpdateRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopImageResponseApiResponse"];
+                        "application/json": components["schemas"]["ShopImageResponseApiResponse"];
+                        "text/json": components["schemas"]["ShopImageResponseApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/admin/shops/{shopId}/drink-items/{drinkItemId}/images/sort": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                    drinkItemId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ShopImageSortRequest"];
+                    "text/json": components["schemas"]["ShopImageSortRequest"];
+                    "application/*+json": components["schemas"]["ShopImageSortRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/admin/shops/{shopId}/images/orphans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopImageBatchDeleteResponseApiResponse"];
+                        "application/json": components["schemas"]["ShopImageBatchDeleteResponseApiResponse"];
+                        "text/json": components["schemas"]["ShopImageBatchDeleteResponseApiResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/shops": {
         parameters: {
             query?: never;
@@ -3378,13 +3721,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 上傳檔案（proxy 至 Upload.API） */
+        /** 上傳圖片（proxy 至 Upload.API；單檔，多檔由前端佇列序列呼叫） */
         post: {
             parameters: {
-                query?: {
-                    /** @description 分類資料夾（如 images, pdf） */
-                    category?: string;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -3392,10 +3732,7 @@ export interface paths {
             requestBody?: {
                 content: {
                     "multipart/form-data": {
-                        /**
-                         * Format: binary
-                         * @description 檔案
-                         */
+                        /** Format: binary */
                         file?: string;
                     };
                 };
@@ -3436,6 +3773,55 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/upload/asset-host": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 取得圖片資產的 base URL（前端拼接圖片 URL 用） */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AssetHostResponseApiResponse"];
+                        "application/json": components["schemas"]["AssetHostResponseApiResponse"];
+                        "text/json": components["schemas"]["AssetHostResponseApiResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4081,6 +4467,8 @@ export interface components {
             description?: string | null;
             /** Format: int32 */
             sort?: number;
+            /** Format: int32 */
+            max_topping_count?: number;
             sizes?: components["schemas"]["AdminShopMenuItemSizeResponse"][] | null;
             sugar_ids?: number[] | null;
             ice_ids?: number[] | null;
@@ -4189,6 +4577,19 @@ export interface components {
                 [key: string]: string[];
             } | null;
         };
+        AssetHostResponse: {
+            base_url?: string | null;
+        };
+        AssetHostResponseApiResponse: {
+            data?: components["schemas"]["AssetHostResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
         BatchDeleteRequest: {
             ids: number[];
         };
@@ -4254,6 +4655,8 @@ export interface components {
             description?: string | null;
             /** Format: int32 */
             sort: number;
+            /** Format: int32 */
+            max_topping_count: number;
             sizes: components["schemas"]["MenuItemSizeRequest"][];
             sugar_ids: number[];
             ice_ids: number[];
@@ -4270,8 +4673,6 @@ export interface components {
             sort: number;
             /** Format: int32 */
             max_topping_per_item: number;
-            /** Format: int32 */
-            max_topping_count: number;
         };
         CreateSizeRequest: {
             name: string;
@@ -4346,11 +4747,15 @@ export interface components {
             } | null;
         };
         FileUploadResponse: {
-            file_name?: string | null;
-            url?: string | null;
-            content_type?: string | null;
+            path?: string | null;
+            hash?: string | null;
             /** Format: int64 */
-            file_size?: number;
+            size?: number;
+            /** Format: int32 */
+            width?: number;
+            /** Format: int32 */
+            height?: number;
+            mime_type?: string | null;
         };
         FileUploadResponseApiResponse: {
             data?: components["schemas"]["FileUploadResponse"];
@@ -4545,8 +4950,6 @@ export interface components {
             sort?: number;
             /** Format: int32 */
             max_topping_per_item?: number;
-            /** Format: int32 */
-            max_topping_count?: number;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -4561,6 +4964,103 @@ export interface components {
             errors?: {
                 [key: string]: string[];
             } | null;
+        };
+        ShopImageBatchDeleteRequest: {
+            ids: number[];
+        };
+        ShopImageBatchDeleteResponse: {
+            /** Format: int32 */
+            deleted?: number;
+        };
+        ShopImageBatchDeleteResponseApiResponse: {
+            data?: components["schemas"]["ShopImageBatchDeleteResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        ShopImageDrinkItemSummary: {
+            /** Format: int32 */
+            id?: number;
+            name?: string | null;
+        };
+        ShopImageListResponse: {
+            items?: components["schemas"]["ShopImageResponse"][] | null;
+            /** Format: int32 */
+            total?: number;
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            page_size?: number;
+        };
+        ShopImageListResponseApiResponse: {
+            data?: components["schemas"]["ShopImageListResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        ShopImageResponse: {
+            /** Format: int32 */
+            id?: number;
+            path?: string | null;
+            hash?: string | null;
+            /** Format: int32 */
+            width?: number;
+            /** Format: int32 */
+            height?: number;
+            /** Format: int64 */
+            file_size?: number;
+            original_file_name?: string | null;
+            is_cover?: boolean;
+            /** Format: int32 */
+            sort?: number;
+            drink_item?: components["schemas"]["ShopImageDrinkItemSummary"];
+            /** Format: date-time */
+            created_at?: string;
+        };
+        ShopImageResponseApiResponse: {
+            data?: components["schemas"]["ShopImageResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        ShopImageResponseListApiResponse: {
+            data?: components["schemas"]["ShopImageResponse"][] | null;
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        ShopImageSortItem: {
+            /** Format: int32 */
+            id: number;
+            /** Format: int32 */
+            sort: number;
+        };
+        ShopImageSortRequest: {
+            items: components["schemas"]["ShopImageSortItem"][];
+        };
+        ShopImageUpdateRequest: {
+            change_drink_item?: boolean;
+            /** Format: int32 */
+            drink_item_id?: number | null;
+            is_cover?: boolean | null;
+            /** Format: int32 */
+            sort?: number | null;
         };
         ShopListResponse: {
             /** Format: int32 */
@@ -4852,6 +5352,8 @@ export interface components {
             description?: string | null;
             /** Format: int32 */
             sort: number;
+            /** Format: int32 */
+            max_topping_count: number;
             sizes: components["schemas"]["MenuItemSizeRequest"][];
             sugar_ids: number[];
             ice_ids: number[];
@@ -4872,8 +5374,6 @@ export interface components {
             sort: number;
             /** Format: int32 */
             max_topping_per_item: number;
-            /** Format: int32 */
-            max_topping_count: number;
         };
         UpdateSizeRequest: {
             name: string;
