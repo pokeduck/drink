@@ -1,10 +1,4 @@
-# admin-shop-override
-
-## Purpose
-
-定義 Admin 後台店家層級的全域 sugar / topping 覆寫契約：以 ShopSugarOverride / ShopToppingOverride 為各店家覆蓋全域 DrinkOption 的價格，並提供整批 delete-then-insert 的更新流程，未包含項目視為移除覆寫、Price 為 null 表示沿用全域預設值。Sort 已移交 `admin-shop-options` 啟用表負責；Override 表職責收窄為「Price 覆寫」。覆寫設定的入口從原 sidemenu `/shop/override` 移至 `admin-shop-hub` 的 `/shop/[id]/overrides` sub-tab，shopId 由 route param 取得。
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: 取得店家覆寫設定
 系統 SHALL 提供 `GET /api/admin/shops/{shopId}/overrides` 端點，回傳該店家的甜度與加料覆寫設定，每筆包含全域預設值（default_price）與覆寫值（override_price）。回應 SHALL 不再包含 `default_sort` / `override_sort` 欄位（店家內排序已移交 `admin-shop-options` 啟用表負責）。
@@ -56,3 +50,14 @@
 #### Scenario: AdminMenu 不再渲染至 sidemenu
 - **WHEN** 前端 sidemenu 渲染
 - **THEN** 對應 ShopOverride 的 menu row SHALL 因 `is_permission_only=true` 不被渲染
+
+## REMOVED Requirements
+
+### Requirement: ~~Sort 欄位於 ShopSugarOverride / ShopToppingOverride~~
+**Reason**: 店家內排序統一由 `admin-shop-options` 的啟用表 `Sort` 負責，避免 sort 散落兩處。Override 表職責收窄為「Price 覆寫」。
+
+**Migration**:
+- EF Migration 直接 drop `ShopSugarOverride.Sort` 與 `ShopToppingOverride.Sort` 欄位。
+- 既有資料：目前只有 1 家店、Sort 重設成本可忽略；不做資料搬遷。
+- 上線後管理員到 hub 內 `/shop/[id]/options` 設定排序。
+- API DTO 同步移除 `default_sort` / `override_sort` 欄位；前端覆寫頁面移除 sort UI。
