@@ -2775,6 +2775,174 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/shops/{shopId}/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopOptionsResponseApiResponse"];
+                        "application/json": components["schemas"]["ShopOptionsResponseApiResponse"];
+                        "text/json": components["schemas"]["ShopOptionsResponseApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateShopOptionsRequest"];
+                    "text/json": components["schemas"]["UpdateShopOptionsRequest"];
+                    "application/*+json": components["schemas"]["UpdateShopOptionsRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["UpdateShopOptionsResponseApiResponse"];
+                        "application/json": components["schemas"]["UpdateShopOptionsResponseApiResponse"];
+                        "text/json": components["schemas"]["UpdateShopOptionsResponseApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/shops/{shopId}/options/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    shopId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateShopOptionsRequest"];
+                    "text/json": components["schemas"]["UpdateShopOptionsRequest"];
+                    "application/*+json": components["schemas"]["UpdateShopOptionsRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ShopOptionsPreviewResponseApiResponse"];
+                        "application/json": components["schemas"]["ShopOptionsPreviewResponseApiResponse"];
+                        "text/json": components["schemas"]["ShopOptionsPreviewResponseApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/sizes": {
         parameters: {
             query?: never;
@@ -4549,10 +4717,21 @@ export interface components {
             /** Format: double */
             price?: number;
         };
+        AdminShopMenuOptionItem: {
+            /** Format: int32 */
+            id?: number;
+            name?: string | null;
+            /** Format: int32 */
+            sort?: number;
+        };
         AdminShopMenuResponse: {
             categories?: components["schemas"]["AdminShopMenuCategoryResponse"][] | null;
             sugar_overrides?: components["schemas"]["AdminShopMenuSugarOverrideResponse"][] | null;
             topping_overrides?: components["schemas"]["AdminShopMenuToppingOverrideResponse"][] | null;
+            enabled_sugars?: components["schemas"]["AdminShopMenuOptionItem"][] | null;
+            enabled_ices?: components["schemas"]["AdminShopMenuOptionItem"][] | null;
+            enabled_toppings?: components["schemas"]["AdminShopMenuOptionItem"][] | null;
+            enabled_sizes?: components["schemas"]["AdminShopMenuOptionItem"][] | null;
         };
         AdminShopMenuResponseApiResponse: {
             data?: components["schemas"]["AdminShopMenuResponse"];
@@ -4570,8 +4749,6 @@ export interface components {
             sugar_name?: string | null;
             /** Format: double */
             price?: number | null;
-            /** Format: int32 */
-            sort?: number | null;
         };
         AdminShopMenuToppingOverrideResponse: {
             /** Format: int32 */
@@ -4579,8 +4756,6 @@ export interface components {
             topping_name?: string | null;
             /** Format: double */
             price?: number | null;
-            /** Format: int32 */
-            sort?: number | null;
         };
         AdminUserDetailResponse: {
             /** Format: int32 */
@@ -4980,6 +5155,7 @@ export interface components {
             endpoint?: string | null;
             /** Format: int32 */
             sort?: number;
+            is_permission_only?: boolean;
             can_read?: boolean;
             can_create?: boolean;
             can_update?: boolean;
@@ -5049,6 +5225,38 @@ export interface components {
             errors?: {
                 [key: string]: string[];
             } | null;
+        };
+        ShopEnabledIceItem: {
+            /** Format: int32 */
+            ice_id: number;
+            /** Format: int32 */
+            sort?: number;
+        };
+        ShopEnabledSizeItem: {
+            /** Format: int32 */
+            size_id: number;
+            /** Format: int32 */
+            sort?: number;
+        };
+        ShopEnabledSugarItem: {
+            /** Format: int32 */
+            sugar_id: number;
+            /** Format: int32 */
+            sort?: number;
+        };
+        ShopEnabledToppingItem: {
+            /** Format: int32 */
+            topping_id: number;
+            /** Format: int32 */
+            sort?: number;
+        };
+        ShopIceOptionItem: {
+            /** Format: int32 */
+            ice_id?: number;
+            ice_name?: string | null;
+            is_enabled?: boolean;
+            /** Format: int32 */
+            sort?: number;
         };
         ShopImageBatchDeleteRequest: {
             ids: number[];
@@ -5183,6 +5391,56 @@ export interface components {
                 [key: string]: string[];
             } | null;
         };
+        ShopOptionsAffectedMenuItem: {
+            /** Format: int32 */
+            id?: number;
+            name?: string | null;
+            removed_options?: components["schemas"]["ShopOptionsRemovedOptions"];
+        };
+        ShopOptionsNewlyDisabledIds: {
+            sugar_ids?: number[] | null;
+            ice_ids?: number[] | null;
+            topping_ids?: number[] | null;
+            size_ids?: number[] | null;
+        };
+        ShopOptionsPreviewResponse: {
+            newly_disabled?: components["schemas"]["ShopOptionsNewlyDisabledIds"];
+            affected_menu_items?: components["schemas"]["ShopOptionsAffectedMenuItem"][] | null;
+            /** Format: int32 */
+            affected_menu_items_count?: number;
+        };
+        ShopOptionsPreviewResponseApiResponse: {
+            data?: components["schemas"]["ShopOptionsPreviewResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        ShopOptionsRemovedOptions: {
+            sugars?: number[] | null;
+            ices?: number[] | null;
+            toppings?: number[] | null;
+            sizes?: number[] | null;
+        };
+        ShopOptionsResponse: {
+            sugars?: components["schemas"]["ShopSugarOptionItem"][] | null;
+            ices?: components["schemas"]["ShopIceOptionItem"][] | null;
+            toppings?: components["schemas"]["ShopToppingOptionItem"][] | null;
+            sizes?: components["schemas"]["ShopSizeOptionItem"][] | null;
+        };
+        ShopOptionsResponseApiResponse: {
+            data?: components["schemas"]["ShopOptionsResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
         ShopOverrideResponse: {
             sugar_overrides?: components["schemas"]["ShopSugarOverrideDetailResponse"][] | null;
             topping_overrides?: components["schemas"]["ShopToppingOverrideDetailResponse"][] | null;
@@ -5197,6 +5455,24 @@ export interface components {
                 [key: string]: string[];
             } | null;
         };
+        ShopSizeOptionItem: {
+            /** Format: int32 */
+            size_id?: number;
+            size_name?: string | null;
+            is_enabled?: boolean;
+            /** Format: int32 */
+            sort?: number;
+        };
+        ShopSugarOptionItem: {
+            /** Format: int32 */
+            sugar_id?: number;
+            sugar_name?: string | null;
+            /** Format: double */
+            default_price?: number;
+            is_enabled?: boolean;
+            /** Format: int32 */
+            sort?: number;
+        };
         ShopSugarOverrideDetailResponse: {
             /** Format: int32 */
             sugar_id?: number;
@@ -5205,18 +5481,22 @@ export interface components {
             default_price?: number;
             /** Format: double */
             override_price?: number | null;
-            /** Format: int32 */
-            default_sort?: number;
-            /** Format: int32 */
-            override_sort?: number | null;
         };
         ShopSugarOverrideItem: {
             /** Format: int32 */
             sugar_id: number;
             /** Format: double */
             price?: number | null;
+        };
+        ShopToppingOptionItem: {
             /** Format: int32 */
-            sort?: number | null;
+            topping_id?: number;
+            topping_name?: string | null;
+            /** Format: double */
+            default_price?: number;
+            is_enabled?: boolean;
+            /** Format: int32 */
+            sort?: number;
         };
         ShopToppingOverrideDetailResponse: {
             /** Format: int32 */
@@ -5226,18 +5506,12 @@ export interface components {
             default_price?: number;
             /** Format: double */
             override_price?: number | null;
-            /** Format: int32 */
-            default_sort?: number;
-            /** Format: int32 */
-            override_sort?: number | null;
         };
         ShopToppingOverrideItem: {
             /** Format: int32 */
             topping_id: number;
             /** Format: double */
             price?: number | null;
-            /** Format: int32 */
-            sort?: number | null;
         };
         SizeDetailResponse: {
             /** Format: int32 */
@@ -5443,6 +5717,26 @@ export interface components {
             sugar_ids: number[];
             ice_ids: number[];
             topping_ids: number[];
+        };
+        UpdateShopOptionsRequest: {
+            sugars: components["schemas"]["ShopEnabledSugarItem"][];
+            ices: components["schemas"]["ShopEnabledIceItem"][];
+            toppings: components["schemas"]["ShopEnabledToppingItem"][];
+            sizes: components["schemas"]["ShopEnabledSizeItem"][];
+        };
+        UpdateShopOptionsResponse: {
+            /** Format: int32 */
+            affected_menu_items_count?: number;
+        };
+        UpdateShopOptionsResponseApiResponse: {
+            data?: components["schemas"]["UpdateShopOptionsResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
         };
         UpdateShopOverrideRequest: {
             sugar_overrides: components["schemas"]["ShopSugarOverrideItem"][];

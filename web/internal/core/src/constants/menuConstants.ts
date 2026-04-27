@@ -12,6 +12,7 @@ export const MENU = {
   Topping: 15,
   Size: 16,
   ShopOverride: 17,
+  ShopOptions: 23,
   NotificationList: 19,
   NotificationByGroup: 20,
   SystemSetting: 21,
