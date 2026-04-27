@@ -44,11 +44,13 @@ const routePermissions: { pattern: RegExp; perm: RoutePermission }[] = [
   // 訂單
   { pattern: /^\/order\/list$/, perm: { menuId: MENU.OrderList, action: 'read' } },
 
-  // 店家
+  // 店家（hub layout：/shop/[id]/* 各 sub-tab 對應不同權限節點）
   { pattern: /^\/shop\/list$/, perm: { menuId: MENU.ShopList, action: 'read' } },
   { pattern: /^\/shop\/create$/, perm: { menuId: MENU.ShopList, action: 'create' } },
   { pattern: /^\/shop\/[^/]+\/edit$/, perm: { menuId: MENU.ShopList, action: 'update' } },
-  { pattern: /^\/shop\/override$/, perm: { menuId: MENU.ShopOverride, action: 'read' } },
+  { pattern: /^\/shop\/[^/]+\/images$/, perm: { menuId: MENU.ShopList, action: 'update' } },
+  { pattern: /^\/shop\/[^/]+\/overrides$/, perm: { menuId: MENU.ShopOverride, action: 'read' } },
+  { pattern: /^\/shop\/[^/]+\/options$/, perm: { menuId: MENU.ShopOptions, action: 'read' } },
 
   // 通知
   { pattern: /^\/notification\/list$/, perm: { menuId: MENU.NotificationList, action: 'read' } },

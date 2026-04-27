@@ -19,22 +19,31 @@ interface MenuPermission {
 }
 
 /**
- * 將 API 回傳的 MenuTreeResponse 轉換為前端 MenuModel
+ * 將 API 回傳的 MenuTreeResponse 轉換為前端 MenuModel。
+ * permission-only 葉節點（is_permission_only=true）SHALL 不渲染為 sidemenu entry：
+ *   - 葉節點：直接過濾掉
+ *   - 群組：先遞迴清理子節點，若清理後子節點為空，則隱藏整個群組
  */
 function toMenuModel(items: MenuTreeResponse[]): MenuModel[] {
-  return items.map((item) => {
-    const model: MenuModel = {
+  const result: MenuModel[] = []
+  for (const item of items) {
+    const isLeaf = !item.children || item.children.length === 0
+    if (isLeaf && item.is_permission_only) continue
+
+    const children = item.children && item.children.length > 0
+      ? toMenuModel(item.children)
+      : undefined
+
+    if (!isLeaf && (!children || children.length === 0)) continue
+
+    result.push({
       index: item.endpoint ?? `/menu-${item.id}`,
       title: item.name!,
       icon: item.icon ?? undefined,
-    }
-
-    if (item.children && item.children.length > 0) {
-      model.children = toMenuModel(item.children)
-    }
-
-    return model
-  })
+      children,
+    })
+  }
+  return result
 }
 
 /**
