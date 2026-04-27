@@ -43,6 +43,19 @@ public class AdminShopMenuResponse
   public List<AdminShopMenuCategoryResponse> Categories { get; set; } = [];
   public List<AdminShopMenuSugarOverrideResponse> SugarOverrides { get; set; } = [];
   public List<AdminShopMenuToppingOverrideResponse> ToppingOverrides { get; set; } = [];
+
+  // 店家啟用的選項池（取代原本的全域 pool）
+  public List<AdminShopMenuOptionItem> EnabledSugars { get; set; } = [];
+  public List<AdminShopMenuOptionItem> EnabledIces { get; set; } = [];
+  public List<AdminShopMenuOptionItem> EnabledToppings { get; set; } = [];
+  public List<AdminShopMenuOptionItem> EnabledSizes { get; set; } = [];
+}
+
+public class AdminShopMenuOptionItem
+{
+  public int Id { get; set; }
+  public string Name { get; set; } = null!;
+  public int Sort { get; set; }
 }
 
 public class AdminShopMenuCategoryResponse
@@ -79,7 +92,6 @@ public class AdminShopMenuSugarOverrideResponse
   public int SugarId { get; set; }
   public string SugarName { get; set; } = null!;
   public decimal? Price { get; set; }
-  public int? Sort { get; set; }
 }
 
 public class AdminShopMenuToppingOverrideResponse
@@ -87,7 +99,6 @@ public class AdminShopMenuToppingOverrideResponse
   public int ToppingId { get; set; }
   public string ToppingName { get; set; } = null!;
   public decimal? Price { get; set; }
-  public int? Sort { get; set; }
 }
 
 // --- Shop Override ---
@@ -104,8 +115,6 @@ public class ShopSugarOverrideDetailResponse
   public string SugarName { get; set; } = null!;
   public decimal DefaultPrice { get; set; }
   public decimal? OverridePrice { get; set; }
-  public int DefaultSort { get; set; }
-  public int? OverrideSort { get; set; }
 }
 
 public class ShopToppingOverrideDetailResponse
@@ -114,6 +123,4 @@ public class ShopToppingOverrideDetailResponse
   public string ToppingName { get; set; } = null!;
   public decimal DefaultPrice { get; set; }
   public decimal? OverridePrice { get; set; }
-  public int DefaultSort { get; set; }
-  public int? OverrideSort { get; set; }
 }

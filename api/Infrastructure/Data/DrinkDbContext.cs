@@ -218,6 +218,70 @@ public class DrinkDbContext : DbContext
         .OnDelete(DeleteBehavior.Restrict);
     });
 
+    // ShopEnabledSugar → Shop + Sugar
+    modelBuilder.Entity<ShopEnabledSugar>(entity =>
+    {
+      entity.HasIndex(e => new { e.ShopId, e.SugarId }).IsUnique();
+
+      entity.HasOne(e => e.Shop)
+        .WithMany(s => s.EnabledSugars)
+        .HasForeignKey(e => e.ShopId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.Sugar)
+        .WithMany()
+        .HasForeignKey(e => e.SugarId)
+        .OnDelete(DeleteBehavior.Restrict);
+    });
+
+    // ShopEnabledIce → Shop + Ice
+    modelBuilder.Entity<ShopEnabledIce>(entity =>
+    {
+      entity.HasIndex(e => new { e.ShopId, e.IceId }).IsUnique();
+
+      entity.HasOne(e => e.Shop)
+        .WithMany(s => s.EnabledIces)
+        .HasForeignKey(e => e.ShopId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.Ice)
+        .WithMany()
+        .HasForeignKey(e => e.IceId)
+        .OnDelete(DeleteBehavior.Restrict);
+    });
+
+    // ShopEnabledTopping → Shop + Topping
+    modelBuilder.Entity<ShopEnabledTopping>(entity =>
+    {
+      entity.HasIndex(e => new { e.ShopId, e.ToppingId }).IsUnique();
+
+      entity.HasOne(e => e.Shop)
+        .WithMany(s => s.EnabledToppings)
+        .HasForeignKey(e => e.ShopId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.Topping)
+        .WithMany()
+        .HasForeignKey(e => e.ToppingId)
+        .OnDelete(DeleteBehavior.Restrict);
+    });
+
+    // ShopEnabledSize → Shop + Size
+    modelBuilder.Entity<ShopEnabledSize>(entity =>
+    {
+      entity.HasIndex(e => new { e.ShopId, e.SizeId }).IsUnique();
+
+      entity.HasOne(e => e.Shop)
+        .WithMany(s => s.EnabledSizes)
+        .HasForeignKey(e => e.ShopId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.Size)
+        .WithMany()
+        .HasForeignKey(e => e.SizeId)
+        .OnDelete(DeleteBehavior.Restrict);
+    });
+
     // ShopImage → Shop + DrinkItem
     modelBuilder.Entity<ShopImage>(entity =>
     {

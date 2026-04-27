@@ -26,6 +26,12 @@ public class AdminShopService : BaseService
   private readonly IGenericRepository<DrinkItem> _drinkItemRepo;
   private readonly IGenericRepository<Sugar> _sugarRepo;
   private readonly IGenericRepository<Topping> _toppingRepo;
+  private readonly IGenericRepository<Ice> _iceRepo;
+  private readonly IGenericRepository<Size> _sizeRepo;
+  private readonly IGenericRepository<ShopEnabledSugar> _enabledSugarRepo;
+  private readonly IGenericRepository<ShopEnabledIce> _enabledIceRepo;
+  private readonly IGenericRepository<ShopEnabledTopping> _enabledToppingRepo;
+  private readonly IGenericRepository<ShopEnabledSize> _enabledSizeRepo;
   private readonly AdminShopImageService _imageService;
 
   public AdminShopService(
@@ -42,6 +48,12 @@ public class AdminShopService : BaseService
     IGenericRepository<DrinkItem> drinkItemRepo,
     IGenericRepository<Sugar> sugarRepo,
     IGenericRepository<Topping> toppingRepo,
+    IGenericRepository<Ice> iceRepo,
+    IGenericRepository<Size> sizeRepo,
+    IGenericRepository<ShopEnabledSugar> enabledSugarRepo,
+    IGenericRepository<ShopEnabledIce> enabledIceRepo,
+    IGenericRepository<ShopEnabledTopping> enabledToppingRepo,
+    IGenericRepository<ShopEnabledSize> enabledSizeRepo,
     AdminShopImageService imageService) : base(currentUser)
   {
     _shopRepo = shopRepo;
@@ -56,6 +68,12 @@ public class AdminShopService : BaseService
     _drinkItemRepo = drinkItemRepo;
     _sugarRepo = sugarRepo;
     _toppingRepo = toppingRepo;
+    _iceRepo = iceRepo;
+    _sizeRepo = sizeRepo;
+    _enabledSugarRepo = enabledSugarRepo;
+    _enabledIceRepo = enabledIceRepo;
+    _enabledToppingRepo = enabledToppingRepo;
+    _enabledSizeRepo = enabledSizeRepo;
     _imageService = imageService;
   }
 
@@ -277,6 +295,23 @@ public class AdminShopService : BaseService
       predicate: x => x.ShopId == shopId,
       include: q => q.Include(o => o.Topping));
 
+    var enabledSugars = await _enabledSugarRepo.GetList(
+      predicate: x => x.ShopId == shopId,
+      include: q => q.Include(e => e.Sugar),
+      order: q => q.OrderBy(e => e.Sort).ThenBy(e => e.Id));
+    var enabledIces = await _enabledIceRepo.GetList(
+      predicate: x => x.ShopId == shopId,
+      include: q => q.Include(e => e.Ice),
+      order: q => q.OrderBy(e => e.Sort).ThenBy(e => e.Id));
+    var enabledToppings = await _enabledToppingRepo.GetList(
+      predicate: x => x.ShopId == shopId,
+      include: q => q.Include(e => e.Topping),
+      order: q => q.OrderBy(e => e.Sort).ThenBy(e => e.Id));
+    var enabledSizes = await _enabledSizeRepo.GetList(
+      predicate: x => x.ShopId == shopId,
+      include: q => q.Include(e => e.Size),
+      order: q => q.OrderBy(e => e.Sort).ThenBy(e => e.Id));
+
     var response = new AdminShopMenuResponse
     {
       Categories = categories.Select(c => new AdminShopMenuCategoryResponse
@@ -307,16 +342,22 @@ public class AdminShopService : BaseService
       {
         SugarId = o.SugarId,
         SugarName = o.Sugar.Name,
-        Price = o.Price,
-        Sort = o.Sort
+        Price = o.Price
       }).ToList(),
       ToppingOverrides = toppingOverrides.Select(o => new AdminShopMenuToppingOverrideResponse
       {
         ToppingId = o.ToppingId,
         ToppingName = o.Topping.Name,
-        Price = o.Price,
-        Sort = o.Sort
-      }).ToList()
+        Price = o.Price
+      }).ToList(),
+      EnabledSugars = enabledSugars.Select(e => new AdminShopMenuOptionItem
+      { Id = e.SugarId, Name = e.Sugar.Name, Sort = e.Sort }).ToList(),
+      EnabledIces = enabledIces.Select(e => new AdminShopMenuOptionItem
+      { Id = e.IceId, Name = e.Ice.Name, Sort = e.Sort }).ToList(),
+      EnabledToppings = enabledToppings.Select(e => new AdminShopMenuOptionItem
+      { Id = e.ToppingId, Name = e.Topping.Name, Sort = e.Sort }).ToList(),
+      EnabledSizes = enabledSizes.Select(e => new AdminShopMenuOptionItem
+      { Id = e.SizeId, Name = e.Size.Name, Sort = e.Sort }).ToList()
     };
 
     return Success(response);
@@ -419,6 +460,12 @@ public class AdminShopService : BaseService
     if (!await _categoryRepo.Any(x => x.Id == categoryId && x.ShopId == shopId))
       return Fail<int>(ErrorCodes.CategoryNotFound, "分類不存在");
 
+    var enabledErrors = await ValidateMenuItemOptionsEnabled(
+      shopId, request.SugarIds, request.IceIds, request.ToppingIds,
+      request.Sizes.Select(s => s.SizeId).ToList());
+    if (enabledErrors is not null)
+      return Fail<int>(ErrorCodes.OptionNotEnabledForShop, "選項未在此店家啟用", enabledErrors);
+
     // Resolve DrinkItem
     int drinkItemId;
     if (request.DrinkItemId.HasValue)
@@ -474,6 +521,12 @@ public class AdminShopService : BaseService
 
     if (entity is null)
       return Fail(ErrorCodes.MenuItemNotFound, "品項不存在");
+
+    var enabledErrors = await ValidateMenuItemOptionsEnabled(
+      shopId, request.SugarIds, request.IceIds, request.ToppingIds,
+      request.Sizes.Select(s => s.SizeId).ToList());
+    if (enabledErrors is not null)
+      return Fail(ErrorCodes.OptionNotEnabledForShop, "選項未在此店家啟用", enabledErrors);
 
     // Resolve DrinkItem
     if (request.DrinkItemId.HasValue)
@@ -584,18 +637,14 @@ public class AdminShopService : BaseService
         SugarId = s.Id,
         SugarName = s.Name,
         DefaultPrice = s.DefaultPrice,
-        DefaultSort = s.Sort,
-        OverridePrice = sugarOverrideMap.TryGetValue(s.Id, out var so) ? so.Price : null,
-        OverrideSort = sugarOverrideMap.TryGetValue(s.Id, out var so2) ? so2.Sort : null
+        OverridePrice = sugarOverrideMap.TryGetValue(s.Id, out var so) ? so.Price : null
       }).ToList(),
       ToppingOverrides = allToppings.Select(t => new ShopToppingOverrideDetailResponse
       {
         ToppingId = t.Id,
         ToppingName = t.Name,
         DefaultPrice = t.DefaultPrice,
-        DefaultSort = t.Sort,
-        OverridePrice = toppingOverrideMap.TryGetValue(t.Id, out var to) ? to.Price : null,
-        OverrideSort = toppingOverrideMap.TryGetValue(t.Id, out var to2) ? to2.Sort : null
+        OverridePrice = toppingOverrideMap.TryGetValue(t.Id, out var to) ? to.Price : null
       }).ToList()
     };
 
@@ -618,8 +667,7 @@ public class AdminShopService : BaseService
       {
         ShopId = shopId,
         SugarId = o.SugarId,
-        Price = o.Price,
-        Sort = o.Sort
+        Price = o.Price
       });
       await _sugarOverrideRepo.InsertRange(sugarEntities);
     }
@@ -631,8 +679,7 @@ public class AdminShopService : BaseService
       {
         ShopId = shopId,
         ToppingId = o.ToppingId,
-        Price = o.Price,
-        Sort = o.Sort
+        Price = o.Price
       });
       await _toppingOverrideRepo.InsertRange(toppingEntities);
     }
@@ -681,6 +728,51 @@ public class AdminShopService : BaseService
         ToppingId = id
       }));
     }
+  }
+
+  private async Task<Dictionary<string, string[]>?> ValidateMenuItemOptionsEnabled(
+    int shopId, List<int> sugarIds, List<int> iceIds, List<int> toppingIds, List<int> sizeIds)
+  {
+    var errors = new Dictionary<string, string[]>();
+
+    if (sugarIds.Count > 0)
+    {
+      var enabled = await _enabledSugarRepo.Query
+        .Where(x => x.ShopId == shopId && sugarIds.Contains(x.SugarId))
+        .Select(x => x.SugarId).ToListAsync();
+      var missing = sugarIds.Except(enabled).ToList();
+      if (missing.Count > 0)
+        errors["sugar_ids"] = [$"以下糖度未在此店家啟用：{string.Join(",", missing)}"];
+    }
+    if (iceIds.Count > 0)
+    {
+      var enabled = await _enabledIceRepo.Query
+        .Where(x => x.ShopId == shopId && iceIds.Contains(x.IceId))
+        .Select(x => x.IceId).ToListAsync();
+      var missing = iceIds.Except(enabled).ToList();
+      if (missing.Count > 0)
+        errors["ice_ids"] = [$"以下冰塊未在此店家啟用：{string.Join(",", missing)}"];
+    }
+    if (toppingIds.Count > 0)
+    {
+      var enabled = await _enabledToppingRepo.Query
+        .Where(x => x.ShopId == shopId && toppingIds.Contains(x.ToppingId))
+        .Select(x => x.ToppingId).ToListAsync();
+      var missing = toppingIds.Except(enabled).ToList();
+      if (missing.Count > 0)
+        errors["topping_ids"] = [$"以下加料未在此店家啟用：{string.Join(",", missing)}"];
+    }
+    if (sizeIds.Count > 0)
+    {
+      var enabled = await _enabledSizeRepo.Query
+        .Where(x => x.ShopId == shopId && sizeIds.Contains(x.SizeId))
+        .Select(x => x.SizeId).ToListAsync();
+      var missing = sizeIds.Except(enabled).ToList();
+      if (missing.Count > 0)
+        errors["sizes"] = [$"以下尺寸未在此店家啟用：{string.Join(",", missing)}"];
+    }
+
+    return errors.Count > 0 ? errors : null;
   }
 
   private static IQueryable<Shop> BuildShopOrder(IQueryable<Shop> query, string? sortBy, string? sortOrder)

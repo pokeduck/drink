@@ -40,4 +40,8 @@ public class Shop : BaseDataEntity, ICreateEntity, IUpdateEntity, ISoftDeleteEnt
   public ICollection<ShopCategory> Categories { get; set; } = [];
   public ICollection<ShopSugarOverride> SugarOverrides { get; set; } = [];
   public ICollection<ShopToppingOverride> ToppingOverrides { get; set; } = [];
+  public ICollection<ShopEnabledSugar> EnabledSugars { get; set; } = [];
+  public ICollection<ShopEnabledIce> EnabledIces { get; set; } = [];
+  public ICollection<ShopEnabledTopping> EnabledToppings { get; set; } = [];
+  public ICollection<ShopEnabledSize> EnabledSizes { get; set; } = [];
 }

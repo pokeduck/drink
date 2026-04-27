@@ -14,10 +14,12 @@ namespace Drink.Admin.API.Controllers;
 public class ShopsController : BaseController
 {
   private readonly AdminShopService _service;
+  private readonly AdminShopOptionService _optionService;
 
-  public ShopsController(AdminShopService service)
+  public ShopsController(AdminShopService service, AdminShopOptionService optionService)
   {
     _service = service;
+    _optionService = optionService;
   }
 
   // ==================== Shop CRUD ====================
@@ -279,5 +281,51 @@ public class ShopsController : BaseController
     if (result.Code != 0)
       return ApiError((result.Code, result.Error!), result.Message!, 404);
     return ApiOk();
+  }
+
+  // ==================== Options (Enable filter) ====================
+
+  [HttpGet("{shopId}/options")]
+  [RequireRole(MenuConstants.ShopOptions, CrudAction.Read)]
+  [ProducesResponseType(typeof(ApiResponse<ShopOptionsResponse>), 200)]
+  [ProducesResponseType(typeof(ApiResponse), 404)]
+  public async Task<IActionResult> GetOptions(int shopId)
+  {
+    var result = await _optionService.GetOptions(shopId);
+    if (result.Code != 0)
+      return ApiError((result.Code, result.Error!), result.Message!, 404);
+    return ApiOk(result.Data);
+  }
+
+  [HttpPost("{shopId}/options/preview")]
+  [RequireRole(MenuConstants.ShopOptions, CrudAction.Update)]
+  [ProducesResponseType(typeof(ApiResponse<ShopOptionsPreviewResponse>), 200)]
+  [ProducesResponseType(typeof(ApiResponse), 400)]
+  [ProducesResponseType(typeof(ApiResponse), 404)]
+  public async Task<IActionResult> PreviewOptions(int shopId, [FromBody] UpdateShopOptionsRequest request)
+  {
+    var result = await _optionService.Preview(shopId, request);
+    if (result.Code != 0)
+    {
+      var httpStatus = result.Error == "SHOP_NOT_FOUND" ? 404 : 400;
+      return ApiError((result.Code, result.Error!), result.Message!, httpStatus, result.Errors);
+    }
+    return ApiOk(result.Data);
+  }
+
+  [HttpPut("{shopId}/options")]
+  [RequireRole(MenuConstants.ShopOptions, CrudAction.Update)]
+  [ProducesResponseType(typeof(ApiResponse<UpdateShopOptionsResponse>), 200)]
+  [ProducesResponseType(typeof(ApiResponse), 400)]
+  [ProducesResponseType(typeof(ApiResponse), 404)]
+  public async Task<IActionResult> UpdateOptions(int shopId, [FromBody] UpdateShopOptionsRequest request)
+  {
+    var result = await _optionService.Update(shopId, request);
+    if (result.Code != 0)
+    {
+      var httpStatus = result.Error == "SHOP_NOT_FOUND" ? 404 : 400;
+      return ApiError((result.Code, result.Error!), result.Message!, httpStatus, result.Errors);
+    }
+    return ApiOk(result.Data);
   }
 }

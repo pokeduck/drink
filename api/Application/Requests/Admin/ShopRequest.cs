@@ -185,8 +185,6 @@ public class ShopSugarOverrideItem
 
   [Range(0, double.MaxValue)]
   public decimal? Price { get; set; }
-
-  public int? Sort { get; set; }
 }
 
 public class ShopToppingOverrideItem
@@ -196,6 +194,4 @@ public class ShopToppingOverrideItem
 
   [Range(0, double.MaxValue)]
   public decimal? Price { get; set; }
-
-  public int? Sort { get; set; }
 }

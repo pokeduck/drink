@@ -56,6 +56,7 @@ public static class ErrorCodes
   public static readonly (int Code, string Error) ShopImageNotFound = (40607, "SHOP_IMAGE_NOT_FOUND");
   public static readonly (int Code, string Error) ImageLimitReached = (40608, "IMAGE_LIMIT_REACHED");
   public static readonly (int Code, string Error) ImageInvalidDrinkItem = (40609, "IMAGE_INVALID_DRINK_ITEM");
+  public static readonly (int Code, string Error) OptionNotEnabledForShop = (40610, "OPTION_NOT_ENABLED_FOR_SHOP");
 
   // Drink Option (4-07-XX)
   public static readonly (int Code, string Error) DrinkItemAlreadyExists = (40701, "DRINK_ITEM_ALREADY_EXISTS");

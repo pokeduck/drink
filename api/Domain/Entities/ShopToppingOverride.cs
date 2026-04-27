@@ -11,7 +11,6 @@ public class ShopToppingOverride : BaseDataEntity, ICreateEntity, IUpdateEntity
   public Topping Topping { get; set; } = null!;
 
   public decimal? Price { get; set; }
-  public int? Sort { get; set; }
 
   public DateTime CreatedAt { get; set; }
   public int Creator { get; set; }
