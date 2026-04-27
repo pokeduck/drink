@@ -19,6 +19,8 @@ public class AdminMenu : BaseDataEntity, ICreateEntity, IUpdateEntity
 
   public int Sort { get; set; }
 
+  public bool IsPermissionOnly { get; set; }
+
   public DateTime CreatedAt { get; set; }
   public int Creator { get; set; }
   public DateTime UpdatedAt { get; set; }

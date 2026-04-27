@@ -33,9 +33,10 @@ public class AdminMenuSeeder : ISeeder
       new() { Id = 8,  ParentId = 7,    Name = "訂單列表", Icon = "DocumentCopy", Endpoint = "/order/list", Sort = 1, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
 
       // 店家管理
-      new() { Id = 9,  ParentId = null, Name = "店家管理", Icon = "Shop",    Endpoint = null,             Sort = 4, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
-      new() { Id = 10, ParentId = 9,    Name = "店家列表", Icon = "House",   Endpoint = "/shop/list",     Sort = 1, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
-      new() { Id = 17, ParentId = 9,    Name = "覆寫設定", Icon = "Setting", Endpoint = "/shop/override", Sort = 2, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
+      new() { Id = 9,  ParentId = null, Name = "店家管理", Icon = "Shop",    Endpoint = null,                       Sort = 4, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
+      new() { Id = 10, ParentId = 9,    Name = "店家列表", Icon = "House",   Endpoint = "/shop/list",               Sort = 1, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
+      new() { Id = 17, ParentId = 9,    Name = "覆寫設定", Icon = "Setting", Endpoint = "/shop/[id]/overrides",     Sort = 2, IsPermissionOnly = true, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
+      new() { Id = 23, ParentId = 9,    Name = "選項管理", Icon = "Filter",  Endpoint = "/shop/[id]/options",       Sort = 3, IsPermissionOnly = true, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },
 
       // 飲料選項
       new() { Id = 11, ParentId = null, Name = "飲料選項", Icon = "ColdDrink", Endpoint = null,                    Sort = 5, CreatedAt = now, Creator = 0, UpdatedAt = now, Updater = 0 },

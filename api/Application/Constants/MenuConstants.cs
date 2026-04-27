@@ -30,6 +30,9 @@ public static class MenuConstants
   // 店家覆寫設定
   public const int ShopOverride = 17;
 
+  // 店家選項管理
+  public const int ShopOptions = 23;
+
   // 通知管理
   public const int NotificationList = 19;
   public const int NotificationByGroup = 20;

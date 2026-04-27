@@ -17,7 +17,7 @@ public class AdminMenuRoleSeeder : ISeeder
 
     // Admin Role 對所有葉節點 Menu 全開 CRUD
     var leafMenuIds = await context.Set<AdminMenu>()
-        .Where(m => m.Endpoint != null)
+        .Where(m => m.Endpoint != null || m.IsPermissionOnly)
         .Select(m => m.Id)
         .ToListAsync();
 
