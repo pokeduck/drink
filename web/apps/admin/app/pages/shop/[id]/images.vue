@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { ArrowLeft, Plus, Upload as UploadIcon } from '@element-plus/icons-vue'
+import { Plus, Upload as UploadIcon } from '@element-plus/icons-vue'
 import { useAdminApi } from '~/composable/useAdminApi'
 import { useApiFeedback } from '~/composable/useApiFeedback'
 import { useLoading } from '~/composable/useLoading'
@@ -10,7 +10,6 @@ import ShopImagePoolGrid from '~/components/ShopImagePoolGrid.vue'
 import ShopImageDrawer from '~/components/ShopImageDrawer.vue'
 
 const route = useRoute()
-const router = useRouter()
 const shopId = computed(() => Number(route.params.id))
 
 const api = useAdminApi()
@@ -256,22 +255,9 @@ async function clearOrphans() {
 </script>
 
 <template>
-  <div>
-    <AppBreadcrumb />
-
-    <el-card shadow="never" v-loading="loading">
-      <template #header>
-        <div style="display: flex; justify-content: space-between; align-items: center">
-          <div style="display: flex; align-items: center; gap: 8px">
-            <el-button text @click="router.push('/shop/list')">
-              <el-icon><ArrowLeft /></el-icon>返回
-            </el-button>
-            <span>店家圖庫: {{ shopName }}</span>
-          </div>
-          <el-button size="small" @click="router.push(`/shop/${shopId}/edit`)">編輯店家</el-button>
-        </div>
-      </template>
-
+  <div v-loading="loading">
+    <h3 style="margin: 0 0 16px 0; font-weight: 600">圖片管理</h3>
+    <div>
       <!-- 篩選列 -->
       <div class="toolbar">
         <div class="toolbar-left">
@@ -350,7 +336,7 @@ async function clearOrphans() {
       <div v-else class="empty">目前沒有圖片</div>
 
       <AppPagination v-model:page="page" v-model:page-size="pageSize" :total="total" @change="fetchList" />
-    </el-card>
+    </div>
 
     <ShopImageDrawer
       v-model="drawerVisible"

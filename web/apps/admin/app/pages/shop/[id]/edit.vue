@@ -14,10 +14,6 @@ import type { components } from '@app/api-types/admin'
 type MenuCategory = components['schemas']['AdminShopMenuCategoryResponse']
 type MenuItem = components['schemas']['AdminShopMenuItemResponse']
 type DrinkItem = components['schemas']['DrinkItemListResponse']
-type SugarItem = components['schemas']['SugarListResponse']
-type IceItem = components['schemas']['IceListResponse']
-type ToppingItem = components['schemas']['ToppingListResponse']
-type SizeItem = components['schemas']['SizeListResponse']
 
 const api = useAdminApi()
 const router = useRouter()
@@ -182,7 +178,9 @@ const fetchMenu = async () => {
       handleError(error, '載入菜單失敗')
       return
     }
-    categories.value = res?.data?.categories ?? []
+    const menu = res?.data
+    categories.value = menu?.categories ?? []
+    if (menu) applyEnabledPoolsFromMenu(menu)
     // 預設展開所有分類
     expandedCategories.value = new Set(categories.value.map(c => c.id!))
   } finally {
@@ -305,26 +303,24 @@ const handleItemDragEnd = async (cat: MenuCategory) => {
 
 // ==================== 品項編輯 Dialog ====================
 
-// 全域選項資料
+// DrinkItem 仍從全域取得；糖/冰/加料/尺寸的可選池改為「本店家啟用清單」
 const allDrinkItems = ref<DrinkItem[]>([])
-const allSugars = ref<SugarItem[]>([])
-const allIces = ref<IceItem[]>([])
-const allToppings = ref<ToppingItem[]>([])
-const allSizes = ref<SizeItem[]>([])
+const allSugars = ref<{ id: number; name: string }[]>([])
+const allIces = ref<{ id: number; name: string }[]>([])
+const allToppings = ref<{ id: number; name: string }[]>([])
+const allSizes = ref<{ id: number; name: string }[]>([])
 
 const fetchOptions = async () => {
-  const [drinkRes, sugarRes, iceRes, toppingRes, sizeRes] = await Promise.all([
-    api.GET('/api/admin/drink-items', { params: { query: { page: 1, page_size: 999 } } }),
-    api.GET('/api/admin/sugars', { params: { query: { page: 1, page_size: 999 } } }),
-    api.GET('/api/admin/ices', { params: { query: { page: 1, page_size: 999 } } }),
-    api.GET('/api/admin/toppings', { params: { query: { page: 1, page_size: 999 } } }),
-    api.GET('/api/admin/sizes', { params: { query: { page: 1, page_size: 999 } } }),
-  ])
+  const drinkRes = await api.GET('/api/admin/drink-items', { params: { query: { page: 1, page_size: 999 } } })
   allDrinkItems.value = drinkRes.data?.data?.items ?? []
-  allSugars.value = sugarRes.data?.data?.items ?? []
-  allIces.value = iceRes.data?.data?.items ?? []
-  allToppings.value = toppingRes.data?.data?.items ?? []
-  allSizes.value = sizeRes.data?.data?.items ?? []
+}
+
+// 從 GET menu 回傳的店家啟用清單填充選項池
+function applyEnabledPoolsFromMenu(menu: components['schemas']['AdminShopMenuResponse']) {
+  allSugars.value = (menu.enabled_sugars ?? []).map(s => ({ id: s.id!, name: s.name! }))
+  allIces.value = (menu.enabled_ices ?? []).map(s => ({ id: s.id!, name: s.name! }))
+  allToppings.value = (menu.enabled_toppings ?? []).map(s => ({ id: s.id!, name: s.name! }))
+  allSizes.value = (menu.enabled_sizes ?? []).map(s => ({ id: s.id!, name: s.name! }))
 }
 
 // Dialog 狀態
@@ -383,15 +379,19 @@ const openItemDialog = (categoryId: number, item?: MenuItem) => {
     itemForm.description = item.description ?? ''
     itemForm.sort = item.sort ?? 0
     itemForm.max_topping_count = item.max_topping_count ?? 5
+    // 只保留目前店家啟用的選項；舊資料殘留的停用 id 會被過濾掉
+    const enabledSugarSet = new Set(allSugars.value.map(s => s.id))
+    const enabledIceSet = new Set(allIces.value.map(s => s.id))
+    const enabledToppingSet = new Set(allToppings.value.map(s => s.id))
     itemForm.sizes = allSizes.value.map(s => ({
-      size_id: s.id!,
-      size_name: s.name!,
+      size_id: s.id,
+      size_name: s.name,
       enabled: item.sizes?.some(is => is.size_id === s.id) ?? false,
       price: item.sizes?.find(is => is.size_id === s.id)?.price ?? 0,
     }))
-    itemForm.sugar_ids = [...(item.sugar_ids ?? [])]
-    itemForm.ice_ids = [...(item.ice_ids ?? [])]
-    itemForm.topping_ids = [...(item.topping_ids ?? [])]
+    itemForm.sugar_ids = (item.sugar_ids ?? []).filter(id => enabledSugarSet.has(id))
+    itemForm.ice_ids = (item.ice_ids ?? []).filter(id => enabledIceSet.has(id))
+    itemForm.topping_ids = (item.topping_ids ?? []).filter(id => enabledToppingSet.has(id))
   } else {
     itemForm.drink_item_id = null
     itemForm.drink_item_name = ''
@@ -497,24 +497,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-    <AppBreadcrumb />
-
-    <!-- 店家基本資訊 -->
-    <el-card v-loading="fetchLoading" shadow="never">
-      <template #header>
-        <div style="display: flex; justify-content: space-between; align-items: center">
-          <div style="display: flex; align-items: center; gap: 8px">
-            <el-button text @click="router.push('/shop/list')"><el-icon><ArrowLeft /></el-icon>返回</el-button>
-            <span>店家基本資訊</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px">
-            <el-button size="small" @click="router.push(`/shop/${shopId}/images`)">圖庫管理</el-button>
-            <AppTimestamp v-if="createdAt" :created-at="createdAt" :updated-at="updatedAt" />
-          </div>
-        </div>
-      </template>
-
+  <div v-loading="fetchLoading">
+    <!-- 店家基本資訊（hub layout 已提供 breadcrumb / 返回 / AppTimestamp） -->
+    <div>
+      <h3 style="margin: 0 0 16px 0; font-weight: 600">店家基本資訊</h3>
       <el-form ref="formRef" :model="form" :rules="rules" :label-position="labelPosition" label-width="120px" size="large">
         <el-row :gutter="24">
           <el-col :span="24">
@@ -604,15 +590,11 @@ onMounted(async () => {
           <el-button type="primary" @click="handleSubmitShop">儲存店家資訊</el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
 
     <!-- 菜單管理 -->
-    <el-card v-loading="menuLoading" shadow="never" style="margin-top: 16px">
-      <template #header>
-        <div style="display: flex; justify-content: space-between; align-items: center">
-          <span>菜單管理</span>
-        </div>
-      </template>
+    <div v-loading="menuLoading" style="margin-top: 24px; border-top: 1px solid var(--el-border-color-lighter); padding-top: 16px">
+      <h3 style="margin: 0 0 16px 0; font-weight: 600">菜單管理</h3>
 
       <!-- 新增分類 -->
       <div v-if="can(MENU.ShopList, 'create')" style="display: flex; gap: 8px; margin-bottom: 16px">
@@ -743,7 +725,7 @@ onMounted(async () => {
           </div>
         </template>
       </draggable>
-    </el-card>
+    </div>
 
     <!-- 品項編輯 Dialog -->
     <el-dialog
