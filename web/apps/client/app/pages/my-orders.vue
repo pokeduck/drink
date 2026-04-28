@@ -78,19 +78,3 @@ const userOrders = computed(() =>
     </EmptyState>
   </div>
 </template>
-
-<style scoped>
-@keyframes slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-.animate-slide-in {
-  animation: slide-in 0.2s ease both;
-}
-</style>

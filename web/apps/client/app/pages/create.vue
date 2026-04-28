@@ -37,12 +37,10 @@ function handleCreate() {
     <div class="space-y-12">
       <!-- Step 1: Shop Selection -->
       <section>
-        <label class="text-[10px] font-black uppercase tracking-widest mb-4 block opacity-60">1. Select Shop</label>
+        <FormLabel text="1. Select Shop" />
         <div v-if="selectedStore" class="brutalist-card p-6 bg-white dark:bg-dark-surface flex items-center justify-between border-brand dark:border-brand">
           <div class="flex items-center gap-6">
-            <div class="w-16 h-16 border-2 border-black dark:border-white bg-slate-50 dark:bg-white/5 p-1">
-              <img :src="selectedStore.logo" :alt="selectedStore.name" class="w-full h-full object-cover">
-            </div>
+            <StoreLogo :src="selectedStore.logo" :alt="selectedStore.name" />
             <div>
               <h3 class="text-2xl italic leading-tight">{{ selectedStore.name }}</h3>
               <p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">Ready to take orders</p>
@@ -69,7 +67,7 @@ function handleCreate() {
 
       <!-- Step 2: Deadline -->
       <section :class="['transition-opacity duration-300', !selectedStore && 'opacity-30 pointer-events-none']">
-        <label class="text-[10px] font-black uppercase tracking-widest mb-4 block opacity-60">2. Deadline Time</label>
+        <FormLabel text="2. Deadline Time" />
         <div class="relative">
           <Calendar class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-dark dark:text-dark-text pointer-events-none" />
           <input
@@ -82,7 +80,7 @@ function handleCreate() {
 
       <!-- Step 3: Notes -->
       <section :class="['transition-opacity duration-300', !selectedStore && 'opacity-30 pointer-events-none']">
-        <label class="text-[10px] font-black uppercase tracking-widest mb-4 block opacity-60">3. Notes for Members</label>
+        <FormLabel text="3. Notes for Members" />
         <textarea
           v-model="description"
           placeholder="Let everyone know where to pick up..."
@@ -140,9 +138,7 @@ function handleCreate() {
             :style="{ animationDelay: `${index * 10}ms` }"
             @click="selectStore(store)"
           >
-            <div class="w-16 h-16 border-2 border-black dark:border-white bg-slate-50 dark:bg-white/5 p-1 shrink-0">
-              <img :src="store.logo" :alt="store.name" class="w-full h-full object-cover">
-            </div>
+            <StoreLogo :src="store.logo" :alt="store.name" />
             <div class="flex-1">
               <h3 class="text-xl italic leading-tight">{{ store.name }}</h3>
               <p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">Drinks · Dessert</p>
@@ -178,19 +174,3 @@ function handleCreate() {
     </BrutalistModal>
   </div>
 </template>
-
-<style scoped>
-@keyframes slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-.animate-slide-in {
-  animation: slide-in 0.2s ease both;
-}
-</style>
