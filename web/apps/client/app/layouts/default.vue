@@ -51,7 +51,7 @@ function isActive(path: string) {
               :key="item.path"
               :to="item.path"
               :class="[
-                'text-[11px] font-black uppercase tracking-widest transition-colors',
+                'text-sm font-black uppercase tracking-widest transition-colors',
                 isActive(item.path)
                   ? 'text-brand underline underline-offset-4 decoration-2'
                   : 'text-dark/60 dark:text-dark-text/60 hover:text-dark dark:hover:text-dark-text'
