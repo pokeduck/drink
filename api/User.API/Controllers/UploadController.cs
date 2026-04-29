@@ -26,7 +26,20 @@ public class UploadController : BaseController
   [ProducesResponseType(typeof(ApiResponse<FileUploadResponse>), 200)]
   [ProducesResponseType(typeof(ApiResponse), 400)]
   [ProducesResponseType(typeof(ApiResponse), 401)]
-  public async Task<IActionResult> Upload(IFormFile file, CancellationToken ct)
+  public Task<IActionResult> Upload(IFormFile file, CancellationToken ct)
+    => ProxyUpload(file, ct, "/api/upload/files");
+
+  /// <summary>
+  /// 上傳頭像（proxy 至 Upload.API /api/upload/avatar；max 長邊 512px）
+  /// </summary>
+  [HttpPost("avatar")]
+  [ProducesResponseType(typeof(ApiResponse<FileUploadResponse>), 200)]
+  [ProducesResponseType(typeof(ApiResponse), 400)]
+  [ProducesResponseType(typeof(ApiResponse), 401)]
+  public Task<IActionResult> UploadAvatar(IFormFile file, CancellationToken ct)
+    => ProxyUpload(file, ct, "/api/upload/avatar");
+
+  private async Task<IActionResult> ProxyUpload(IFormFile file, CancellationToken ct, string path)
   {
     using var client = _httpClientFactory.CreateClient();
     client.DefaultRequestHeaders.Add("X-Api-Key", _uploadApiSettings.ApiKey);
@@ -37,10 +50,7 @@ public class UploadController : BaseController
     fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
     content.Add(fileContent, "file", file.FileName);
 
-    var response = await client.PostAsync(
-      $"{_uploadApiSettings.BaseUrl}/api/upload/files",
-      content,
-      ct);
+    var response = await client.PostAsync($"{_uploadApiSettings.BaseUrl}{path}", content, ct);
 
     var json = await response.Content.ReadAsStringAsync(ct);
     var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };

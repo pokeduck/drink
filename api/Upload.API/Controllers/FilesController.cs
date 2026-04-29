@@ -23,7 +23,21 @@ public class FilesController : BaseController
   [ProducesResponseType(typeof(ApiResponse), 401)]
   public async Task<IActionResult> Upload(IFormFile file, CancellationToken ct)
   {
-    var result = await _uploadService.Upload(file, ct);
+    var result = await _uploadService.Upload(file, ct, FileUploadService.DefaultMaxDimension);
+    return result.Code == 0 ? Ok(result) : BadRequest(result);
+  }
+
+  /// <summary>
+  /// Upload an avatar image (internal API, requires X-Api-Key).
+  /// Same pipeline as <see cref="Upload"/> but resized to max 512px long edge.
+  /// </summary>
+  [HttpPost("/api/upload/avatar")]
+  [ProducesResponseType(typeof(ApiResponse<FileUploadResponse>), 200)]
+  [ProducesResponseType(typeof(ApiResponse), 400)]
+  [ProducesResponseType(typeof(ApiResponse), 401)]
+  public async Task<IActionResult> UploadAvatar(IFormFile file, CancellationToken ct)
+  {
+    var result = await _uploadService.Upload(file, ct, FileUploadService.AvatarMaxDimension);
     return result.Code == 0 ? Ok(result) : BadRequest(result);
   }
 }

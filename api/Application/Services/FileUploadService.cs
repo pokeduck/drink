@@ -11,7 +11,8 @@ namespace Drink.Application.Services;
 
 public class FileUploadService : BaseService
 {
-  private const int MaxDimension = 4000;
+  public const int DefaultMaxDimension = 4000;
+  public const int AvatarMaxDimension = 512;
   private const int WebpQuality = 85;
 
   private readonly IFileStorageService _storageService;
@@ -31,7 +32,7 @@ public class FileUploadService : BaseService
     _uploadSettings = uploadSettings.Value;
   }
 
-  public async Task<ApiResponse<FileUploadResponse>> Upload(IFormFile file, CancellationToken ct = default)
+  public async Task<ApiResponse<FileUploadResponse>> Upload(IFormFile file, CancellationToken ct = default, int maxDimension = DefaultMaxDimension)
   {
     if (file.Length == 0)
       return Fail<FileUploadResponse>(ErrorCodes.InvalidImage, "File is empty.");
@@ -68,7 +69,7 @@ public class FileUploadService : BaseService
     if (bitmap is null)
       return Fail<FileUploadResponse>(ErrorCodes.InvalidImage, "Failed to decode image.");
 
-    var (resized, ownsResized) = ResizeIfNeeded(bitmap);
+    var (resized, ownsResized) = ResizeIfNeeded(bitmap, maxDimension);
 
     try
     {
@@ -134,13 +135,13 @@ public class FileUploadService : BaseService
     return SKBitmap.Decode(bytes);
   }
 
-  private static (SKBitmap bitmap, bool ownsResized) ResizeIfNeeded(SKBitmap bitmap)
+  private static (SKBitmap bitmap, bool ownsResized) ResizeIfNeeded(SKBitmap bitmap, int maxDimension)
   {
     var maxSide = Math.Max(bitmap.Width, bitmap.Height);
-    if (maxSide <= MaxDimension)
+    if (maxSide <= maxDimension)
       return (bitmap, false);
 
-    var scale = (double)MaxDimension / maxSide;
+    var scale = (double)maxDimension / maxSide;
     var newWidth = (int)(bitmap.Width * scale);
     var newHeight = (int)(bitmap.Height * scale);
 
