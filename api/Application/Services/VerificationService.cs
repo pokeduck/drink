@@ -15,12 +15,15 @@ namespace Drink.Application.Services;
 public class VerificationService : BaseService
 {
   private readonly IGenericRepository<VerificationEmail> _verificationRepo;
+  private readonly IEmailSender _emailSender;
 
   public VerificationService(
     ICurrentUserContext currentUser,
-    IGenericRepository<VerificationEmail> verificationRepo) : base(currentUser)
+    IGenericRepository<VerificationEmail> verificationRepo,
+    IEmailSender emailSender) : base(currentUser)
   {
     _verificationRepo = verificationRepo;
+    _emailSender = emailSender;
   }
 
   /// <summary>
@@ -69,7 +72,7 @@ public class VerificationService : BaseService
     if (await IsResendTooFrequent(original.UserId, original.Type))
       return Fail(ErrorCodes.ResendTooFrequent, "同一用戶 10 分鐘內已重發過，請稍後再試");
 
-    await CreateAndSendVerification(original.UserId, original.Type);
+    await CreateAndSendVerification(original.User, original.Type);
 
     return Success();
   }
@@ -102,7 +105,7 @@ public class VerificationService : BaseService
         continue;
       }
 
-      await CreateAndSendVerification(original.UserId, original.Type);
+      await CreateAndSendVerification(original.User, original.Type);
       response.SuccessCount++;
     }
 
@@ -122,7 +125,7 @@ public class VerificationService : BaseService
       v.SentAt > tenMinutesAgo);
   }
 
-  private async Task CreateAndSendVerification(int userId, VerificationEmailType type)
+  public async Task CreateAndSendVerification(User user, VerificationEmailType type)
   {
     var token = GenerateToken();
     var expiresAt = type == VerificationEmailType.Register
@@ -131,18 +134,18 @@ public class VerificationService : BaseService
 
     var verification = new VerificationEmail
     {
-      UserId = userId,
+      UserId = user.Id,
       Type = type,
       Token = token,
       ExpiresAt = expiresAt,
       IsUsed = false,
-      IsSuccess = true, // TODO: 實際發送郵件後根據結果設定
+      IsSuccess = true,
       SentAt = DateTime.UtcNow
     };
 
     await _verificationRepo.Insert(verification);
 
-    // TODO: 實際發送郵件邏輯（目前僅建立紀錄）
+    await _emailSender.SendVerificationEmailAsync(user.Email, type, token);
   }
 
   private static string GenerateToken()

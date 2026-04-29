@@ -37,6 +37,9 @@ public static class ServiceCollectionExtensions
     // PasswordHasher
     services.AddScoped<IPasswordHasher, Argon2PasswordHasher>();
 
+    // EmailSender (dev: log only; replace before production)
+    services.AddScoped<IEmailSender, LogEmailSender>();
+
     return services;
   }
 
