@@ -1,15 +1,23 @@
 <script setup lang="ts">
-import { Home, PlusCircle, List, User, Moon, Sun, LogOut, Settings } from 'lucide-vue-next'
+import { Home, PlusCircle, List, User, Moon, Sun, LogOut, Settings, LogIn, UserPlus, Star } from 'lucide-vue-next'
 import { onClickOutside } from '@vueuse/core'
+import { useAuthStore } from '~/stores/auth'
 
 const route = useRoute()
 const colorMode = useColorMode()
+const authStore = useAuthStore()
 
 const isUserMenuOpen = ref(false)
 const menuRef = ref<HTMLDivElement>()
 
 onClickOutside(menuRef, () => {
   isUserMenuOpen.value = false
+})
+
+onMounted(() => {
+  if (authStore.isLoggedIn && !authStore.currentUser) {
+    authStore.fetchProfile()
+  }
 })
 
 const navItems = [
@@ -20,10 +28,12 @@ const navItems = [
 ]
 
 const dropdownItems = [
-  { label: 'Profile', path: '/profile', icon: User },
-  { label: 'My Orders', path: '/my-orders', icon: List },
-  { label: 'Settings', path: '/profile', icon: Settings }
+  { label: '偏好設定', path: '/settings', icon: Settings },
+  { label: '我的收藏', path: '/favorites', icon: Star }
 ]
+
+const avatarSeed = computed(() => authStore.currentUser?.email ?? 'guest')
+const currentUserName = computed(() => authStore.currentUser?.name ?? 'Guest')
 
 function toggleTheme() {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
@@ -31,6 +41,12 @@ function toggleTheme() {
 
 function isActive(path: string) {
   return route.path === path
+}
+
+async function handleLogout() {
+  await authStore.logout()
+  isUserMenuOpen.value = false
+  await navigateTo('/login')
 }
 </script>
 
@@ -81,7 +97,7 @@ function isActive(path: string) {
               class="w-8 md:w-10 h-8 md:h-10 border-2 border-black dark:border-white rounded-full overflow-hidden bg-brand/10 hover:shadow-brutalist-sm dark:hover:shadow-brutalist-dark-sm transition-shadow active:scale-95 block"
               @click="isUserMenuOpen = !isUserMenuOpen"
             >
-              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User" class="w-full h-full object-cover">
+              <img :src="`https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`" :alt="currentUserName" class="w-full h-full object-cover">
             </button>
 
             <Transition name="dropdown">
@@ -89,30 +105,59 @@ function isActive(path: string) {
                 v-if="isUserMenuOpen"
                 class="absolute right-0 mt-4 w-56 bg-white dark:bg-dark-surface border-4 border-black dark:border-white shadow-brutalist-lg dark:shadow-brutalist-dark-lg p-2 z-[60]"
               >
-                <div class="p-4 border-b-2 border-black dark:border-white/10 mb-2">
-                  <p class="text-[10px] font-black uppercase tracking-widest opacity-40">Signed in as</p>
-                  <p class="text-sm font-black italic truncate">Alex (Creative Dept)</p>
-                </div>
+                <template v-if="authStore.isLoggedIn">
+                  <div class="p-4 border-b-2 border-black dark:border-white/10 mb-2">
+                    <p class="text-[10px] font-black uppercase tracking-widest opacity-40">Signed in as</p>
+                    <p class="text-sm font-black italic truncate">{{ currentUserName }}</p>
+                  </div>
 
-                <div class="space-y-1">
-                  <NuxtLink
-                    v-for="item in dropdownItems"
-                    :key="item.label"
-                    :to="item.path"
-                    class="flex items-center gap-3 w-full p-3 text-xs font-black uppercase tracking-widest hover:bg-brand hover:text-white dark:hover:text-dark-bg transition-colors group"
-                    @click="isUserMenuOpen = false"
-                  >
-                    <component :is="item.icon" class="w-4 h-4 group-hover:scale-110 transition-transform" />
-                    {{ item.label }}
-                  </NuxtLink>
+                  <div class="space-y-1">
+                    <NuxtLink
+                      v-for="item in dropdownItems"
+                      :key="item.label"
+                      :to="item.path"
+                      class="flex items-center gap-3 w-full p-3 text-xs font-black uppercase tracking-widest hover:bg-brand hover:text-white dark:hover:text-dark-bg transition-colors group"
+                      @click="isUserMenuOpen = false"
+                    >
+                      <component :is="item.icon" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                      {{ item.label }}
+                    </NuxtLink>
 
-                  <button
-                    class="flex items-center gap-3 w-full p-3 text-xs font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-colors group border-t-2 border-black/5 dark:border-white/5 mt-2"
-                  >
-                    <LogOut class="w-4 h-4" />
-                    Logout
-                  </button>
-                </div>
+                    <button
+                      class="flex items-center gap-3 w-full p-3 text-xs font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-colors group border-t-2 border-black/5 dark:border-white/5 mt-2"
+                      @click="handleLogout"
+                    >
+                      <LogOut class="w-4 h-4" />
+                      Logout
+                    </button>
+                  </div>
+                </template>
+
+                <template v-else>
+                  <div class="p-4 border-b-2 border-black dark:border-white/10 mb-2">
+                    <p class="text-[10px] font-black uppercase tracking-widest opacity-40">Not signed in</p>
+                    <p class="text-sm font-black italic truncate">Guest</p>
+                  </div>
+
+                  <div class="space-y-1">
+                    <NuxtLink
+                      to="/login"
+                      class="flex items-center gap-3 w-full p-3 text-xs font-black uppercase tracking-widest hover:bg-brand hover:text-white dark:hover:text-dark-bg transition-colors group"
+                      @click="isUserMenuOpen = false"
+                    >
+                      <LogIn class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                      登入
+                    </NuxtLink>
+                    <NuxtLink
+                      to="/register"
+                      class="flex items-center gap-3 w-full p-3 text-xs font-black uppercase tracking-widest hover:bg-brand hover:text-white dark:hover:text-dark-bg transition-colors group"
+                      @click="isUserMenuOpen = false"
+                    >
+                      <UserPlus class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                      註冊
+                    </NuxtLink>
+                  </div>
+                </template>
               </div>
             </Transition>
           </div>
@@ -157,10 +202,12 @@ function isActive(path: string) {
         <span class="text-brand">Mode: {{ colorMode.value?.toUpperCase() }}</span>
       </div>
       <div class="flex gap-4">
-        <span>Current User: Alex (Creative Dept)</span>
+        <span>Current User: {{ currentUserName }}</span>
         <span>•</span>
         <span>API v2.1.0</span>
       </div>
     </footer>
+
+    <ToastContainer />
   </div>
 </template>
