@@ -7,7 +7,8 @@ const { resolve } = createResolver(import.meta.url)
 export default defineNuxtConfig({
   modules: [
     '@nuxtjs/color-mode',
-    '@nuxtjs/google-fonts'
+    '@nuxtjs/google-fonts',
+    '@pinia/nuxt'
   ],
 
   devtools: {
@@ -71,7 +72,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBase: 'http://localhost:5102/api'
+      apiBase: 'https://localhost:5102/api'
     }
   }
 })
