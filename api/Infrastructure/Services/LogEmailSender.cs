@@ -19,4 +19,12 @@ public class LogEmailSender : IEmailSender
     _logger.LogInformation("[MOCK EMAIL] to={To} type={Type} token={Token}", to, type, token);
     return Task.CompletedTask;
   }
+
+  public Task SendOrderNotificationAsync(string to, string recipientName, string groupTitle, string shopName, string? note)
+  {
+    _logger.LogInformation(
+      "[MOCK EMAIL] ORDER_NOTIFY to={To} recipient={Recipient} group={Group} shop={Shop} note={Note}",
+      to, recipientName, groupTitle, shopName, note);
+    return Task.CompletedTask;
+  }
 }

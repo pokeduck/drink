@@ -1178,6 +1178,285 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Page?: number;
+                    PageSize?: number;
+                    SortBy?: string;
+                    SortOrder?: string;
+                    Keyword?: string;
+                    Status?: components["schemas"]["GroupOrderStatus"];
+                    ShopId?: number;
+                    CreatedFrom?: string;
+                    CreatedTo?: string;
+                    DeadlineFrom?: string;
+                    DeadlineTo?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminOrderListItemResponsePaginationListApiResponse"];
+                        "application/json": components["schemas"]["AdminOrderListItemResponsePaginationListApiResponse"];
+                        "text/json": components["schemas"]["AdminOrderListItemResponsePaginationListApiResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/orders/{orderId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    orderId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminOrderDetailResponseApiResponse"];
+                        "application/json": components["schemas"]["AdminOrderDetailResponseApiResponse"];
+                        "text/json": components["schemas"]["AdminOrderDetailResponseApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/orders/{orderId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    orderId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateGroupOrderStatusRequest"];
+                    "text/json": components["schemas"]["UpdateGroupOrderStatusRequest"];
+                    "application/*+json": components["schemas"]["UpdateGroupOrderStatusRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/orders/{orderId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    orderId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/orders/{orderId}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    orderId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/orders/{orderId}/notify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    orderId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminOrderNotifyResponseApiResponse"];
+                        "application/json": components["schemas"]["AdminOrderNotifyResponseApiResponse"];
+                        "text/json": components["schemas"]["AdminOrderNotifyResponseApiResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/roles": {
         parameters: {
             query?: never;
@@ -4646,6 +4925,137 @@ export interface components {
             can_update?: boolean;
             can_delete?: boolean;
         };
+        AdminOrderDetailResponse: {
+            /** Format: int32 */
+            id?: number;
+            title?: string | null;
+            /** Format: int32 */
+            shop_id?: number;
+            shop_name?: string | null;
+            /** Format: int32 */
+            initiator_id?: number;
+            initiator_name?: string | null;
+            status?: components["schemas"]["GroupOrderStatus"];
+            /** Format: date-time */
+            deadline?: string;
+            note?: string | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+            order_items?: components["schemas"]["AdminOrderItemResponse"][] | null;
+            summary?: components["schemas"]["AdminOrderSummary"];
+        };
+        AdminOrderDetailResponseApiResponse: {
+            data?: components["schemas"]["AdminOrderDetailResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        AdminOrderItemResponse: {
+            /** Format: int32 */
+            id?: number;
+            /** Format: int32 */
+            user_id?: number;
+            user_name?: string | null;
+            recipient_name?: string | null;
+            menu_item_name?: string | null;
+            size_name?: string | null;
+            sugar_name?: string | null;
+            ice_name?: string | null;
+            toppings?: components["schemas"]["AdminOrderItemToppingResponse"][] | null;
+            /** Format: double */
+            item_price?: number;
+            /** Format: double */
+            sugar_price?: number;
+            /** Format: double */
+            topping_price?: number;
+            /** Format: double */
+            total_price?: number;
+            /** Format: int32 */
+            quantity?: number;
+            note?: string | null;
+            /** Format: date-time */
+            created_at?: string;
+        };
+        AdminOrderItemToppingResponse: {
+            topping_name?: string | null;
+            /** Format: double */
+            price?: number;
+        };
+        AdminOrderListItemResponse: {
+            /** Format: int32 */
+            id?: number;
+            title?: string | null;
+            /** Format: int32 */
+            shop_id?: number;
+            shop_name?: string | null;
+            /** Format: int32 */
+            initiator_id?: number;
+            initiator_name?: string | null;
+            status?: components["schemas"]["GroupOrderStatus"];
+            /** Format: date-time */
+            deadline?: string;
+            /** Format: int32 */
+            order_item_count?: number;
+            /** Format: double */
+            total_amount?: number;
+            /** Format: date-time */
+            created_at?: string;
+        };
+        AdminOrderListItemResponsePaginationList: {
+            items?: components["schemas"]["AdminOrderListItemResponse"][] | null;
+            /** Format: int32 */
+            total?: number;
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            page_size?: number;
+        };
+        AdminOrderListItemResponsePaginationListApiResponse: {
+            data?: components["schemas"]["AdminOrderListItemResponsePaginationList"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        AdminOrderNotifyResponse: {
+            /** Format: int32 */
+            total_recipients?: number;
+            /** Format: int32 */
+            email_sent?: number;
+            /** Format: int32 */
+            push_skipped?: number;
+            /** Format: int32 */
+            none_skipped?: number;
+            /** Format: int32 */
+            failed?: number;
+        };
+        AdminOrderNotifyResponseApiResponse: {
+            data?: components["schemas"]["AdminOrderNotifyResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        AdminOrderSummary: {
+            /** Format: int32 */
+            total_items?: number;
+            /** Format: double */
+            total_amount?: number;
+            /** Format: int32 */
+            recipient_count?: number;
+        };
         AdminRefreshTokenRequest: {
             refresh_token: string;
         };
@@ -5012,6 +5422,11 @@ export interface components {
                 [key: string]: string[];
             } | null;
         };
+        /**
+         * Format: int32
+         * @enum {integer}
+         */
+        GroupOrderStatus: 1 | 2 | 3 | 4 | 5;
         IceDetailResponse: {
             /** Format: int32 */
             id?: number;
@@ -5687,6 +6102,9 @@ export interface components {
             name: string;
             /** Format: int32 */
             sort: number;
+        };
+        UpdateGroupOrderStatusRequest: {
+            status: components["schemas"]["GroupOrderStatus"];
         };
         UpdateIceRequest: {
             name: string;

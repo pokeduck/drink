@@ -34,4 +34,6 @@ public class User : BaseDataEntity, ICreateEntity, IUpdateEntity
   public int Updater { get; set; }
 
   public ICollection<UserRefreshToken> RefreshTokens { get; set; } = [];
+  public ICollection<GroupOrder> InitiatedOrders { get; set; } = [];
+  public ICollection<OrderItem> OrderItems { get; set; } = [];
 }

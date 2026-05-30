@@ -282,6 +282,87 @@ public class DrinkDbContext : DbContext
         .OnDelete(DeleteBehavior.Restrict);
     });
 
+    // GroupOrder → Shop + User(Initiator)
+    modelBuilder.Entity<GroupOrder>(entity =>
+    {
+      entity.HasOne(e => e.Shop)
+        .WithMany()
+        .HasForeignKey(e => e.ShopId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+      entity.HasOne(e => e.Initiator)
+        .WithMany(u => u.InitiatedOrders)
+        .HasForeignKey(e => e.InitiatorId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+      entity.Property(e => e.Title).HasMaxLength(100);
+      entity.Property(e => e.Note).HasMaxLength(500);
+
+      entity.HasIndex(e => e.ShopId);
+      entity.HasIndex(e => e.InitiatorId);
+      entity.HasIndex(e => e.Status);
+      entity.HasIndex(e => e.Deadline);
+    });
+
+    // OrderItem → GroupOrder + User + ShopMenuItem + Size + Sugar + Ice
+    modelBuilder.Entity<OrderItem>(entity =>
+    {
+      entity.HasOne(e => e.GroupOrder)
+        .WithMany(g => g.OrderItems)
+        .HasForeignKey(e => e.GroupOrderId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.User)
+        .WithMany(u => u.OrderItems)
+        .HasForeignKey(e => e.UserId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+      entity.HasOne(e => e.MenuItem)
+        .WithMany()
+        .HasForeignKey(e => e.MenuItemId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+      entity.HasOne(e => e.Size)
+        .WithMany()
+        .HasForeignKey(e => e.SizeId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+      entity.HasOne(e => e.Sugar)
+        .WithMany()
+        .HasForeignKey(e => e.SugarId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+      entity.HasOne(e => e.Ice)
+        .WithMany()
+        .HasForeignKey(e => e.IceId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+      entity.Property(e => e.RecipientName).HasMaxLength(100);
+      entity.Property(e => e.Note).HasMaxLength(200);
+      entity.Property(e => e.ItemPrice).HasColumnType("decimal(10,2)");
+      entity.Property(e => e.SugarPrice).HasColumnType("decimal(10,2)");
+      entity.Property(e => e.ToppingPrice).HasColumnType("decimal(10,2)");
+      entity.Property(e => e.TotalPrice).HasColumnType("decimal(10,2)");
+
+      entity.HasIndex(e => e.GroupOrderId);
+    });
+
+    // OrderItemTopping → OrderItem + Topping
+    modelBuilder.Entity<OrderItemTopping>(entity =>
+    {
+      entity.HasOne(e => e.OrderItem)
+        .WithMany(i => i.Toppings)
+        .HasForeignKey(e => e.OrderItemId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(e => e.Topping)
+        .WithMany()
+        .HasForeignKey(e => e.ToppingId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+      entity.Property(e => e.Price).HasColumnType("decimal(10,2)");
+    });
+
     // ShopImage → Shop + DrinkItem
     modelBuilder.Entity<ShopImage>(entity =>
     {
