@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { ChevronRight } from 'lucide-vue-next'
+import { ChevronRight, LogIn } from 'lucide-vue-next'
 import type { Drink } from '~/composables/useMockData'
+import { useAuthStore } from '~/stores/auth'
 
 const route = useRoute()
+const authStore = useAuthStore()
 const { groups, stores, currentUser } = useMockData()
 
 const group = computed(() => groups.find(g => g.id === route.params.id))
 const store = computed(() => stores.find(s => s.name === group.value?.storeName))
-const isHost = computed(() => group.value?.hostId === currentUser.id)
+const isHost = computed(() => !!currentUser && group.value?.hostId === currentUser.id)
+const loginRedirectTo = computed(() => `/login?redirect=${encodeURIComponent(`/group/${route.params.id}`)}`)
 
 const selectedDrink = ref<Drink | null>(null)
 const isOrderModalOpen = computed({
@@ -48,7 +51,7 @@ const sugarOptions = ['100%', '75%', '50%', '25%', '0%']
     </div>
 
     <!-- Host Controls -->
-    <div v-if="isHost" class="mb-8 p-6 brutalist-card bg-brand/10 flex flex-col gap-4">
+    <div v-if="isHost && authStore.isLoggedIn" class="mb-8 p-6 brutalist-card bg-brand/10 flex flex-col gap-4">
       <div class="flex items-center gap-3">
         <h3 class="text-xl italic text-brand">Host Controls</h3>
       </div>
@@ -141,12 +144,21 @@ const sugarOptions = ['100%', '75%', '50%', '25%', '0%']
 
           <div class="flex gap-4">
             <button
+              v-if="authStore.isLoggedIn"
               :disabled="isOrdered"
               class="flex-1 brutalist-button brutalist-button-primary py-4 text-lg"
               @click="handlePlaceOrder"
             >
               {{ isOrdered ? 'PROCESSING...' : 'ADD TO ORDER' }}
             </button>
+            <NuxtLink
+              v-else
+              :to="loginRedirectTo"
+              class="flex-1 brutalist-button brutalist-button-primary py-4 text-lg flex items-center justify-center gap-2"
+            >
+              <LogIn class="w-5 h-5" />
+              <span>登入後下單</span>
+            </NuxtLink>
           </div>
         </div>
       </template>

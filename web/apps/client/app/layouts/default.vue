@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Home, PlusCircle, List, User, Moon, Sun, LogOut, Settings, LogIn, UserPlus, Star } from 'lucide-vue-next'
+import { Home, PlusCircle, List, User, Moon, Sun, LogOut, Settings, LogIn, Star } from 'lucide-vue-next'
 import { onClickOutside } from '@vueuse/core'
 import { useAuthStore } from '~/stores/auth'
 
@@ -105,59 +105,43 @@ async function handleLogout() {
                 v-if="isUserMenuOpen"
                 class="absolute right-0 mt-4 w-56 bg-white dark:bg-dark-surface border-4 border-black dark:border-white shadow-brutalist-lg dark:shadow-brutalist-dark-lg p-2 z-[60]"
               >
-                <template v-if="authStore.isLoggedIn">
-                  <div class="p-4 border-b-2 border-black dark:border-white/10 mb-2">
-                    <p class="text-[10px] font-black uppercase tracking-widest opacity-40">Signed in as</p>
-                    <p class="text-sm font-black italic truncate">{{ currentUserName }}</p>
-                  </div>
+                <div class="p-4 border-b-2 border-black dark:border-white/10 mb-2">
+                  <p class="text-[10px] font-black uppercase tracking-widest opacity-40">
+                    {{ authStore.isLoggedIn ? 'Signed in as' : 'Not signed in' }}
+                  </p>
+                  <p class="text-sm font-black italic truncate">{{ currentUserName }}</p>
+                </div>
 
-                  <div class="space-y-1">
-                    <NuxtLink
-                      v-for="item in dropdownItems"
-                      :key="item.label"
-                      :to="item.path"
-                      class="flex items-center gap-3 w-full p-3 text-xs font-black uppercase tracking-widest hover:bg-brand hover:text-white dark:hover:text-dark-bg transition-colors group"
-                      @click="isUserMenuOpen = false"
-                    >
-                      <component :is="item.icon" class="w-4 h-4 group-hover:scale-110 transition-transform" />
-                      {{ item.label }}
-                    </NuxtLink>
+                <div class="space-y-1">
+                  <NuxtLink
+                    v-for="item in dropdownItems"
+                    :key="item.label"
+                    :to="item.path"
+                    class="flex items-center gap-3 w-full p-3 text-xs font-black uppercase tracking-widest hover:bg-brand hover:text-white dark:hover:text-dark-bg transition-colors group"
+                    @click="isUserMenuOpen = false"
+                  >
+                    <component :is="item.icon" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    {{ item.label }}
+                  </NuxtLink>
 
-                    <button
-                      class="flex items-center gap-3 w-full p-3 text-xs font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-colors group border-t-2 border-black/5 dark:border-white/5 mt-2"
-                      @click="handleLogout"
-                    >
-                      <LogOut class="w-4 h-4" />
-                      Logout
-                    </button>
-                  </div>
-                </template>
-
-                <template v-else>
-                  <div class="p-4 border-b-2 border-black dark:border-white/10 mb-2">
-                    <p class="text-[10px] font-black uppercase tracking-widest opacity-40">Not signed in</p>
-                    <p class="text-sm font-black italic truncate">Guest</p>
-                  </div>
-
-                  <div class="space-y-1">
-                    <NuxtLink
-                      to="/login"
-                      class="flex items-center gap-3 w-full p-3 text-xs font-black uppercase tracking-widest hover:bg-brand hover:text-white dark:hover:text-dark-bg transition-colors group"
-                      @click="isUserMenuOpen = false"
-                    >
-                      <LogIn class="w-4 h-4 group-hover:scale-110 transition-transform" />
-                      登入
-                    </NuxtLink>
-                    <NuxtLink
-                      to="/register"
-                      class="flex items-center gap-3 w-full p-3 text-xs font-black uppercase tracking-widest hover:bg-brand hover:text-white dark:hover:text-dark-bg transition-colors group"
-                      @click="isUserMenuOpen = false"
-                    >
-                      <UserPlus class="w-4 h-4 group-hover:scale-110 transition-transform" />
-                      註冊
-                    </NuxtLink>
-                  </div>
-                </template>
+                  <button
+                    v-if="authStore.isLoggedIn"
+                    class="flex items-center gap-3 w-full p-3 text-xs font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-colors group border-t-2 border-black/5 dark:border-white/5 mt-2"
+                    @click="handleLogout"
+                  >
+                    <LogOut class="w-4 h-4" />
+                    Logout
+                  </button>
+                  <NuxtLink
+                    v-else
+                    to="/login"
+                    class="flex items-center gap-3 w-full p-3 text-xs font-black uppercase tracking-widest text-brand hover:bg-brand hover:text-white transition-colors group border-t-2 border-black/5 dark:border-white/5 mt-2"
+                    @click="isUserMenuOpen = false"
+                  >
+                    <LogIn class="w-4 h-4" />
+                    登入
+                  </NuxtLink>
+                </div>
               </div>
             </Transition>
           </div>

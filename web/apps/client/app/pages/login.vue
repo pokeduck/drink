@@ -6,6 +6,7 @@ definePageMeta({ layout: false })
 useHead({ title: 'Sign In · DRINK.UP' })
 
 const authStore = useAuthStore()
+const route = useRoute()
 const email = ref('')
 const password = ref('')
 const submitting = ref(false)
@@ -19,7 +20,8 @@ async function handleSubmit() {
 
   try {
     await authStore.login({ email: email.value.trim(), password: password.value })
-    await navigateTo('/')
+    const target = safeRedirect(route.query.redirect)
+    await navigateTo(target)
   } catch (err: unknown) {
     const e = err as { message?: string; errors?: Record<string, string[]> } | null
     if (e?.errors && typeof e.errors === 'object') {
