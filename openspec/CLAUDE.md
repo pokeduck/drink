@@ -33,6 +33,7 @@ openspec/
 
 - admin-feedback
 - admin-forgot-password-verification-ui
+- admin-order / admin-order-ui
 - admin-permission
 - admin-shop / admin-shop-hub / admin-shop-image / admin-shop-menu / admin-shop-options / admin-shop-override
 - api-codegen
@@ -42,12 +43,12 @@ openspec/
 - openspec-format
 - typed-api-client
 - user-auth
+- user-order
 - user-profile
 
 ## 進行中 changes（`changes/`，不含 archive）
 
-- add-admin-order
-- add-relax-guest-access
+（目前沒有進行中的 change）
 
 已歸檔變更請見 `changes/archive/`（依日期排序，例如 `2026-04-29-add-user-auth`）。
 
