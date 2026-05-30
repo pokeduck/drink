@@ -416,6 +416,476 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/user/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Page?: number;
+                    PageSize?: number;
+                    SortBy?: string;
+                    SortOrder?: string;
+                    Keyword?: string;
+                    ShopId?: number;
+                    Scope?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["UserOrderListItemResponsePaginationListApiResponse"];
+                        "application/json": components["schemas"]["UserOrderListItemResponsePaginationListApiResponse"];
+                        "text/json": components["schemas"]["UserOrderListItemResponsePaginationListApiResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateGroupOrderRequest"];
+                    "text/json": components["schemas"]["CreateGroupOrderRequest"];
+                    "application/*+json": components["schemas"]["CreateGroupOrderRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["Int32ApiResponse"];
+                        "application/json": components["schemas"]["Int32ApiResponse"];
+                        "text/json": components["schemas"]["Int32ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["UserOrderDetailResponseApiResponse"];
+                        "application/json": components["schemas"]["UserOrderDetailResponseApiResponse"];
+                        "text/json": components["schemas"]["UserOrderDetailResponseApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateGroupOrderRequest"];
+                    "text/json": components["schemas"]["UpdateGroupOrderRequest"];
+                    "application/*+json": components["schemas"]["UpdateGroupOrderRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/orders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/orders/{groupOrderId}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    groupOrderId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateOrderItemRequest"];
+                    "text/json": components["schemas"]["CreateOrderItemRequest"];
+                    "application/*+json": components["schemas"]["CreateOrderItemRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["Int32ApiResponse"];
+                        "application/json": components["schemas"]["Int32ApiResponse"];
+                        "text/json": components["schemas"]["Int32ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/orders/{groupOrderId}/items/{itemId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    groupOrderId: number;
+                    itemId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateOrderItemRequest"];
+                    "text/json": components["schemas"]["UpdateOrderItemRequest"];
+                    "application/*+json": components["schemas"]["UpdateOrderItemRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    groupOrderId: number;
+                    itemId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponse"];
+                        "application/json": components["schemas"]["ApiResponse"];
+                        "text/json": components["schemas"]["ApiResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/user/profile": {
         parameters: {
             query?: never;
@@ -729,6 +1199,29 @@ export interface components {
             old_password: string;
             new_password: string;
         };
+        CreateGroupOrderRequest: {
+            title: string;
+            /** Format: int32 */
+            shop_id: number;
+            /** Format: date-time */
+            deadline: string;
+            note?: string | null;
+        };
+        CreateOrderItemRequest: {
+            recipient_name: string;
+            /** Format: int32 */
+            menu_item_id: number;
+            /** Format: int32 */
+            size_id: number;
+            /** Format: int32 */
+            sugar_id: number;
+            /** Format: int32 */
+            ice_id: number;
+            topping_ids?: number[] | null;
+            /** Format: int32 */
+            quantity?: number;
+            note?: string | null;
+        };
         FileUploadResponse: {
             path?: string | null;
             hash?: string | null;
@@ -754,7 +1247,44 @@ export interface components {
          * Format: int32
          * @enum {integer}
          */
+        GroupOrderStatus: 1 | 2 | 3 | 4 | 5;
+        Int32ApiResponse: {
+            /** Format: int32 */
+            data?: number;
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        /**
+         * Format: int32
+         * @enum {integer}
+         */
         NotificationType: 0 | 1 | 2 | 3;
+        UpdateGroupOrderRequest: {
+            title: string;
+            /** Format: date-time */
+            deadline: string;
+            note?: string | null;
+        };
+        UpdateOrderItemRequest: {
+            recipient_name: string;
+            /** Format: int32 */
+            menu_item_id: number;
+            /** Format: int32 */
+            size_id: number;
+            /** Format: int32 */
+            sugar_id: number;
+            /** Format: int32 */
+            ice_id: number;
+            topping_ids?: number[] | null;
+            /** Format: int32 */
+            quantity?: number;
+            note?: string | null;
+        };
         UpdateUserProfileRequest: {
             name: string;
             avatar?: string | null;
@@ -781,6 +1311,113 @@ export interface components {
         };
         UserLogoutRequest: {
             refresh_token: string;
+        };
+        UserOrderDetailResponse: {
+            /** Format: int32 */
+            id?: number;
+            title?: string | null;
+            /** Format: int32 */
+            shop_id?: number;
+            shop_name?: string | null;
+            initiator_name?: string | null;
+            is_mine?: boolean;
+            status?: components["schemas"]["GroupOrderStatus"];
+            /** Format: date-time */
+            deadline?: string;
+            note?: string | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+            order_items?: components["schemas"]["UserOrderItemResponse"][] | null;
+            summary?: components["schemas"]["UserOrderSummary"];
+        };
+        UserOrderDetailResponseApiResponse: {
+            data?: components["schemas"]["UserOrderDetailResponse"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        UserOrderItemResponse: {
+            /** Format: int32 */
+            id?: number;
+            user_name?: string | null;
+            recipient_name?: string | null;
+            menu_item_name?: string | null;
+            size_name?: string | null;
+            sugar_name?: string | null;
+            ice_name?: string | null;
+            toppings?: components["schemas"]["UserOrderItemToppingResponse"][] | null;
+            /** Format: double */
+            item_price?: number;
+            /** Format: double */
+            sugar_price?: number;
+            /** Format: double */
+            topping_price?: number;
+            /** Format: double */
+            total_price?: number;
+            /** Format: int32 */
+            quantity?: number;
+            note?: string | null;
+            is_mine?: boolean;
+            /** Format: date-time */
+            created_at?: string;
+        };
+        UserOrderItemToppingResponse: {
+            topping_name?: string | null;
+            /** Format: double */
+            price?: number;
+        };
+        UserOrderListItemResponse: {
+            /** Format: int32 */
+            id?: number;
+            title?: string | null;
+            /** Format: int32 */
+            shop_id?: number;
+            shop_name?: string | null;
+            initiator_name?: string | null;
+            status?: components["schemas"]["GroupOrderStatus"];
+            /** Format: date-time */
+            deadline?: string;
+            /** Format: int32 */
+            order_item_count?: number;
+            /** Format: double */
+            total_amount?: number;
+            is_mine?: boolean;
+            is_joined?: boolean;
+            /** Format: date-time */
+            created_at?: string;
+        };
+        UserOrderListItemResponsePaginationList: {
+            items?: components["schemas"]["UserOrderListItemResponse"][] | null;
+            /** Format: int32 */
+            total?: number;
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            page_size?: number;
+        };
+        UserOrderListItemResponsePaginationListApiResponse: {
+            data?: components["schemas"]["UserOrderListItemResponsePaginationList"];
+            message?: string | null;
+            /** Format: int32 */
+            code?: number;
+            error?: string | null;
+            errors?: {
+                [key: string]: string[];
+            } | null;
+        };
+        UserOrderSummary: {
+            /** Format: int32 */
+            total_items?: number;
+            /** Format: double */
+            total_amount?: number;
+            /** Format: int32 */
+            recipient_count?: number;
         };
         UserProfileResponse: {
             /** Format: int32 */
